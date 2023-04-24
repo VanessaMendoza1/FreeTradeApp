@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "836632075133",
+    "firebase_url": "https://freetrade-fc705-default-rtdb.firebaseio.com",
+    "project_id": "freetrade-fc705",
+    "storage_bucket": "freetrade-fc705.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836632075133:android:553ec8ce3f3b0bc37f8a14",
+        "android_client_info": {
+          "package_name": "com.freetrade"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "836632075133-ubaqd9021ll6pcc48k4o9ha13aq28pcl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEy8rvXrZugJcyxM2hQx2DEZqySpb1pwI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "836632075133-ubaqd9021ll6pcc48k4o9ha13aq28pcl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "836632075133-hsrqq38u09836sivp8fjllsp262jtf9d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.FreeTrade"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
