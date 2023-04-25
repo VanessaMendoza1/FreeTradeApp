@@ -24,6 +24,137 @@ import {DataInsert} from '../../redux/counterSlice';
 import auth from '@react-native-firebase/auth';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
 
+const openPhoto = (setloading, setShowUploadBox, setImgeUrl, updateDetails) => {
+  setloading(true);
+  ImagePicker.openPicker({
+    width: 300,
+    height: 400,
+    cropping: true,
+  })
+    .then(image => {
+      console.log(image.path);
+      setShowUploadBox(false);
+      // end
+      const uploadTask = storage()
+        .ref()
+        .child(`/items/${Date.now()}`)
+        .putFile(image.path);
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          var progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (progress == 100) {
+            // console.warn('DONE');
+          }
+        },
+        error => {
+          console.log(error);
+          setloading(false);
+          alert('Something went wrong');
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            setloading(false);
+            setImgeUrl(downloadURL);
+            updateDetails(downloadURL);
+          });
+        },
+      );
+
+      // end
+    })
+    .catch(err => {
+      setShowUploadBox(false);
+      console.warn(err);
+      setloading(false);
+      alert('Something went wrong');
+    });
+};
+
+const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => {
+  // setloading(true);
+  ImagePicker.openCamera({
+    width: 300,
+    height: 400,
+    cropping: true,
+  })
+    .then(image => {
+      console.log(image.path);
+      setShowUploadBox(false);
+      // end
+      const uploadTask = storage()
+        .ref()
+        .child(`/items/${Date.now()}`)
+        .putFile(image.path);
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          var progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (progress == 100) {
+            // console.warn('DONE');
+          }
+        },
+        error => {
+          console.log(error);
+          setloading(false);
+          alert('Something went wrong');
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            setloading(false);
+            setImgeUrl(downloadURL);
+            updateDetails(downloadURL);
+          });
+        },
+      );
+
+      // end
+    })
+    .catch(err => {
+      setShowUploadBox(false);
+      console.warn(err);
+      setloading(false);
+      alert('Something went wrong');
+    });
+};
+
+const updateDetails = downloadURL => {
+  setloading(true);
+  firestore()
+    .collection('Users')
+    .doc(MyData.UserID)
+    .update({
+      image: downloadURL ? downloadURL : MyData.image,
+    })
+    .then(async () => {
+      let userData = [];
+      await firestore()
+        .collection('Users')
+        .doc(MyData.UserID)
+        .get()
+        .then(documentSnapshot => {
+          if (documentSnapshot.exists) {
+            userData.push(documentSnapshot.data());
+          }
+        })
+        .catch(err => {
+          setloading(false);
+          console.warn(err);
+        });
+
+      await dispatch(DataInsert(userData[0]));
+      alert('Profile Picture Updated');
+      setloading(false);
+      navigation.goBack();
+    })
+    .catch(err => {
+      setloading(false);
+      console.log(err);
+    });
+};
+
 const EditAccount = ({navigation}) => {
   const MyData = useSelector(state => state.counter.data);
   // console.warn(MyData.email);
@@ -83,135 +214,6 @@ const EditAccount = ({navigation}) => {
   
   }, []);
 
-  const openPhoto = () => {
-    setloading(true);
-    ImagePicker.openPicker({
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        console.log(image.path);
-        setShowUploadBox(false);
-        // end
-        const uploadTask = storage()
-          .ref()
-          .child(`/items/${Date.now()}`)
-          .putFile(image.path);
-        uploadTask.on(
-          'state_changed',
-          snapshot => {
-            var progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            if (progress == 100) {
-              // console.warn('DONE');
-            }
-          },
-          error => {
-            console.log(error);
-            setloading(false);
-            alert('Something went wrong');
-          },
-          () => {
-            uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-              setloading(false);
-              setImgeUrl(downloadURL);
-              updateDetails(downloadURL);
-            });
-          },
-        );
-
-        // end
-      })
-      .catch(err => {
-        setShowUploadBox(false);
-        console.warn(err);
-        setloading(false);
-        alert('Something went wrong');
-      });
-  };
-  const openCamera = () => {
-    // setloading(true);
-    ImagePicker.openCamera({
-      width: 300,
-      height: 400,
-      cropping: true,
-    })
-      .then(image => {
-        console.log(image.path);
-        setShowUploadBox(false);
-        // end
-        const uploadTask = storage()
-          .ref()
-          .child(`/items/${Date.now()}`)
-          .putFile(image.path);
-        uploadTask.on(
-          'state_changed',
-          snapshot => {
-            var progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            if (progress == 100) {
-              // console.warn('DONE');
-            }
-          },
-          error => {
-            console.log(error);
-            setloading(false);
-            alert('Something went wrong');
-          },
-          () => {
-            uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-              setloading(false);
-              setImgeUrl(downloadURL);
-              updateDetails(downloadURL);
-            });
-          },
-        );
-
-        // end
-      })
-      .catch(err => {
-        setShowUploadBox(false);
-        console.warn(err);
-        setloading(false);
-        alert('Something went wrong');
-      });
-  };
-
-  const updateDetails = downloadURL => {
-    setloading(true);
-    firestore()
-      .collection('Users')
-      .doc(MyData.UserID)
-      .update({
-        image: downloadURL ? downloadURL : MyData.image,
-      })
-      .then(async () => {
-        let userData = [];
-        await firestore()
-          .collection('Users')
-          .doc(MyData.UserID)
-          .get()
-          .then(documentSnapshot => {
-            if (documentSnapshot.exists) {
-              userData.push(documentSnapshot.data());
-            }
-          })
-          .catch(err => {
-            setloading(false);
-            console.warn(err);
-          });
-
-        await dispatch(DataInsert(userData[0]));
-        alert('Profile Picture Updated');
-        setloading(false);
-        navigation.goBack();
-      })
-      .catch(err => {
-        setloading(false);
-        console.log(err);
-      });
-  };
   const updateName = () => {
     setloading(true);
     firestore()
@@ -428,13 +430,13 @@ const EditAccount = ({navigation}) => {
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={openCamera}>
+            onPress={openCamera(setShowUploadBox, setloading, setImgeUrl, updateDetails)}>
             <Text>From Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={openPhoto}>
+            onPress={() => openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)}>
             <Text>From Gallery</Text>
           </TouchableOpacity>
         </View>
@@ -443,6 +445,7 @@ const EditAccount = ({navigation}) => {
   );
 };
 
+export { openPhoto, openCamera, updateDetails }
 export default EditAccount;
 
 const styles = StyleSheet.create({

@@ -1,34 +1,24 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 import Colors from '../utils/Colors';
-import { getCurrentLocalTime } from "../utils/time"
-import Icons from "../utils/icons"
+import { convertToLocalTime, getCurrentTimeStamp } from "../utils/time"
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
 const MsgComponent = props => {
   const {sender, item} = props;
-  
-  // if (item.text == "From yamileth"){
-    
-  //   console.log({item})
-  // }
-  // console.log(getCurrentLocalTime())
-
   React.useEffect(() => {
     setMessageSeenTime(item)
   }, [item])
 
   const isMessageForCurrentUser = (messageData) => {
     const currentUser = auth().currentUser.uid
-    // return currentUser.id == messageData.to // 
-    return "G7t8asZeawP3ZqHCOkJOpklHwH32" == messageData.to
+    return currentUser.id == messageData.to
   }
 
   const isMessageForOtherUser = (messageData) => {
     const currentUser = auth().currentUser.uid
-    // return currentUser.id != messageData.to
-    return "G7t8asZeawP3ZqHCOkJOpklHwH32" != messageData.to
+    return currentUser.id != messageData.to
   }
 
   const setMessageSeenTime = (messageData) => {
@@ -36,11 +26,9 @@ const MsgComponent = props => {
     if (!isMessageSeenBefore && isMessageForCurrentUser(messageData)){
       database()
         .ref('/messages/' + messageData.roomId + '/' + messageData.id + '/seenTime')
-        .set(getCurrentLocalTime())
-        .then(() => console.log('HERE UPDATED AGAIN !!!' + getCurrentLocalTime()))
-        // .catch((err) => console.log(err))
-    } else if (!isMessageForCurrentUser(messageData)){
-      // console.log("MESSAGE FOR OTHER PERSON")
+        .set(getCurrentTimeStamp())
+        .then(() => console.log('HERE UPDATED AGAIN !!!' + getCurrentTimeStamp()))
+        .catch((err) => console.log(err))
     }
   }
 
@@ -54,8 +42,9 @@ const MsgComponent = props => {
         paddingRight: isMessageForOtherUser(item) ? 10 : 0,
         paddingLeft: isMessageForCurrentUser(item) ? 10 : 0,
       }}>
-        {item.sendTime}
+        {convertToLocalTime(item.sendTime)}
       </Text>
+
       <View
         style={[
           styles.masBox,
@@ -74,9 +63,8 @@ const MsgComponent = props => {
           }}>
           {item.message}
         </Text>
-        
-      
       </View>
+      
       {isMessageForOtherUser(item) && (
         <Text style={{
           fontSize: 9,

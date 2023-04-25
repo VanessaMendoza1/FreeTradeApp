@@ -168,48 +168,12 @@ const SearchScreen = ({navigation}) => {
       {/* button Containers */}
       {activeField === 'Services' && (
         <>
-          {/* {ServiceData.length >= 1 ? (
-            <FlatList
-              data={ServiceData}
-              contentContainerStyle={{paddingBottom: h('3%')}}
-              numColumns={3}
-              renderItem={({item}) => (
-                <View
-                  style={{
-                    flex: 1,
-                    margin: 5,
-                    backgroundColor: '#fff',
-                    height: h('25%'),
-                  }}>
-                  <ServiceItem
-                    item={item}
-                    onPress={() => {
-                      navigation.navigate('PostScreen', {data: item});
-                    }}
-                  />
-                </View>
-              )}
-              keyExtractor={item => item.id}
-            />
-          ) : (
-            <View style={styles.ViewMainFrame}>
-              <Text>No search results. Please try changing your</Text>
-              <Text>location to find in a different city.</Text>
-            </View>
-          )} */}
-
           {ServiceAllData.length >= 1 ? (
             <FlatList
               data={ServiceAllData}
               contentContainerStyle={{paddingBottom: h('3%')}}
               numColumns={3}
               renderItem={({item}) => {
-                const lat1 = latitude; // Latitude of first coordinate
-                const lon1 = longitude; // Longitude of first coordinate
-                const lat2 = item.user.latitude; // Latitude of second coordinate
-                const lon2 = item.user.longitude;
-                const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
                 return (
                   <>
                     <View
@@ -241,52 +205,12 @@ const SearchScreen = ({navigation}) => {
       )}
       {activeField === 'Selling' && (
         <>
-          {/* {SellingData.length >= 1 ? (
-            <FlatList
-              data={SellingData}
-              contentContainerStyle={{paddingBottom: h('3%')}}
-              numColumns={3}
-              renderItem={({item}) => (
-                <View
-                  style={{
-                    flex: 1,
-                    margin: 5,
-                    backgroundColor: '#fff',
-                    height: h('25%'),
-                  }}>
-                  <ServiceItem
-                    item={item}
-                    onPress={() => {
-                      navigation.navigate('PostScreen', {data: item});
-                    }}
-                  />
-                </View>
-              )}
-              keyExtractor={item => item.id}
-            />
-          ) : (
-            <View style={styles.ViewMainFrame}>
-              <Text>No search results. Please try changing your</Text>
-              <Text>location to find in a different city.</Text>
-            </View>
-          )} */}
-
           {SellingAllData.length >= 1 ? (
             <FlatList
               data={SellingAllData}
               contentContainerStyle={{paddingBottom: h('3%')}}
               numColumns={3}
               renderItem={({item, index}) => {
-                // const lat1 = latitude; // Latitude of first coordinate
-                // const lon1 = longitude; // Longitude of first coordinate
-                // const lat2 = item.user.latitude; // Latitude of second coordinate
-                // const lon2 = item.user.longitude;
-                // const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
-                // const distnaceMile = getPreciseDistance(
-                //   {latitude: latitude, longitude: longitude},
-                //   {latitude: lat2, longitude: lon2},
-                // );
 
                 return (
                   <>
@@ -319,36 +243,6 @@ const SearchScreen = ({navigation}) => {
       )}
       {activeField === 'Trading' && (
         <>
-          {/* {TradingData.length >= 1 ? (
-            <FlatList
-              data={TradingData}
-              contentContainerStyle={{paddingBottom: h('3%')}}
-              numColumns={3}
-              renderItem={({item}) => (
-                <View
-                  style={{
-                    flex: 1,
-                    margin: 5,
-                    backgroundColor: '#fff',
-                    height: h('25%'),
-                  }}>
-                  <ServiceItem
-                    item={item}
-                    onPress={() => {
-                      navigation.navigate('PostScreen', {data: item});
-                    }}
-                  />
-                </View>
-              )}
-              keyExtractor={item => item.id}
-            />
-          ) : (
-            <View style={styles.ViewMainFrame}>
-              <Text>No search results. Please try changing your</Text>
-              <Text>location to find in a different city.</Text>
-            </View>
-          )} */}
-
           {TradingAllData.length >= 1 ? (
             <FlatList
               data={TradingAllData}

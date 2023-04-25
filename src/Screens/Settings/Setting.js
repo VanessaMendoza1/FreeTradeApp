@@ -5,11 +5,14 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ScrollView
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import Appbutton from '../../Components/Appbutton';
 import SettingItem from '../../Components/SettingItem';
 import Icons from '../../utils/icons';
@@ -18,6 +21,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector, useDispatch} from 'react-redux';
 
 const Setting = ({navigation}) => {
+  const [ isBusinessAccount, setIsBusinessAccount ] = React.useState(false)
+  React.useEffect(() => {
+    // isUserHavingBussinessSubscription()
+    setIsBusinessAccount(true)
+  }, [])
   const MyData = useSelector(state => state.counter.data);
   console.warn(MyData.name);
 
@@ -32,103 +40,182 @@ const Setting = ({navigation}) => {
     console.log('Done.');
   };
 
+  const isUserHavingBussinessSubscription = async () => {
+    let currentUserId = auth().currentUser.uid
+    await firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          let userData = documentSnapshot.data()
+          console.log({userData})
+          if (userData.AccountType == "Bussiness"){
+            setIsBusinessAccount(true)
+          }
+        }
+      })
+      .catch(err => {
+        setloading(false);
+        console.warn(err);
+      });
+  }
+
   return (
-    <View style={styles.MainContainer}>
-      {/* header */}
-      <View style={styles.Header}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-          style={styles.LeftContainer}>
-          <Icon name="arrow-back-outline" size={30} color="#ffff" />
-        </TouchableOpacity>
-        <View style={styles.MiddleContainer}>
-          <Text style={styles.FontWork}>Setting</Text>
-        </View>
-      </View>
-      {/* header */}
+    <ScrollView>
 
-      {/* profile Container */}
-      <View style={styles.ProfileContainer}>
-        <View style={styles.ProfileCC}>
-          <Image
-            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            source={{
-              uri: MyData.image
-                ? MyData.image
-                : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+      <View style={styles.MainContainer}>
+        {/* header */}
+        <View style={styles.Header}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
             }}
-          />
+            style={styles.LeftContainer}>
+            <Icon name="arrow-back-outline" size={30} color="#ffff" />
+          </TouchableOpacity>
+          <View style={styles.MiddleContainer}>
+            <Text style={styles.FontWork}>Setting</Text>
+          </View>
         </View>
-        <Text style={styles.nameText}>
-          {MyData.BussinessDetails === true ? MyData.BusinessName : MyData.name}
-        </Text>
-      </View>
-      {/* profile Containr */}
-      <View style={styles.mainContainerSetting}>
-        {/* <SettingItem
-          onPress={() => {
-            navigation.navigate('VerifyNumber');
-          }}
-          text={'Verify Account'}>
-          {Icons.Verify({
-            tintColor: Colors.Primary,
-          })}
-        </SettingItem> */}
+        {/* header */}
 
-      
+        {/* profile Container */}
+        <View style={styles.ProfileContainer}>
+          <View style={styles.ProfileCC}>
+            <Image
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              source={{
+                uri: MyData.image
+                  ? MyData.image
+                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+              }}
+            />
+          </View>
+          <Text style={styles.nameText}>
+            {MyData.BussinessDetails === true ? MyData.BusinessName : MyData.name}
+          </Text>
+        </View>
+        {/* profile Containr */}
+        <View style={styles.mainContainerSetting}>
+          {/* <SettingItem
+            onPress={() => {
+              navigation.navigate('VerifyNumber');
+            }}
+            text={'Verify Account'}>
+            {Icons.Verify({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem> */}
+
+          {isBusinessAccount ? (
+            <SettingItem
+              onPress={() => {
+                navigation.navigate('BussinessAccountEdits');
+              }}
+              text={'Business Account edits'}>
+              {Icons.Bussiness({
+                tintColor: Colors.Primary,
+              })}
+            </SettingItem>
+          ) : (
+            <SettingItem
+              onPress={() => {
+                navigation.navigate('EditAccount');
+              }}
+              text={'Edit Account'}>
+              {Icons.Pencil({
+                tintColor: Colors.Primary,
+              })}
+            </SettingItem>
+          )}
+        
+
           <SettingItem
             onPress={() => {
-              navigation.navigate('BussinessAccountEdits');
+              navigation.navigate('LocationPage');
             }}
-            text={'Business Account edits'}>
-            {Icons.Bussiness({
+            text={'Add My Location'}>
+            {Icons.LocationPinIcon({
               tintColor: Colors.Primary,
             })}
           </SettingItem>
-        
+
           <SettingItem
             onPress={() => {
-              navigation.navigate('EditAccount');
+              navigation.navigate('Notification');
             }}
-            text={'Edit Account'}>
-            {Icons.Pencil({
+            text={'Notification'}>
+            {Icons.NotificationIcon({
               tintColor: Colors.Primary,
             })}
           </SettingItem>
-        
-        <SettingItem text={'Privacy Policy'}>
-          {Icons.Terms({
-            tintColor: Colors.Primary,
-          })}
-        </SettingItem>
-        <SettingItem text={'Terms and Conditions'}>
-          {Icons.Info({
-            tintColor: Colors.Primary,
-          })}
-        </SettingItem>
 
-        <SettingItem
-          onPress={() => {
-            navigation.navigate('SubscriptionPage');
-          }}
-          text={'Subscription'}>
-          {Icons.Subscribe({
-            tintColor: Colors.Primary,
-          })}
-        </SettingItem>
-        <SettingItem
-          onPress={() => {
-            clearAll();
-          }}
-          text={'Logout'}>
-          {Icons.Logout({
-            tintColor: Colors.Primary,
-          })}
-        </SettingItem>
+          <SettingItem
+            onPress={() => {
+              navigation.navigate('FavouriteItems');
+            }}
+            text={'Favourites'}>
+            {Icons.HeartIcon({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+
+          <SettingItem
+            onPress={() => {
+              navigation.navigate('ContactUs');
+            }}
+            text={'Contact Us'}>
+            {Icons.ContactUs({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+          
+          
+          <SettingItem text={'Privacy Policy'}>
+            {Icons.Terms({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+          <SettingItem text={'Terms and Conditions'}>
+            {Icons.Info({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+
+          <SettingItem
+            onPress={() => {
+              navigation.navigate('SubscriptionPage');
+            }}
+            text={'Subscription'}>
+            {Icons.Subscribe({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+
+          {/* <SettingItem
+            onPress={() => {
+              navigation.navigate('CancelSubscriptionPage');
+            }}
+            text={'Cancel Subscription'}>
+            {Icons.CancelSubscriptionIcon({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem> */}
+
+          <SettingItem
+            onPress={() => {
+              clearAll();
+            }}
+            text={'Logout'}>
+            {Icons.Logout({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+        </View>
+
+        
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -138,6 +225,7 @@ const styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
     backgroundColor: 'white',
+    paddingBottom: 100,
   },
   Header: {
     width: '100%',

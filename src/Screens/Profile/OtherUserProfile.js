@@ -49,7 +49,6 @@ const OtherUserProfile = ({navigation, route}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           if (documentSnapshot.data().UserID === route.params.data.UserID) {
-            console.log({ID_BEING_SEND: documentSnapshot._data.DocId})
             let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
             if (documentSnapshot.data().PostType === 'Trading') {
               TradingData.push(newDataObject);

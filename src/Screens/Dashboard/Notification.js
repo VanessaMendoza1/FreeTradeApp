@@ -96,7 +96,6 @@ const Notification = ({navigation}) => {
                           let newlyAddedItemData = documentSnapshot.data()
                           navigation.navigate('PostScreen', {data: newlyAddedItemData});
                         }
-                        // or
                       });
                   } else if (item.sellerData.UserID){
                     navigation.navigate('Review', {data: item.sellerData});

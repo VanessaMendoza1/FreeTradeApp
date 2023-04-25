@@ -152,26 +152,21 @@ const PostScreen = ({navigation, route}) => {
     let similarItems = []
     await firestore()
       .collection('Post')
-      // .where('PostType', '==', 'Selling') NOT NEEDED
-      // .where('Category', '==', data.Category)
-      // .where('SubCategory', '==', data.SubCategory)
+      .where('Category', '==', data.Category)
+      .where('SubCategory', '==', data.SubCategory)
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          similarItems.push(documentSnapshot.data())
+          similarItems.push({...documentSnapshot.data(), id: documentSnapshot.id})
         });
-        console.log({similarItems})
         setSitem(similarItems)
       });
   }
 
   const randomItem = () => {
-    console.log(AllPostData);
-
     const arr = AllPostData.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
-    console.log({arr})
     // console.warn(arr);
 
     setSitem(arr.slice(0, 3));
@@ -272,7 +267,7 @@ const PostScreen = ({navigation, route}) => {
   //     scrollViewRef.current.scrollTo({y: 0, animated: true});
   //   }
   // };
-
+  console.log({VideoAd: VideoAd[0]})
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -592,6 +587,13 @@ const PostScreen = ({navigation, route}) => {
                         <Text style={styles.videoShoesTag2}>
                           {VideoAd[0].TagLine}
                         </Text>
+
+                        
+                          <Text style={styles.MainText2}>{VideoAd[0].user.Address}</Text>
+                          {(VideoAd[0].user?.Phone !== undefined) && (
+                            <Text style={styles.MainText2}>Call: {VideoAd[0].user.Phone}</Text>
+                          )}
+
                       </View>
                     </>
                   )}
@@ -609,7 +611,7 @@ const PostScreen = ({navigation, route}) => {
                 data={Sitem}
                 horizontal={true}
                 renderItem={({item}) => {
-                  console.log({item})
+                  // console.log({item})
                   if (item.images){
                     return (
                       <TouchableOpacity
@@ -1010,7 +1012,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     width: '100%',
-    height: h('10%'),
+    height: h('12.5%'),
 
     backgroundColor: '#fff',
 

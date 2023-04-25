@@ -21,7 +21,7 @@ import {DataInsert} from '../../redux/counterSlice';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import LoadingScreen from '../../Components/LoadingScreen';
-
+import { openPhoto, openCamera, updateDetails } from './EditAccount'
 const heightDropItem = 40;
 
 const BussinessAccountEdits = ({navigation}) => {
@@ -32,21 +32,62 @@ const BussinessAccountEdits = ({navigation}) => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [modalType, setmodalType] = React.useState('');
 
+  const [ImageUrl, setImgeUrl] = React.useState('');
+  const [showUploadBox, setShowUploadBox] = React.useState(false);
+
   const [items, setItems] = React.useState([
+    {label: '0:00 Am', value: '0:00 Am'},
+    {label: '1:00 Am', value: '1:00 Am'},
+    {label: '2:00 Am', value: '2:00 Am'},
+    {label: '3:00 Am', value: '3:00 Am'},
+    {label: '4:00 Am', value: '4:00 Am'},
+    {label: '5:00 Am', value: '5:00 Am'},
     {label: '6:00 Am', value: '6:00 Am'},
     {label: '7:00 Am', value: '7:00 Am'},
     {label: '8:00 Am', value: '8:00 Am'},
     {label: '9:00 Am', value: '9:00 Am'},
     {label: '10:00 Am', value: '10:00 Am'},
+    {label: '11:00 Am', value: '11:00 Am'},
+    {label: '12:00 Pm', value: '12:00 Pm'},
+    {label: '13:00 Pm', value: '13:00 Pm'},
+    {label: '14:00 Pm', value: '14:00 Pm'},
+    {label: '15:00 Pm', value: '15:00 Pm'},
+    {label: '16:00 Pm', value: '16:00 Pm'},
+    {label: '17:00 Pm', value: '17:00 Pm'},
+    {label: '18:00 Pm', value: '18:00 Pm'},
+    {label: '19:00 Pm', value: '19:00 Pm'},
+    {label: '20:00 Pm', value: '20:00 Pm'},
+    {label: '21:00 Pm', value: '21:00 Pm'},
+    {label: '22:00 Pm', value: '22:00 Pm'},
+    {label: '23:00 Pm', value: '23:00 Pm'},
   ]);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
   const [items2, setItems2] = React.useState([
-    {label: '6:00 pm', value: '6:00 pm'},
-    {label: '7:00 pm', value: '7:00 pm'},
-    {label: '8:00 pm', value: '8:00 pm'},
-    {label: '9:00 pm', value: '9:00 pm'},
-    {label: '10:00 pm', value: '10:00 pm'},
+    {label: '0:00 Am', value: '0:00 Am'},
+    {label: '1:00 Am', value: '1:00 Am'},
+    {label: '2:00 Am', value: '2:00 Am'},
+    {label: '3:00 Am', value: '3:00 Am'},
+    {label: '4:00 Am', value: '4:00 Am'},
+    {label: '5:00 Am', value: '5:00 Am'},
+    {label: '6:00 Am', value: '6:00 Am'},
+    {label: '7:00 Am', value: '7:00 Am'},
+    {label: '8:00 Am', value: '8:00 Am'},
+    {label: '9:00 Am', value: '9:00 Am'},
+    {label: '10:00 Am', value: '10:00 Am'},
+    {label: '11:00 Am', value: '11:00 Am'},
+    {label: '12:00 Pm', value: '12:00 Pm'},
+    {label: '13:00 Pm', value: '13:00 Pm'},
+    {label: '14:00 Pm', value: '14:00 Pm'},
+    {label: '15:00 Pm', value: '15:00 Pm'},
+    {label: '16:00 Pm', value: '16:00 Pm'},
+    {label: '17:00 Pm', value: '17:00 Pm'},
+    {label: '18:00 Pm', value: '18:00 Pm'},
+    {label: '19:00 Pm', value: '19:00 Pm'},
+    {label: '20:00 Pm', value: '20:00 Pm'},
+    {label: '21:00 Pm', value: '21:00 Pm'},
+    {label: '22:00 Pm', value: '22:00 Pm'},
+    {label: '23:00 Pm', value: '23:00 Pm'},
   ]);
   const [open2, setOpen2] = React.useState(false);
   const [value2, setValue2] = React.useState(null);
@@ -193,7 +234,31 @@ const BussinessAccountEdits = ({navigation}) => {
           </View>
           {/* header */}
           {/* profile Container */}
-          <View style={styles.ProfileContainer}>
+          
+
+          {/* <TouchableOpacity
+              onPress={() => {
+                setShowUploadBox(true);
+              }}
+              style={styles.ProfileCC}>
+              <View style={styles.CamerColar}>
+                <Icon name="camera" size={35} color="#ffff" />
+              </View>
+              <Image
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                source={{
+                  uri: MyData.image
+                    ? MyData.image
+                    : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+                }}
+              />
+            </TouchableOpacity> */}
+
+
+
+          <TouchableOpacity style={styles.ProfileContainer} onPress={() => {
+                setShowUploadBox(true);
+              }}>
             <View style={styles.ProfileCC}>
               {/* <View style={styles.CamerColar}>
               <Icon name="camera" size={35} color="#ffff" />
@@ -208,7 +273,7 @@ const BussinessAccountEdits = ({navigation}) => {
               />
             </View>
             <Text style={styles.nameText}>{MyData.name}</Text>
-          </View>
+          </TouchableOpacity>
           {/* profile Containr */}
 
           <View style={styles.bottomContaaainers}>
@@ -271,6 +336,23 @@ const BussinessAccountEdits = ({navigation}) => {
               }}
             />
           </View>
+        </View>
+      )}
+
+      {showUploadBox && (
+        <View style={styles.uploadOptionsContainer}>
+          <TouchableOpacity
+            style={styles.captureOptionItem}
+            activeOpacity={0.9}
+            onPress={openCamera(setShowUploadBox, setloading, setImgeUrl, updateDetails)}>
+            <Text>From Camera</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.captureOptionItem}
+            activeOpacity={0.9}
+            onPress={() => openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)}>
+            <Text>From Gallery</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -583,5 +665,33 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  uploadOptionsContainer: {
+    position: 'absolute',
+    backgroundColor: '#0004',
+    width: w('100%'),
+
+    alignSelf: 'center',
+    // top: '35%',
+    borderWidth: 2,
+    borderColor: '#0003',
+    bottom: 50,
+    height: '100%',
+    // alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+  },
+  captureOptionItem: {
+    textAlign: 'center',
+    justifyContent: 'center',
+    // position: 'absolute',
+    // bottom: 0,
+    backgroundColor: '#fff',
+    width: '100%',
+    height: h('10%'),
+
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderColor: '#0003',
+    borderWidth: h('0.1%'),
   },
 });

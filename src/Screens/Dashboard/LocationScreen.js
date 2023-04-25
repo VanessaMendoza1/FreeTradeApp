@@ -9,7 +9,6 @@ import React from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import {Slider} from '@miblanchard/react-native-slider'; UNINSTALL THIS
 import AppInput from '../../Components/AppInput';
 import LoadingScreen from '../../Components/LoadingScreen';
 import {DataInsert} from '../../redux/counterSlice';

@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, TouchableOpacity, Text, View, Image} from 'react-native';
 import React, {useEffect} from 'react';
 import {
   PostAdd,
@@ -6,6 +6,7 @@ import {
   SellingAdd,
   ServiceAdd,
 } from '../../redux/postSlice';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import Colors from '../../utils/Colors';
@@ -70,9 +71,13 @@ const LocationPage = ({navigation}) => {
         <View style={styles.mainContainer}>
           {/* header */}
           <View style={styles.Header}>
-            <View style={styles.LeftContainer}>
-              {/* <Icon name="arrow-back-outline" size={30} color="#ffff" /> */}
-            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+              style={styles.LeftContainer}>
+              <Icon name="arrow-back-outline" size={30} color="#ffff" />
+            </TouchableOpacity>
             <View style={styles.MiddleContainer}>
               <Text style={styles.FontWork}>Set Location</Text>
             </View>
@@ -197,7 +202,7 @@ export default LocationPage;
 
 const styles = StyleSheet.create({
   mainContainer: {
-    width: '100%',
+        flex: 1,
     height: h('95%'),
     backgroundColor: '#fff7',
   },
@@ -210,7 +215,6 @@ const styles = StyleSheet.create({
   LeftContainer: {
     width: '20%',
     height: '100%',
-    // backgroundColor: 'gold',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -235,6 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: h('2%'),
   },
   TxtGG: {
+    marginTop: 15,
     alignSelf: 'center',
     color: Colors.Primary,
     fontSize: h('2.3%'),

@@ -25,7 +25,7 @@ const Appheader = ({onSearch, onMessage, onNotification, noti}) => {
           <Icon name="search" size={30} color={Colors.Primary} />
         </View>
         <TextInput
-          placeholder="Sell/Trade"
+          placeholder="Service/Sell/Trade"
           onChangeText={text => onSearch(text)}
           style={styles.Txtinput}
           placeholderTextColor={Colors.Primary}
