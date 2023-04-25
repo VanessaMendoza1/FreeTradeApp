@@ -1,19 +1,10 @@
 const functions = require("firebase-functions");
 const axios = require("axios")
 
-// // Create and deploy your first functions
-// // https://firebase.google.com/docs/functions/get-started
-//
+
 const admin = require('firebase-admin');
 admin.initializeApp();
 
-// exports.notifyUsersWhoLikeNewlyAddedItem = functions.https.onRequest(async (request, response) => {
-// 	const original = req.query.text;
-// 	const writeResult = await admin.firestore().collection('messages').add({original: original});
-
-// 	functions.logger.info("Hello logs!", {structuredData: true});
-// 	res.json({result: `Message with ID: ${writeResult.id} added.`});
-// });
 
 // "http://localhost:5001/freetrade-fc705/us-central1/notifyUsersWhoLikeNewlyAddedItem-0"
 exports.notifyUsersWhoLikeNewlyAddedItem = functions.firestore.document('/Post/{documentId}')

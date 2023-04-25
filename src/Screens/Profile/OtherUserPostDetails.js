@@ -32,21 +32,15 @@ import {
     let currentUserId = auth().currentUser.uid
     firestore()
     .collection('Favourite')
-    // .doc()
     .where("productId", "==", itemId)
     .get()
     .then(querySnapshot => {
-      console.log('ADADADAS: ', querySnapshot.size);
       if (querySnapshot.size > 0){
         querySnapshot.forEach(documentSnapshot => {
           let favouriteItem = documentSnapshot.data()
           let usersWhoMadeItemFavourite = favouriteItem.users
           if (usersWhoMadeItemFavourite.includes(currentUserId)){
             setLikedCallback()
-            console.log("SHOWN LIKED")
-          } else {
-            console.log("NOT  SHOWN LIKED")
-
           }
         });
       }
@@ -55,127 +49,64 @@ import {
 
   const toggleMarkFavourite = async (itemId, itemCategory, itemSubCategory, isForRemovingFromFavourites = false) => {
     let currentUserId = auth().currentUser.uid
-    firestore()
-    .collection('Favourite')
-    // .doc()
-    .where("productId", "==", itemId)
-    .get()
-    .then(querySnapshot => {
-      if (querySnapshot.size > 0){
-        querySnapshot.forEach(documentSnapshot => {
-          let favouriteItem = documentSnapshot.data()
-          let usersWhoMadeItemFavourite = [...favouriteItem.users]
-          console.log({favouriteItem})
-          
-          if (!isForRemovingFromFavourites && !usersWhoMadeItemFavourite.includes(currentUserId)){
-            usersWhoMadeItemFavourite.push(currentUserId)
-          } else if (isForRemovingFromFavourites && usersWhoMadeItemFavourite.includes(currentUserId)){
-            // usersWhoMadeItemFavourite.remove(currentUserId)
-
-            const userIndexFound = usersWhoMadeItemFavourite.indexOf(currentUserId);
-            usersWhoMadeItemFavourite.splice(userIndexFound, 1); // 2nd parameter means remove one item only
-
-          }
-          console.log({usersWhoMadeItemFavourite})
-          if (usersWhoMadeItemFavourite.length > 0){
-            console.log("1")
-            firestore()
-              .collection('Favourite')
-              .doc(documentSnapshot.id)
-              .update("users", usersWhoMadeItemFavourite)
-              .catch((updateErr) => {
-                console.log({updateErr})
-              })
-            console.log("UPDATE OR REMOVED FAVOURITE")
-          } else {
-            console.log("2")
-            firestore()
-              .collection('Favourite')
-              .doc(documentSnapshot.id)
-              .delete()
-              .catch((deleteErr) => {
-                console.log({deleteErr})
-              })
-          }
-        });
-      } else {
-        if (isForRemovingFromFavourites){
-          console.log("DIDNT NEED TO DO ANYTHIN")
-          return
-        }
-        console.log({ADDING: {
-          productId: itemId,
-          category: itemCategory,
-          subCategory: itemSubCategory,
-          users: [ currentUserId ]
-        }})
-        firestore()
-          .collection('Favourite')
-          .add({
-            productId: itemId,
-            category: itemCategory,
-            subCategory: itemSubCategory,
-            users: [ currentUserId ]
-          })
-          .catch((setErr) => {
-            console.log({setErr})
-          })
-          console.log("SET FAVOURITE")
-      }
-
-
-    })
-    // .catch((overAll) => {
-    //   console.log({overAll})
-    // })
     
-    // try {
-    //   console.log({itemId})
-    //   let currentUserId = auth().currentUser
-    //   console.log(" HERE")
-    //   let querySnapshot = await firestore()
-    //     .collection('Favourite')
-    //     // .doc()
-    //     // .where("productId", "==", itemId)
-    //     .get()
-    //   console.log({querySnapshot:querySnapshot})
-    //   if (querySnapshot.length > 0){
-    //     let usersWhoMadeItemFavourite = [...favouriteItem.users]
-    //     let favouriteItem = querySnapshot[0].data()
-    //     console.log({favouriteItem})
-        
-    //     if (!isForRemovingFromFavourites && !usersWhoMadeItemFavourite.includes(currentUserId)){
-    //       usersWhoMadeItemFavourite.push(currentUserId)
-    //     } else if (isForRemovingFromFavourites && usersWhoMadeItemFavourite.includes(currentUserId)){
-    //       sersWhoMadeItemFavourite.remove(currentUserId)
-    //     }
-    //     console.log({usersWhoMadeItemFavourite})
-    //     await firestore()
-    //       .collection('Favourite')
-    //       .doc()
-    //       .where("productId", "==", itemId)
-    //       .update("users", usersWhoMadeItemFavourite)
-    //     console.log("UPDATE OR REMOVED FAVOURITE")
-    //   } else {
-    //     if (isForRemovingFromFavourites){
-    //       console.log("DIDNT NEED TO DO ANYTHIN")
-    //       return
-    //     }
-    //     await firestore()
-    //       .collection('Favourite')
-    //       .doc()
-    //       .set({
-    //         productId: itemId,
-    //         category: itemCategory,
-    //         subCategory: itemSubCategory,
-    //         users: [ currentUserId ]
-    //       })
-    //       console.log("SET FAVOURITE")
-    //   }
-    // } catch (err){
-    //   console.log("CAUGHT FAVOURITE ERROR")
-    //   console.log(err)
-    // }
+    firestore()
+      .collection('Favourite')
+      .where("productId", "==", itemId)
+      .get()
+      .then(querySnapshot => {
+        if (querySnapshot.size > 0){
+          querySnapshot.forEach(documentSnapshot => {
+            let favouriteItem = documentSnapshot.data()
+            let usersWhoMadeItemFavourite = [...favouriteItem.users]
+            
+            if (!isForRemovingFromFavourites && !usersWhoMadeItemFavourite.includes(currentUserId)){
+              usersWhoMadeItemFavourite.push(currentUserId)
+            } else if (isForRemovingFromFavourites && usersWhoMadeItemFavourite.includes(currentUserId)){
+              const userIndexFound = usersWhoMadeItemFavourite.indexOf(currentUserId);
+              usersWhoMadeItemFavourite.splice(userIndexFound, 1);
+            }
+
+            if (usersWhoMadeItemFavourite.length > 0){
+              firestore()
+                .collection('Favourite')
+                .doc(documentSnapshot.id)
+                .update("users", usersWhoMadeItemFavourite)
+                .catch((updateErr) => {
+                  console.log({updateErr})
+                })
+              
+            } else {
+
+              firestore()
+                .collection('Favourite')
+                .doc(documentSnapshot.id)
+                .delete()
+                .catch((deleteErr) => {
+                  console.log({deleteErr})
+                })
+            }
+          });
+        } else {
+          if (isForRemovingFromFavourites){
+            return
+          }
+          firestore()
+            .collection('Favourite')
+            .add({
+              productId: itemId,
+              category: itemCategory,
+              subCategory: itemSubCategory,
+              users: [ currentUserId ]
+            })
+            .catch((setErr) => {
+              console.log({setErr})
+            })
+        }
+      })
+      .catch((overAllError) => {
+        console.log({overAllError})
+      })
   }
 
   const OtherUserPostDetails = ({navigation, route}) => {

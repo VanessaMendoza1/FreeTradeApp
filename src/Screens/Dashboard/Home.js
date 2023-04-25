@@ -23,7 +23,6 @@ import {SubDataAdd} from '../../redux/subSlicer';
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
-import Carousel from 'react-native-reanimated-carousel';
 
 import {getPreciseDistance} from 'geolib';
 
@@ -61,7 +60,6 @@ const Home = ({navigation}) => {
   const ServiceAllData = useSelector(state => state.post.ServiceData);
   const SellingAllData = useSelector(state => state.post.SellingData);
   const TradingAllData = useSelector(state => state.post.TradingData);
-  console.log({TradingAllData})
   const [Notii, setNotii] = React.useState('');
 
   const [searchValue, setSearchValue] = React.useState('');
@@ -74,9 +72,7 @@ const Home = ({navigation}) => {
   // console.warn(UserData.longitude);
 
   const ImageAds = useSelector(state => state.ads.ImageData);
-  console.log({ImageAds})
   const subdata = useSelector(state => state.sub.subdata);
-  console.log({subdata})
   // console.warn(subdata[0].plan === 'Business');
   // console.warn(subdata.length > 0);
 
@@ -220,13 +216,9 @@ const Home = ({navigation}) => {
   };
 
   const allpost = async () => {
-    console.log("")
-    console.log("TRIGGERED")
-    console.log("")
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
-    console.log({UserData})
     const lat1 = UserData.latitude; // Latitude of first coordinate
     const lon1 = UserData.longitude; // Longitude of first coordinate
 
@@ -257,13 +249,9 @@ const Home = ({navigation}) => {
         });
       })
       .catch((err) =>  {
-        console.log("CHECK THIS")
-        console.log("CHECK THIS")
         console.log(err)
       })
-    console.log({FINAL: SellingData})
-    console.log({FINAL: TradingData})
-    console.log({FINAL: ServiceData})
+
     await dispatch(SellingAdd(SellingData));
     await dispatch(TradingAdd(TradingData));
     await dispatch(ServiceAdd(ServiceData));
@@ -272,10 +260,7 @@ const Home = ({navigation}) => {
   const focus = useIsFocused();
 
   useEffect(() => {
-
-      // if condition required here because it will call the function even when you are not focused in the screen as well, because we passed it as a dependencies to useEffect hook
-      allpost();
-     
+    allpost();
   }, []);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
@@ -336,9 +321,6 @@ const Home = ({navigation}) => {
       <View style={styles.mainContainer}>
         <Appheader
           onSearch={searchFilter}
-          // onSearch={() => {
-          //   navigation.navigate('SearchScreen'); // TURNED OFF
-          // }}
           onMessage={() => {
             navigation.navigate('MessageScreen');
           }}
@@ -372,26 +354,7 @@ const Home = ({navigation}) => {
             )}
           />
         </View>
-        {/* <Carousel
-          loop
-          width={w}
-          height={w / 2}
-          autoPlay={true}
-          data={ImageAds}
-          scrollAnimationDuration={1000}
-          onSnapToItem={(index) => console.log('current index:', index)}
-          renderItem={({ index }) => (
-            <Ads
-              onPress={() => {
-                alert('It will take to User Screen');
-                // navigation.navigate('OtherUserProfile', {
-                //   data: item.user,
-                // });
-              }}
-              data={item}
-            />
-          )}
-        /> */}
+        
         {/* {ImageAds.length > 0 ? (
           <>
             {subdata.length > 0 && (

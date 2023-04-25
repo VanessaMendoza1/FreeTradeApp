@@ -62,10 +62,6 @@ const PostSubmitDetails = ({navigation, route}) => {
   const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
 
-  const notifyUsersWhoMightLikeThisItem = () => {
-
-  }
-
   const onSubmit = () => {
     let POstId = uuid.v4();
     setloading(true);

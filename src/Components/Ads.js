@@ -1,6 +1,7 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
+import { formatPhoneNumber } from '../utils/phoneNumberFormatter'
 import Colors from '../utils/Colors';
 
 let img =
@@ -26,7 +27,7 @@ const Ads = ({data, onPress}) => {
         <>
           <Text style={styles.MainText2}>{data.user.Address}</Text>
           {(data.user?.Phone !== undefined) && (
-            <Text style={styles.MainText2}>Call: {data.user.Phone}</Text>
+            <Text style={styles.MainText2}>Call: {formatPhoneNumber(data.user.Phone)}</Text>
           )}
         </>
       )}

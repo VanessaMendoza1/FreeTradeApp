@@ -623,15 +623,14 @@ const MakePost = ({navigation}) => {
                 value={Title}
               />
 
-              {toggleCheckBox2 ||
-                (toggleCheckBox && (
-                  <TextInput
-                    style={styles.inputTxtC}
-                    placeholder={'Price (Optional)'}
-                    onChangeText={e => setPrice(e)}
-                    placeholderTextColor={Colors.Primary}
-                  />
-                ))}
+              {(toggleCheckBox2 || toggleCheckBox) && (
+                <TextInput
+                  style={styles.inputTxtC}
+                  placeholder={'Price (Optional)'}
+                  onChangeText={e => setPrice(e)}
+                  placeholderTextColor={Colors.Primary}
+                />
+              )}
 
               <Text style={styles.ImgVides}>Add Video (optional)</Text>
 

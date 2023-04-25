@@ -42,6 +42,7 @@ import VerificationDone from '../Screens/Settings/VerificationDone';
 import BussinessAccountEdits from '../Screens/Settings/BussinessAccountEdits';
 import SubscriptionPage from '../Screens/Settings/SubscriptionPage';
 import ImageScreen from '../Screens/Post/ImageScreen';
+import FavouriteItemsScreen from '../Screens/Settings/FavouriteItemsScreen'
 
 import TabNavigation from './TabNavigation';
 
@@ -83,6 +84,7 @@ const StackNavigation = () => {
         <Stack.Screen name="ImageScreen" component={ImageScreen} />
         <Stack.Screen name="VerificationDone" component={VerificationDone} />
         <Stack.Screen name="SubscriptionPage" component={SubscriptionPage} />
+        <Stack.Screen name="FavouriteItems" component={FavouriteItemsScreen} />
         <Stack.Screen
           name="BussinessAccountEdits"
           component={BussinessAccountEdits}

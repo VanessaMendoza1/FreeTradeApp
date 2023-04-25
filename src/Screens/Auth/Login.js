@@ -38,83 +38,7 @@ const Login = ({navigation}) => {
   const [loading, setloading] = useState(false);
 
   const dispatch = useDispatch();
-  React.useEffect(() => {
-    auth()
-      .signInWithEmailAndPassword("arsalan.ahmad.ishaq@gmail.com", "animation")
-      .then(async userCredential => {
-        const user = userCredential.user;
 
-        
-        if (user.emailVerified) {
-          let userData = [];
-          await firestore()
-            .collection('Users')
-            .doc("bx6tcozmzePrl0bSANlsXNPvfD03") //16X3IO7AiUbcyp0EJgliljmAlDQ2 G7t8asZeawP3ZqHCOkJOpklHwH32  bx6tcozmzePrl0bSANlsXNPvfD03 THIS IS TEMPORARY HARDCODED
-            .get()
-            .then(documentSnapshot => {
-              if (documentSnapshot.exists) {
-                userData.push(documentSnapshot.data());
-              }
-            })
-            .catch(err => {
-              setloading(false);
-              console.warn(err);
-            });
-
-          console.warn(userData[0]);
-          await dispatch(DataInsert(userData[0]));
-          if (toggleCheckBox) {
-            await AsyncStorage.setItem(
-              '@userData2',
-              JSON.stringify(userData[0].UserID),
-            );
-          }
-
-          try {
-            const value = await AsyncStorage.getItem('@user');
-            if (value !== null) {
-              // allmypost();
-              navigation.navigate('TabNavigation');
-              console.warn(value);
-            } else {
-              navigation.navigate('TabNavigation');
-
-              // navigation.navigate('LocationPage');
-              console.warn(value);
-              setloading(false);
-            }
-          } catch (e) {
-            setloading(false);
-            console.warn(e);
-            // error reading value
-          }
-
-          // saveUser(userData[0]);
-        } else {
-          setloading(false);
-          alert('Email is not verified Please check your Inbox');
-        }
-      })
-      .catch(error => {
-        setloading(true);
-        const errorMessage = error.code;
-        console.warn(error);
-        if (errorMessage === 'auth/wrong-password') {
-          alert('Wrong Password');
-          setloading(false);
-        }
-        if (errorMessage === 'auth/operation-not-allowed') {
-          alert('Operation not alloweded');
-          setloading(false);
-        }
-
-        if (errorMessage === 'auth/user-not-found') {
-          alert('This Email is Not Register');
-          setloading(false);
-        }
-        setloading(false);
-      });
-  }, [])
   // const allmypost = async () => {
   //   let SellingData = [];
   //   let TradingData = [];
@@ -211,7 +135,7 @@ const Login = ({navigation}) => {
             let userData = [];
             await firestore()
               .collection('Users')
-              .doc("G7t8asZeawP3ZqHCOkJOpklHwH32") // G7t8asZeawP3ZqHCOkJOpklHwH32  bx6tcozmzePrl0bSANlsXNPvfD03 THIS IS TEMPORARY HARDCODED
+              .doc(user.uid)
               .get()
               .then(documentSnapshot => {
                 if (documentSnapshot.exists) {

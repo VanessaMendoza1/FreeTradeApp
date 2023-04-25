@@ -13,14 +13,12 @@ import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MessageHead from '../../Components/MessageHead';
+import { getCurrentTimeStamp } from '../../utils/time'
 
 import {useSelector} from 'react-redux';
 import database from '@react-native-firebase/database';
 
 import MsgComponent from '../../Components/MsgComponent';
-import { getCurrentTimeStamp } from "../../utils/time"
-
-const messagesPaginationSize = 10
 
 const Inbox = ({navigation, route}) => {
   const userData = useSelector(state => state.counter.data);
@@ -29,7 +27,7 @@ const Inbox = ({navigation, route}) => {
 
   React.useEffect(() => {
     if (txt !== '') {
-      // AutSender(); // DONT KNOW WHY THIS WAS ADDED !!!
+      // AutSender(); dont know why this was added
     }
   }, []);
 
@@ -39,7 +37,7 @@ const Inbox = ({navigation, route}) => {
       message: txt,
       from: userData?.UserID,
       to: receiverData.id,
-      sendTime: getCurrentTimeStamp(), // '123',
+      sendTime: getCurrentTimeStamp(),
       msgType: 'text',
     };
 
@@ -67,141 +65,23 @@ const Inbox = ({navigation, route}) => {
     });
   };
 
-
-
   const [msg, setMsg] = React.useState('');
   const [disabled, setdisabled] = React.useState(false);
   const [allChat, setallChat] = React.useState([]);
-  const [currentMessageCount, setCurrentMessageCount] = React.useState(10)
-  const [lastMessageKey, setLastMessageKey] = React.useState(null)
-  const [areInitialMessagesSet, setAreInitialMessagesSet] =  React.useState(false)
 
   React.useEffect(() => {
     const onChildAdd = database()
       .ref('/messages/' + receiverData.roomId)
-      .limitToLast(currentMessageCount)
-      .on('child_added', snapshot => { // child_added
-      // .on('child_added', snapshot => { // child_added
+      .on('child_added', snapshot => {
         // console.log('A new node has been added', snapshot.val());
-        setallChat(state => {
-          let allMessagesOtherThanLast = state
-          allMessagesOtherThanLast.forEach(() => {
-
-          })
-
-          let lastMessage = snapshot.val()
-
-          setLastMessageKey(lastMessage.sendTime)
-
-
-          console.log({STATE: state, VAL: snapshot.val()})
-          if (!areInitialMessagesSet){
-            setAreInitialMessagesSet(true)
-            return [lastMessage, ...allMessagesOtherThanLast]
-          } else {
-            return [lastMessage, ...allChat]
-          }
-        });
+        setallChat(state => [snapshot.val(), ...state]);
       });
     // Stop listening for updates when no longer required
     return () =>
       database()
         .ref('/messages' + receiverData.roomId)
-        .limitToLast(currentMessageCount)
         .off('child_added', onChildAdd);
-  }, [receiverData.roomId, currentMessageCount]);
-
-
-  const getFurtherMessages = () => {
-    database()
-      .ref('/messages/' + receiverData.roomId)
-      // .orderByKey()
-      .orderByChild("sendTime")
-
-      .endAt(lastMessageKey)
-      .limitToLast(20)
-
-      // .limitToLast(messagesPaginationSize)
-      // .orderByChild('sendTime')
-      // .startAt(21)
-      // // .endBefore(lastMessageKey)
-      // // .endBefore(topMessageTimeStamp)
-      .once('value', snapshot => {
-        let messages = Object.values(snapshot.val()).reverse()
-        console.log({FURTHER_REVERSED: ""})
-        console.log({FURTHER_REVERSED: messages})
-        console.log({FURTHER_REVERSED: ""})
-        let messageKeys = Object.keys(snapshot.val())
-        setLastMessageKey(messageKeys[0])
-        // setTopMessageTimeStamp(messages[0].sendTime)
-        setallChat([...messages, ...allChat])
-      });
-  }
-
-  const getInitialMessages = () => {
-    console.log("")
-    console.log("CALLED getInitialMessages")
-    console.log("")
-    console.log(receiverData.roomId)
-    database()
-      .ref('/messages/' + receiverData.roomId)
-      .limitToLast(messagesPaginationSize)
-      .once('value', snapshot => { // child_added
-        // console.log('A new node has been added', snapshot.val());
-        // setallChat(state => [snapshot.val(), ...state]);
-        let messages = Object.values(snapshot.val()).reverse()
-        console.log({INITIAL_REVERSED: ""})
-        console.log({INITIAL_REVERSED: messages})
-        console.log({INITIAL_REVERSED: ""})
-        let messageKeys = Object.keys(snapshot.val())
-        setLastMessageKey(messageKeys[0])
-        // setTopMessageTimeStamp(messages[0].sendTime)
-        setallChat(messages)
-
-        // console.log({DATA11: Object.values(snapshot.val())})
-        // isEndReached ? setallChat([...allChat, ...Object.values(snapshot.val())]) : setallChat(Object.values(snapshot.val()));
-        
-        // setallChat(state => [snapshot.val(), ...state]);
-
-      })
-  }
-
-  const subscribeToNewMessages = () => {
-    console.log("")
-    console.log("CALLED UNSUBSCRIBE")
-    console.log("")
-    database()
-      .ref('/messages/' + receiverData.roomId)
-      // .limitToLast(1)
-      .on('child_added', snapshot => { // child_added
-        // console.log('A new node has been added', snapshot.val());
-        console.log({NEW: snapshot.val()})
-        // setallChat(state => [snapshot.val(), ...state]);
-        // setallChat([...allChat, snapshot.val()]);
-      })
-  }
-
-  const unSubscribe = (subscriberFunction) => {
-    console.log("")
-    console.log("CALLED UNSUBSCRIBE")
-    console.log("")
-    database()
-      .ref('/messages' + receiverData.roomId)
-      .limitToLast(currentMessageCount)
-      .off('child_added', subscriberFunction);
-  }
-
-  // React.useEffect(() => {
-  //   getInitialMessages()
-  // }, [])
-
-  // React.useEffect(() => {
-  //   // subscribeToNewMessages()
-  //   // Stop listening for updates when no longer required
-  //   // return () => unSubscribe(subscribeToNewMessages)
-  // }, [receiverData.roomId]);
-
-  
+  }, [receiverData.roomId]);
 
   const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
 
@@ -217,7 +97,7 @@ const Inbox = ({navigation, route}) => {
       message: msg,
       from: userData?.UserID,
       to: receiverData.id,
-      sendTime: getCurrentTimeStamp(), // '123',
+      sendTime: getCurrentTimeStamp(),
       msgType: 'text',
     };
 
@@ -245,15 +125,8 @@ const Inbox = ({navigation, route}) => {
     });
   };
 
-  const makeSomething = () => {
-    console.log("TOP REACHED")
-  }
-  const onContentOffsetChanged = (distanceFromTop) => {
-    distanceFromTop === 0 && makeSomething();
-  }
-
   return (
-    // <ScrollView automaticallyAdjustKeyboardInsets={true}>
+    <ScrollView automaticallyAdjustKeyboardInsets={true}>
       <View style={styles.MainContainer}>
         {/* header */}
         <View style={styles.Header}>
@@ -282,7 +155,7 @@ const Inbox = ({navigation, route}) => {
             </View>
           </View>
         </View>
-
+        {/* header */}
 
         <View style={{flex: 1}}>
           <FlatList
@@ -291,18 +164,6 @@ const Inbox = ({navigation, route}) => {
             showsVerticalScrollIndicator={false}
             keyExtractor={(item, index) => index}
             inverted
-            onEndReached={(event) => {
-              // console.log("TOP REACHED")
-              // unSubscribe(subscribeToNewMessages)
-              
-              getFurtherMessages()
-              // setCurrentMessageCount(currentMessageCount + 10)
-             
-              
-              
-              // subscribeToNewMessages()
-            }}
-            // onScroll={(event) => onContentOffsetChanged(event.nativeEvent.contentOffset.y)}
             renderItem={({item}) => {
               console.warn(userData.userid);
               return (
@@ -314,6 +175,7 @@ const Inbox = ({navigation, route}) => {
             }}
           />
         </View>
+
         <View
           style={{
             // backgroundColor: Colors.Primary,
@@ -350,10 +212,8 @@ const Inbox = ({navigation, route}) => {
             <Text style={{color: '#fff', fontSize: 18}}>Send</Text>
           </TouchableOpacity>
         </View>
-        </View>
-
-      // </View>
-    // </ScrollView>
+      </View>
+    </ScrollView>
   );
 };
 

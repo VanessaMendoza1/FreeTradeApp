@@ -13,12 +13,12 @@ const getTimeFromATimeZone = (timestamp, timeZone) => {
     return localTime;
 }
 
-const getCurrentLocalTime = (timestamp) => {
+const convertToLocalTime = (timestamp) => {
     const localTimeZone = RNLocalize.getTimeZone()
-    return getTimeFromATimeZone(localTimeZone)
+    return getTimeFromATimeZone(timestamp, localTimeZone)
 }
 
 module.exports =  {
-    getCurrentLocalTime,
+    convertToLocalTime,
     getCurrentTimeStamp
 }

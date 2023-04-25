@@ -21,7 +21,11 @@ import term from '../../assets/setting/term.png';
 import info from '../../assets/setting/info.png';
 import subscribe from '../../assets/setting/subscribe.png';
 import logout from '../../assets/setting/logout.png';
-
+import locationPin from '../../assets/setting/location-pin.png'
+import notificationIcon from '../../assets/setting/notification.png'
+import heartIcon from '../../assets/setting/heart.png'
+import contactUs from '../../assets/setting/contact-us.png'
+import cancelSubscriptionIcon from '../../assets/setting/cancel-icon.png'
 // import Colors from './colors';
 
 const Icons = {
@@ -69,6 +73,21 @@ const Icons = {
   ),
   DoubleTickIcon: (style = {}) => (
     <Image source={doubleTickIcon} style={{...styles.defaultStyle, ...style}} />
+  ),
+  LocationPinIcon: (style = {}) => (
+    <Image source={locationPin} style={{...styles.defaultStyle, ...style}} />
+  ),
+  NotificationIcon: (style = {}) => (
+    <Image source={notificationIcon} style={{...styles.defaultStyle, ...style}} />
+  ),
+  HeartIcon: (style = {}) => (
+    <Image source={heartIcon} style={{...styles.defaultStyle, ...style}} />
+  ),
+  ContactUs: (style = {}) => (
+    <Image source={contactUs} style={{...styles.defaultStyle, ...style}} />
+  ),
+  CancelSubscriptionIcon: (style = {}) => (
+    <Image source={cancelSubscriptionIcon} style={{...styles.defaultStyle, ...style}} />
   ),
 };
 const styles = StyleSheet.create({
