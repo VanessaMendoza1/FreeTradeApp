@@ -14,8 +14,15 @@ const getTimeFromATimeZone = (timestamp, timeZone) => {
 }
 
 const convertToLocalTime = (timestamp) => {
-    const localTimeZone = RNLocalize.getTimeZone()
-    return getTimeFromATimeZone(timestamp, localTimeZone)
+    try{
+        const localTimeZone = RNLocalize.getTimeZone()
+        return getTimeFromATimeZone(timestamp, localTimeZone)
+    } catch(err){
+        console.log("TIME CONVERSION ERROR")
+        console.log("the timestamp isnt a unix time")
+        console.log(err)
+        return "Its an Old Time Format"
+    }
 }
 
 module.exports =  {
