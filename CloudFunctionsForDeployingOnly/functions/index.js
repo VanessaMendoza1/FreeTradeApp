@@ -29,7 +29,7 @@ exports.notifyUsersWhoLikeNewlyAddedItem = functions.firestore.document('/Post/{
 				querySnapshot.forEach((doc) => {
 					// console.log(doc.id, doc.data());
 					let favouriteItemData = doc.data()
-					let itemId = favouriteItemData.productId
+					let itemId = doc.id // favouriteItemData.productId
 					let users = favouriteItemData.users
 					functions.logger.log('USERS LIKING IT ARE ', users.length)
 					if (!users){
@@ -108,3 +108,48 @@ exports.notifyUsersWhoLikeNewlyAddedItem = functions.firestore.document('/Post/{
 	return allPromises
 });
 
+
+
+exports.progagateCategoryNameChangesOnAllItems = functions.firestore.document('/Category/{title}')
+	.onUpdate(async (change, context) => {
+
+		const categoryId = context.params.title
+		const categoryNewData = change.after.data()
+		const categoryOldData = change.before.data()
+
+
+
+		let allPromises = []
+		var noItemsWithEditedCategoryFoundResponse = await admin.firestore()
+			.collection('Post')
+			.where('Category', '==', categoryOldData.title)
+			.get()
+			.then(querySnapshot => {
+				if (querySnapshot.empty){
+					functions.logger.log('NO ITEM FOUND');
+					return
+				}
+				querySnapshot.forEach((doc) => {
+					// console.log(doc.id, doc.data());
+					let itemData = doc.data()
+					let itemId = doc.id
+					allPromises.push(
+						admin.firestore()
+							.collection('Post')
+							.doc(itemId)
+							.update({
+								Category: categoryNewData.title
+							})
+							.then(async () => {
+								functions.logger.log(`Category for item ${itemId} changed from ${categoryOldData.title} to ${categoryNewData.title}`);
+							})
+							.catch(err => {
+								functions.logger.log(`Failed to edit Category for item ${itemId} changed from ${categoryOldData.title} to ${categoryNewData.title}`);
+							})
+					)
+
+				})
+			})
+		
+		return noItemsWithEditedCategoryFoundResponse
+})
