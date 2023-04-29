@@ -116,13 +116,18 @@ exports.progagateCategoryNameChangesOnAllItems = functions.firestore.document('/
 		const categoryId = context.params.title
 		const categoryNewData = change.after.data()
 		const categoryOldData = change.before.data()
-
-
+		const categoryOldTitle = categoryOldData.title
+		const categoryNewTitle = categoryNewData.title
+		
+		if (categoryOldTitle == categoryNewTitle){
+			functions.logger.log(`Nothing to change in Category`);
+			return
+		}
 
 		let allPromises = []
 		var noItemsWithEditedCategoryFoundResponse = await admin.firestore()
 			.collection('Post')
-			.where('Category', '==', categoryOldData.title)
+			.where('Category', '==', categoryOldTitle)
 			.get()
 			.then(querySnapshot => {
 				if (querySnapshot.empty){
@@ -138,13 +143,13 @@ exports.progagateCategoryNameChangesOnAllItems = functions.firestore.document('/
 							.collection('Post')
 							.doc(itemId)
 							.update({
-								Category: categoryNewData.title
+								Category: categoryNewTitle
 							})
 							.then(async () => {
-								functions.logger.log(`Category for item ${itemId} changed from ${categoryOldData.title} to ${categoryNewData.title}`);
+								functions.logger.log(`Category for item ${itemId} changed from ${categoryOldTitle} to ${categoryNewTitle}`);
 							})
 							.catch(err => {
-								functions.logger.log(`Failed to edit Category for item ${itemId} changed from ${categoryOldData.title} to ${categoryNewData.title}`);
+								functions.logger.log(`Failed to edit Category for item ${itemId} changed from ${categoryOldTitle} to ${categoryNewTitle}`);
 							})
 					)
 
@@ -153,3 +158,54 @@ exports.progagateCategoryNameChangesOnAllItems = functions.firestore.document('/
 		
 		return noItemsWithEditedCategoryFoundResponse
 })
+
+
+exports.progagateSubCategoryNameChangesOnAllItems = functions.firestore.document('/SubCategory/{subCategory}')
+	.onUpdate(async (change, context) => {
+
+		const subCategoryId = context.params.title
+		const subCategoryNewData = change.after.data()
+		const subCategoryOldData = change.before.data()
+		const oldSubCategoryName = subCategoryOldData.subCategory
+		const newSubCategoryName = subCategoryNewData.subCategory
+
+		if (oldSubCategoryName == newSubCategoryName){
+			functions.logger.log(`Nothing to change in Sub Category`);
+			return
+		}
+
+		let allPromises = []
+		var noItemsWithEditedSubCategoryFoundResponse = await admin.firestore()
+			.collection('Post')
+			.where('SubCategory', '==', oldSubCategoryName)
+			.get()
+			.then(querySnapshot => {
+				if (querySnapshot.empty){
+					functions.logger.log('NO ITEM FOUND');
+					return
+				}
+				querySnapshot.forEach((doc) => {
+					// console.log(doc.id, doc.data());
+					let itemData = doc.data()
+					let itemId = doc.id
+					allPromises.push(
+						admin.firestore()
+							.collection('Post')
+							.doc(itemId)
+							.update({
+								SubCategory: newSubCategoryName
+							})
+							.then(async () => {
+								functions.logger.log(`Category for item ${itemId} changed from ${oldSubCategoryName} to ${newSubCategoryName}`);
+							})
+							.catch(err => {
+								functions.logger.log(`Failed to edit Category for item ${itemId} changed from ${oldSubCategoryName} to ${newSubCategoryName}`);
+							})
+					)
+
+				})
+			})
+		
+		return noItemsWithEditedSubCategoryFoundResponse
+})
+
