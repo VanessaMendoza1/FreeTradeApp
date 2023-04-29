@@ -629,6 +629,7 @@ const MakePost = ({navigation}) => {
                   placeholder={'Price (Optional)'}
                   onChangeText={e => setPrice(e)}
                   placeholderTextColor={Colors.Primary}
+                  value={Price}
                 />
               )}
 

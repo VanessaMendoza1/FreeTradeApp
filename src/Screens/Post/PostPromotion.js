@@ -187,7 +187,7 @@ const PostPromotion = ({navigation, route}) => {
             </View>
           </View>
           {/* img */}
-          <Text style={styles.NameC}>Nike Shoes</Text>
+          <Text style={styles.NameC}>{route.params.data.title}</Text>
 
           {/* dropdown */}
 

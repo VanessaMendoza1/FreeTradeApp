@@ -23,6 +23,7 @@ import {SubDataAdd} from '../../redux/subSlicer';
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
+import Icons from '../../utils/icons';
 
 import {getPreciseDistance} from 'geolib';
 
@@ -415,10 +416,13 @@ const Home = ({navigation}) => {
           }}
           style={styles.LocationMeter}>
           <View style={styles.ImgContainer2}>
-            <Image
+            {Icons.LocationIcon({
+              tintColor: 'red',
+            })}
+            {/* <Image
               style={{width: '70%', height: '70%', resizeMode: 'contain'}}
               source={require('../../../assets/carimg.png')}
-            />
+            /> */}
           </View>
           <Text style={styles.LondonUkText}>
             {UserData.location === ''

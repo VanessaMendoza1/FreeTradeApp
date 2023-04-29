@@ -23,6 +23,7 @@ import subscribe from '../../assets/setting/subscribe.png';
 import logout from '../../assets/setting/logout.png';
 import locationPin from '../../assets/setting/location-pin.png'
 import notificationIcon from '../../assets/setting/notification.png'
+import locationIcon from '../../assets/locationBG.png'
 import heartIcon from '../../assets/setting/heart.png'
 import contactUs from '../../assets/setting/contact-us.png'
 import cancelSubscriptionIcon from '../../assets/setting/cancel-icon.png'
@@ -76,6 +77,9 @@ const Icons = {
   ),
   LocationPinIcon: (style = {}) => (
     <Image source={locationPin} style={{...styles.defaultStyle, ...style}} />
+  ),
+  LocationIcon: (style = {}) => (
+    <Image source={locationIcon} style={{...styles.defaultStyle, ...style}} />
   ),
   NotificationIcon: (style = {}) => (
     <Image source={notificationIcon} style={{...styles.defaultStyle, ...style}} />

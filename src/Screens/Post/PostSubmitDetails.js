@@ -58,6 +58,7 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [brand, setbrand] = React.useState('');
   const [Description, setDescription] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
+  console.log({MyData})
   // console.warn(MyData.latitude);
   const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
@@ -105,7 +106,11 @@ const PostSubmitDetails = ({navigation, route}) => {
             await dispatch(PostAdd(PostData));
 
             console.warn('Ad Posted');
-          });
+          })
+          .catch((err) => {
+            console.log("Caught error while submitting post")
+            console.log(err)
+          })
         setloading(false);
       })
       .catch(err => {
@@ -127,22 +132,30 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          const lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
-          const lon2 = documentSnapshot.data().user.longitude;
-          const distanceInKm = Distance(lat1, lon1, lat2, lon2);
+          try {
+            let lat2
+            let lon2
+            lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
+            lon2 = documentSnapshot.data().user.longitude;
+            const distanceInKm = Distance(lat1, lon1, lat2, lon2);
 
-          if (documentSnapshot.data().status === false) {
-            if (Math.ceil(distanceInKm) <= 160) {
-              if (documentSnapshot.data().PostType === 'Trading') {
-                TradingData.push(documentSnapshot.data());
-              }
-              if (documentSnapshot.data().PostType === 'Selling') {
-                SellingData.push(documentSnapshot.data());
-              }
-              if (documentSnapshot.data().PostType === 'Service') {
-                ServiceData.push(documentSnapshot.data());
+            if (documentSnapshot.data().status === false) {
+              if (Math.ceil(distanceInKm) <= 160) {
+                if (documentSnapshot.data().PostType === 'Trading') {
+                  TradingData.push(documentSnapshot.data());
+                }
+                if (documentSnapshot.data().PostType === 'Selling') {
+                  SellingData.push(documentSnapshot.data());
+                }
+                if (documentSnapshot.data().PostType === 'Service') {
+                  ServiceData.push(documentSnapshot.data());
+                }
               }
             }
+          } catch (_err){
+            console.log(_err)
+            console.log("Bad Data, user object not found in Post, check below object")
+            console.log(documentSnapshot.data())
           }
         });
       });

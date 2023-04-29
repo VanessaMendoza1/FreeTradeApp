@@ -24,6 +24,35 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import { openPhoto, openCamera, updateDetails } from './EditAccount'
 const heightDropItem = 40;
 
+const allowedTimings = [
+  {label: '0:00 Am', value: '0:00 Am'},
+  {label: '1:00 Am', value: '1:00 Am'},
+  {label: '2:00 Am', value: '2:00 Am'},
+  {label: '3:00 Am', value: '3:00 Am'},
+  {label: '4:00 Am', value: '4:00 Am'},
+  {label: '5:00 Am', value: '5:00 Am'},
+  {label: '6:00 Am', value: '6:00 Am'},
+  {label: '7:00 Am', value: '7:00 Am'},
+  {label: '8:00 Am', value: '8:00 Am'},
+  {label: '9:00 Am', value: '9:00 Am'},
+  {label: '10:00 Am', value: '10:00 Am'},
+  {label: '11:00 Am', value: '11:00 Am'},
+  {label: '12:00 Pm', value: '12:00 Pm'},
+  {label: '01:00 Pm', value: '01:00 Pm'},
+  {label: '02:00 Pm', value: '02:00 Pm'},
+  {label: '03:00 Pm', value: '03:00 Pm'},
+  {label: '04:00 Pm', value: '04:00 Pm'},
+  {label: '05:00 Pm', value: '05:00 Pm'},
+  {label: '06:00 Pm', value: '06:00 Pm'},
+  {label: '07:00 Pm', value: '07:00 Pm'},
+  {label: '08:00 Pm', value: '08:00 Pm'},
+  {label: '09:00 Pm', value: '09:00 Pm'},
+  {label: '10:00 Pm', value: '10:00 Pm'},
+  {label: '11:00 Pm', value: '11:00 Pm'},
+  {label: '12:00 Pm', value: '12:00 Pm'},
+]
+
+
 const BussinessAccountEdits = ({navigation}) => {
   const MyData = useSelector(state => state.counter.data);
   console.warn(MyData.name);
@@ -35,60 +64,10 @@ const BussinessAccountEdits = ({navigation}) => {
   const [ImageUrl, setImgeUrl] = React.useState('');
   const [showUploadBox, setShowUploadBox] = React.useState(false);
 
-  const [items, setItems] = React.useState([
-    {label: '0:00 Am', value: '0:00 Am'},
-    {label: '1:00 Am', value: '1:00 Am'},
-    {label: '2:00 Am', value: '2:00 Am'},
-    {label: '3:00 Am', value: '3:00 Am'},
-    {label: '4:00 Am', value: '4:00 Am'},
-    {label: '5:00 Am', value: '5:00 Am'},
-    {label: '6:00 Am', value: '6:00 Am'},
-    {label: '7:00 Am', value: '7:00 Am'},
-    {label: '8:00 Am', value: '8:00 Am'},
-    {label: '9:00 Am', value: '9:00 Am'},
-    {label: '10:00 Am', value: '10:00 Am'},
-    {label: '11:00 Am', value: '11:00 Am'},
-    {label: '12:00 Pm', value: '12:00 Pm'},
-    {label: '13:00 Pm', value: '13:00 Pm'},
-    {label: '14:00 Pm', value: '14:00 Pm'},
-    {label: '15:00 Pm', value: '15:00 Pm'},
-    {label: '16:00 Pm', value: '16:00 Pm'},
-    {label: '17:00 Pm', value: '17:00 Pm'},
-    {label: '18:00 Pm', value: '18:00 Pm'},
-    {label: '19:00 Pm', value: '19:00 Pm'},
-    {label: '20:00 Pm', value: '20:00 Pm'},
-    {label: '21:00 Pm', value: '21:00 Pm'},
-    {label: '22:00 Pm', value: '22:00 Pm'},
-    {label: '23:00 Pm', value: '23:00 Pm'},
-  ]);
+  const [items, setItems] = React.useState(allowedTimings);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
-  const [items2, setItems2] = React.useState([
-    {label: '0:00 Am', value: '0:00 Am'},
-    {label: '1:00 Am', value: '1:00 Am'},
-    {label: '2:00 Am', value: '2:00 Am'},
-    {label: '3:00 Am', value: '3:00 Am'},
-    {label: '4:00 Am', value: '4:00 Am'},
-    {label: '5:00 Am', value: '5:00 Am'},
-    {label: '6:00 Am', value: '6:00 Am'},
-    {label: '7:00 Am', value: '7:00 Am'},
-    {label: '8:00 Am', value: '8:00 Am'},
-    {label: '9:00 Am', value: '9:00 Am'},
-    {label: '10:00 Am', value: '10:00 Am'},
-    {label: '11:00 Am', value: '11:00 Am'},
-    {label: '12:00 Pm', value: '12:00 Pm'},
-    {label: '13:00 Pm', value: '13:00 Pm'},
-    {label: '14:00 Pm', value: '14:00 Pm'},
-    {label: '15:00 Pm', value: '15:00 Pm'},
-    {label: '16:00 Pm', value: '16:00 Pm'},
-    {label: '17:00 Pm', value: '17:00 Pm'},
-    {label: '18:00 Pm', value: '18:00 Pm'},
-    {label: '19:00 Pm', value: '19:00 Pm'},
-    {label: '20:00 Pm', value: '20:00 Pm'},
-    {label: '21:00 Pm', value: '21:00 Pm'},
-    {label: '22:00 Pm', value: '22:00 Pm'},
-    {label: '23:00 Pm', value: '23:00 Pm'},
-  ]);
+  const [items2, setItems2] = React.useState(allowedTimings);
   const [open2, setOpen2] = React.useState(false);
   const [value2, setValue2] = React.useState(null);
   const [items3, setItems3] = React.useState([
