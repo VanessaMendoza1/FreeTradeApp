@@ -12,6 +12,7 @@ import deals from '../../assets/bt/hand.png';
 import report from '../../assets/bt/repot.png';
 import eyeIcon from '../../assets/bt/eye.png';
 import doubleTickIcon from '../../assets/bt/double-tick.png';
+import cancelIcon from '../../assets/bt/cancel.png'
 
 //setting
 import pencil from '../../assets/setting/pencil.png';
@@ -92,6 +93,9 @@ const Icons = {
   ),
   CancelSubscriptionIcon: (style = {}) => (
     <Image source={cancelSubscriptionIcon} style={{...styles.defaultStyle, ...style}} />
+  ),
+  CancelIcon: (style = {}) => (
+    <Image source={cancelIcon} style={{...styles.defaultStyle, ...style}} />
   ),
 };
 const styles = StyleSheet.create({

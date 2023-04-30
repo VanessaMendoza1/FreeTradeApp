@@ -27,6 +27,7 @@ const Appheader = ({onSearch, onMessage, onNotification, noti}) => {
         <TextInput
           placeholder="Service/Sell/Trade"
           onChangeText={text => onSearch(text)}
+          returnKeyType='search'
           style={styles.Txtinput}
           placeholderTextColor={Colors.Primary}
         />

@@ -32,7 +32,10 @@ const Notification = ({navigation}) => {
         querySnapshot.forEach(documentSnapshot => {
           // console.warn(data.UserID);
           if (documentSnapshot.data().userID == userData.UserID) {
-            NotificationData.push(documentSnapshot.data());
+            NotificationData.push({
+              ...documentSnapshot.data(), 
+              id: documentSnapshot.id
+            });
           }
         });
         setNotii(NotificationData);
@@ -102,6 +105,8 @@ const Notification = ({navigation}) => {
                   }
                 }}
                 data={item}
+                notifications={Notii}
+                setNotifications={setNotii}
               />
             );
           })}
