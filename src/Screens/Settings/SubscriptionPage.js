@@ -31,6 +31,29 @@ const SubscriptionPage = ({navigation}) => {
   const [plan, setplan] = React.useState('Personal');
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
+  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
+  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
+
+  React.useEffect(() => {
+    firestore()
+      .collection('AppConfigurations')
+      .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          const subscriptionData = documentSnapshot.data()
+          if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
+            setIndividualSubscriptionPricing(subscriptionData.value)
+          } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
+            setBusinessSubscriptionPricing(subscriptionData.value)
+          }
+        })
+        .then((err) => {
+          console.log(err)
+        })
+      });
+  }, [])
+
 
   return (
     <>
@@ -71,7 +94,7 @@ const SubscriptionPage = ({navigation}) => {
               setsub(!sub);
             }}
             style={styles.mainViewCC}>
-            <Text style={styles.mainText123}>Personal Plan $1.99/Month</Text>
+            <Text style={styles.mainText123}>Personal Plan ${individualSubscriptionPricing}/Month</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -79,7 +102,7 @@ const SubscriptionPage = ({navigation}) => {
               setsub(!sub);
             }}
             style={styles.mainViewCC}>
-            <Text style={styles.mainText123}>Business Plan $9.99/Month</Text>
+            <Text style={styles.mainText123}>Business Plan ${businessSubscriptionPricing}/Month</Text>
             <Text style={styles.mainText1233}>Let’s grow your business!</Text>
           </TouchableOpacity>
         </View>
