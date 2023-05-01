@@ -22,6 +22,7 @@ import uuid from 'react-native-uuid';
 import {useSelector, useDispatch} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import Appbutton from '../../Components/Appbutton';
+import { sendMsg } from './Inbox'
 
 const StartConversation = ({navigation, route}) => {
   //   console.warn(route.params.data.Notification !== '');
@@ -31,12 +32,24 @@ const StartConversation = ({navigation, route}) => {
 
   const createChatList = data => {
     setloading(true);
+    let roomId = uuid.v4();
+    let SendData = {
+      roomId,
+      id: data.UserID,
+      name: data.name,
+      img: data.image,
+      emailId: data.email,
+      about: data.Bio,
+      lastMsg: txt,
+      Token: data.NotificationToken,
+    };
+    sendMsg(txt, settxt, setloading, userData, SendData)
     database()
       .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
       .once('value')
-      .then(snapshot => {
+      .then(async snapshot => {
         if (snapshot.val() == null) {
-          let roomId = uuid.v4();
+
           let myData = {
             roomId,
             id: userData.UserID,
@@ -44,25 +57,15 @@ const StartConversation = ({navigation, route}) => {
             img: userData.image,
             emailId: userData.emails,
             about: userData.Bio,
-            lastMsg: '',
+            lastMsg: txt,
             Token: userData.NotificationToken,
-          };
-          let SendData = {
-            roomId,
-            id: data.UserID,
-            name: data.name,
-            img: data.image,
-            emailId: data.email,
-            about: data.Bio,
-            lastMsg: '',
-            Token: data.NotificationToken,
           };
           database()
             .ref('/chatlist/' + data.UserID + '/' + userData.UserID)
             .update(myData)
             .then(() => console.log('Data updated.'));
 
-          data.lastMsg = '';
+          data.lastMsg = txt;
           data.roomId = roomId;
 
           database()
@@ -105,6 +108,7 @@ const StartConversation = ({navigation, route}) => {
           placeholder="Enter Message"
           placeholderTextColor={Colors.Primary}
           onChangeText={e => settxt(e)}
+          value={txt}
         />
         <TouchableOpacity
           onPress={() => {

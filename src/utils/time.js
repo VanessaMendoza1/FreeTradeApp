@@ -1,11 +1,10 @@
 import moment from 'moment-timezone';
 import * as RNLocalize from "react-native-localize";
 
-const standardTimeZone = "America/New_York"
-const timeFormat = "YYYY-MM-DD HH:mm"
+const timeFormat = "YYYY-MM-DD  hh:mm A"
 
 const getCurrentTimeStamp = () => {
-    return moment().unix()
+    return moment(new Date()).unix() * 1000
 }
 
 const getTimeFromATimeZone = (timestamp, timeZone) => {

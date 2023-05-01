@@ -20,6 +20,60 @@ import database from '@react-native-firebase/database';
 
 import MsgComponent from '../../Components/MsgComponent';
 
+const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
+
+const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
+  console.log({msg, setMsg, setdisabled, userData, receiverData})
+  try {
+    if (msg == '' || msgvalid(msg) == 0) {
+      alert('Enter something....');
+  
+      return false;
+    }
+    setdisabled(true);
+    let msgData = {
+      roomId: receiverData.roomId,
+      message: msg,
+      from: userData?.UserID,
+      to: receiverData.id,
+      sendTime: getCurrentTimeStamp(),
+      msgType: 'text',
+    };
+  
+    const newReference = database()
+      .ref('/messages/' + receiverData.roomId)
+      .push();
+    msgData.id = newReference.key;
+    newReference.set(msgData).then(() => {
+      console.log("MESSAGE SENT")
+      console.log({msgData})
+      let chatListupdate = {
+        lastMsg: msg,
+        sendTime: msgData.sendTime,
+      };
+      database()
+        .ref('/chatlist/' + receiverData?.id + '/' + userData?.UserID)
+        .update(chatListupdate)
+        .then(() => console.log('Data updated.'));
+  
+      database()
+        .ref('/chatlist/' + userData?.UserID + '/' + receiverData?.id)
+        .update(chatListupdate)
+        .then(() => console.log('Data updated.'));
+  
+      setMsg('');
+      setdisabled(false);
+    })
+    .catch((err) => {
+      console.log("ERROR CAUGHT WHILE SENDING MESSAGE")
+      console.log(err)
+    })
+  } catch (_err){
+    console.log({_err})
+  }
+};
+
+
 const Inbox = ({navigation, route}) => {
   const userData = useSelector(state => state.counter.data);
 
@@ -70,6 +124,10 @@ const Inbox = ({navigation, route}) => {
   const [allChat, setallChat] = React.useState([]);
 
   React.useEffect(() => {
+    console.log({allChat})
+  }, [allChat])
+
+  React.useEffect(() => {
     const onChildAdd = database()
       .ref('/messages/' + receiverData.roomId)
       .on('child_added', snapshot => {
@@ -82,48 +140,6 @@ const Inbox = ({navigation, route}) => {
         .ref('/messages' + receiverData.roomId)
         .off('child_added', onChildAdd);
   }, [receiverData.roomId]);
-
-  const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
-
-  const sendMsg = () => {
-    if (msg == '' || msgvalid(msg) == 0) {
-      alert('Enter something....');
-
-      return false;
-    }
-    setdisabled(true);
-    let msgData = {
-      roomId: receiverData.roomId,
-      message: msg,
-      from: userData?.UserID,
-      to: receiverData.id,
-      sendTime: getCurrentTimeStamp(),
-      msgType: 'text',
-    };
-
-    const newReference = database()
-      .ref('/messages/' + receiverData.roomId)
-      .push();
-    msgData.id = newReference.key;
-    newReference.set(msgData).then(() => {
-      let chatListupdate = {
-        lastMsg: msg,
-        sendTime: msgData.sendTime,
-      };
-      database()
-        .ref('/chatlist/' + receiverData?.id + '/' + userData?.UserID)
-        .update(chatListupdate)
-        .then(() => console.log('Data updated.'));
-
-      database()
-        .ref('/chatlist/' + userData?.UserID + '/' + receiverData?.id)
-        .update(chatListupdate)
-        .then(() => console.log('Data updated.'));
-
-      setMsg('');
-      setdisabled(false);
-    });
-  };
 
   return (
     <ScrollView automaticallyAdjustKeyboardInsets={true}>
@@ -190,12 +206,13 @@ const Inbox = ({navigation, route}) => {
           <TextInput
             style={{
               backgroundColor: '#ffff',
-              width: '78%',
+              width: '75%',
               height: h('7%'),
               paddingHorizontal: 15,
               color: '#000',
               fontSize: h('2%'),
               borderColor: Colors.Primary,
+              // borderRadius: 10,
               borderWidth: h('0.2%'),
               alignSelf: 'center',
               // marginTop: h('1%'),
@@ -207,7 +224,7 @@ const Inbox = ({navigation, route}) => {
             onChangeText={val => setMsg(val)}
             // onChangeText={val => setMsg(val)}
           />
-          <TouchableOpacity style={styles.BtnCCW} onPress={sendMsg}>
+          <TouchableOpacity style={styles.BtnCCW} onPress={() => sendMsg(msg, setMsg, setdisabled, userData, receiverData)}>
             <Icon name="chatbubbles" size={25} color={'#fff'} />
             <Text style={{color: '#fff', fontSize: 18}}>Send</Text>
           </TouchableOpacity>
@@ -219,10 +236,12 @@ const Inbox = ({navigation, route}) => {
 
 export default Inbox;
 
+export { sendMsg }
+
 const styles = StyleSheet.create({
   MainContainer: {
     width: '100%',
-    height: h('100%'),
+    height: h('95%'),
     backgroundColor: '#fff',
   },
   Header: {
