@@ -31,11 +31,13 @@ const LocationScreen = ({navigation}) => {
   const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
   const [Location, setLocation] = React.useState('');
+  const [currentLocation, setCurrentLocation] = React.useState('');
   const [PlaceId, setPlaceId] = React.useState('');
   const [Cods, setCods] = React.useState([]);
   const [latitude, setlatitude] = React.useState([]);
   const [longitude, setlongitude] = React.useState([]);
   const [distance, setDistance] = React.useState(10)
+  const [currentDistance, setCurrentDistance] = React.useState("")
   const MyData = useSelector(state => state.counter.data);
 
   const [slider, setSlider] = React.useState(0.2);
@@ -85,6 +87,33 @@ const LocationScreen = ({navigation}) => {
     navigation.navigate('TabNavigation');
   };
 
+
+  React.useEffect(() => {
+    try{
+      firestore()
+      .collection('Users')
+      .doc(MyData.UserID)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          let userData = documentSnapshot.data();
+          let currentLocationFilter = userData.LocationFilter
+          setCurrentLocation(currentLocationFilter.location)
+          setCurrentDistance(currentLocationFilter.LocalDistance)
+          setlatitude(currentLocationFilter.latitude)
+          setlongitude(currentLocationFilter.longitude)
+        }
+        setloading(false)
+      })
+      .catch(err => {
+        setloading(false);
+        console.warn(err);
+      })
+    } catch (_err){
+      console.log(_err)
+    }
+  }, [])
+
   // React.useEffect(() => {
   //   // allmypost();
   //   // calculateDistance();
@@ -117,7 +146,30 @@ const LocationScreen = ({navigation}) => {
             textAlign: "center",
             fontSize: 20,
           }}>
-            {distance} Km
+            Current Distance: {currentDistance} miles
+          </Text>
+          <Text style={{
+            marginTop: 20,
+            textAlign: "center",
+            fontSize: 20,
+          }}>
+            Current Location: {currentLocation}
+          </Text>
+          
+          <Text style={{
+            marginTop: 40,
+            textAlign: "center",
+            fontSize: 20,
+            fontWeight: "bold"
+          }}>
+            Set New Location And Distance
+          </Text>
+          <Text style={{
+            marginTop: 40,
+            textAlign: "center",
+            fontSize: 20,
+          }}>
+            New Distance: {distance} miles
           </Text>
           <Slider
             style={{width: "94%", height: 100, alignSelf: "center"}}
@@ -130,7 +182,7 @@ const LocationScreen = ({navigation}) => {
           />
 
           <GooglePlacesAutocomplete
-            placeholder="Enter Location"
+            placeholder="Enter New Location"
             fetchDetails={true}
             GooglePlacesDetailsQuery={{fields: 'geometry'}}
             onPress={(data, details = null) => {
@@ -174,8 +226,6 @@ const LocationScreen = ({navigation}) => {
             }}
           />
 
-
-
           <View style={styles.AppBtn}>
             <Appbutton
               onPress={async () => {
@@ -187,7 +237,7 @@ const LocationScreen = ({navigation}) => {
                   .update({
                     LocationFilter:{
                       LocalDistance: distance, 
-                      location: Location,
+                      location: Location == "" ? currentLocation : Location,
                       latitude: latitude,
                       longitude: longitude,
                     }

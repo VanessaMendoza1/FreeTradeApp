@@ -170,13 +170,25 @@ const Setting = ({navigation}) => {
             })}
           </SettingItem>
           
-          
-          <SettingItem text={'Privacy Policy'}>
+          <SettingItem text={'About Us'} onPress={() => {
+            navigation.navigate('AboutUs');
+          }}>
             {Icons.Terms({
               tintColor: Colors.Primary,
             })}
           </SettingItem>
-          <SettingItem text={'Terms and Conditions'}>
+          
+          <SettingItem text={'Privacy Policy'} onPress={() => {
+            navigation.navigate('PrivacyPolicy');
+          }}>
+            {Icons.Terms({
+              tintColor: Colors.Primary,
+            })}
+          </SettingItem>
+          
+          <SettingItem text={'Terms and Conditions'} onPress={() => {
+            navigation.navigate('TermsAndConditions');
+          }}>
             {Icons.Info({
               tintColor: Colors.Primary,
             })}

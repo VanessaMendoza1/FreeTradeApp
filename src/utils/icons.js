@@ -12,6 +12,7 @@ import deals from '../../assets/bt/hand.png';
 import report from '../../assets/bt/repot.png';
 import eyeIcon from '../../assets/bt/eye.png';
 import doubleTickIcon from '../../assets/bt/double-tick.png';
+import cancelIcon from '../../assets/bt/cancel.png'
 
 //setting
 import pencil from '../../assets/setting/pencil.png';
@@ -23,6 +24,7 @@ import subscribe from '../../assets/setting/subscribe.png';
 import logout from '../../assets/setting/logout.png';
 import locationPin from '../../assets/setting/location-pin.png'
 import notificationIcon from '../../assets/setting/notification.png'
+import locationIcon from '../../assets/locationBG.png'
 import heartIcon from '../../assets/setting/heart.png'
 import contactUs from '../../assets/setting/contact-us.png'
 import cancelSubscriptionIcon from '../../assets/setting/cancel-icon.png'
@@ -77,6 +79,9 @@ const Icons = {
   LocationPinIcon: (style = {}) => (
     <Image source={locationPin} style={{...styles.defaultStyle, ...style}} />
   ),
+  LocationIcon: (style = {}) => (
+    <Image source={locationIcon} style={{...styles.defaultStyle, ...style}} />
+  ),
   NotificationIcon: (style = {}) => (
     <Image source={notificationIcon} style={{...styles.defaultStyle, ...style}} />
   ),
@@ -88,6 +93,9 @@ const Icons = {
   ),
   CancelSubscriptionIcon: (style = {}) => (
     <Image source={cancelSubscriptionIcon} style={{...styles.defaultStyle, ...style}} />
+  ),
+  CancelIcon: (style = {}) => (
+    <Image source={cancelIcon} style={{...styles.defaultStyle, ...style}} />
   ),
 };
 const styles = StyleSheet.create({

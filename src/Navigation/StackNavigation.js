@@ -43,6 +43,10 @@ import BussinessAccountEdits from '../Screens/Settings/BussinessAccountEdits';
 import SubscriptionPage from '../Screens/Settings/SubscriptionPage';
 import ImageScreen from '../Screens/Post/ImageScreen';
 import FavouriteItemsScreen from '../Screens/Settings/FavouriteItemsScreen'
+import AboutUsScreen from '../Screens/Settings/AboutUsScreen'
+import PrivacyPolicyScreen from '../Screens/Settings/PrivacyPolicyScreen'
+import TermsAndConditionsScreen from '../Screens/Settings/TermsAndConditionsScreen'
+import ContactUsScreen from '../Screens/Settings/ContactUsScreen'
 
 import TabNavigation from './TabNavigation';
 
@@ -85,6 +89,10 @@ const StackNavigation = () => {
         <Stack.Screen name="VerificationDone" component={VerificationDone} />
         <Stack.Screen name="SubscriptionPage" component={SubscriptionPage} />
         <Stack.Screen name="FavouriteItems" component={FavouriteItemsScreen} />
+        <Stack.Screen name="AboutUs" component={AboutUsScreen} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+        <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
+        <Stack.Screen name="ContactUs" component={ContactUsScreen} />
         <Stack.Screen
           name="BussinessAccountEdits"
           component={BussinessAccountEdits}

@@ -23,6 +23,7 @@ import {SubDataAdd} from '../../redux/subSlicer';
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
+import Icons from '../../utils/icons';
 
 import {getPreciseDistance} from 'geolib';
 
@@ -228,21 +229,24 @@ const Home = ({navigation}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           console.log({HERE: documentSnapshot.data()})
-          const lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
-          const lon2 = documentSnapshot.data().user.longitude;
-          const distanceInKm = Distance(lat1, lon1, lat2, lon2);
 
-          if (documentSnapshot.data().status === false) {
-            if (Math.ceil(distanceInKm) < 160) {
-              let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
-              if (documentSnapshot.data().PostType === 'Trading') {
-                TradingData.push(newDataObject);
-              }
-              if (documentSnapshot.data().PostType === 'Selling') {
-                SellingData.push(newDataObject);
-              }
-              if (documentSnapshot.data().PostType === 'Service') {
-                ServiceData.push(newDataObject);
+          if (documentSnapshot.data()){
+            const lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
+            const lon2 = documentSnapshot.data().user.longitude;
+            const distanceInKm = Distance(lat1, lon1, lat2, lon2);
+  
+            if (documentSnapshot.data().status === false) {
+              if (Math.ceil(distanceInKm) < 160) {
+                let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
+                if (documentSnapshot.data().PostType === 'Trading') {
+                  TradingData.push(newDataObject);
+                }
+                if (documentSnapshot.data().PostType === 'Selling') {
+                  SellingData.push(newDataObject);
+                }
+                if (documentSnapshot.data().PostType === 'Service') {
+                  ServiceData.push(newDataObject);
+                }
               }
             }
           }
@@ -277,13 +281,20 @@ const Home = ({navigation}) => {
   const searchFilter = text => {
     if (activeField === 'Services') {
       console.warn('This ran');
+      console.log({TEXT: text})
       const newData = ServiceData.filter(item => {
-        return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
+        let itemTitle = item.Title.toLowerCase()
+        let searchText = text.toLowerCase()
+        if (itemTitle.includes(searchText) || itemTitle == searchText){
+          console.log({MATCHED: itemTitle})
+          return item
+        }
       });
       console.log({ NewData: newData})
       if (text.trim().length === 0) {
         setServiceData(ServiceAllData);
       } else {
+        console.log("NEW SEARCH DATA SET SUCCESSFULLY")
         setServiceData(newData);
       }
       setSearchValue(text);
@@ -415,10 +426,13 @@ const Home = ({navigation}) => {
           }}
           style={styles.LocationMeter}>
           <View style={styles.ImgContainer2}>
-            <Image
+            {Icons.LocationIcon({
+              tintColor: 'red',
+            })}
+            {/* <Image
               style={{width: '70%', height: '70%', resizeMode: 'contain'}}
               source={require('../../../assets/carimg.png')}
-            />
+            /> */}
           </View>
           <Text style={styles.LondonUkText}>
             {UserData.location === ''
