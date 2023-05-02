@@ -142,9 +142,9 @@ const Setting = ({navigation}) => {
 
           <SettingItem
             onPress={() => {
-              navigation.navigate('Notification');
+              navigation.navigate('ToggleNotifications');
             }}
-            text={'Notification'}>
+            text={'Switch On/Off Notifications'}>
             {Icons.NotificationIcon({
               tintColor: Colors.Primary,
             })}

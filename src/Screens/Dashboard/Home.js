@@ -57,6 +57,7 @@ const Home = ({navigation}) => {
   indexRef.current = active;
   const [activeField, setActiveField] = useState('Services');
   const UserData = useSelector(state => state.counter.data);
+  console.log({UserData})
   const AllPostData = useSelector(state => state.post.PostData);
   const ServiceAllData = useSelector(state => state.post.ServiceData);
   const SellingAllData = useSelector(state => state.post.SellingData);
@@ -220,23 +221,21 @@ const Home = ({navigation}) => {
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
-    const lat1 = UserData.latitude; // Latitude of first coordinate
-    const lon1 = UserData.longitude; // Longitude of first coordinate
+    const lat1 = UserData.LocationFilter.latitude; // Latitude of first coordinate
+    const lon1 = UserData.LocationFilter.longitude; // Longitude of first coordinate
 
     await firestore()
       .collection('Post')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          console.log({HERE: documentSnapshot.data()})
-
           if (documentSnapshot.data()){
             const lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
             const lon2 = documentSnapshot.data().user.longitude;
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
   
             if (documentSnapshot.data().status === false) {
-              if (Math.ceil(distanceInKm) < 160) {
+              if (Math.ceil(distanceInKm) < UserData.LocationFilter.LocalDistance) {
                 let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
@@ -435,9 +434,9 @@ const Home = ({navigation}) => {
             /> */}
           </View>
           <Text style={styles.LondonUkText}>
-            {UserData.location === ''
+            {UserData.LocationFilter.location === ''
               ? 'Enter Your Location'
-              : UserData.location}
+              : UserData.LocationFilter.location}
           </Text>
         </TouchableOpacity>
         {/* location meter */}

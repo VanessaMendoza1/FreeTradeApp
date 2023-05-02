@@ -13,14 +13,20 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import NotificationHead from '../../Components/NotificationHead';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
+import { areNotificationsHidden } from "../../utils/appConfigurations"
 
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
   const userData = useSelector(state => state.counter.data);
 
-  React.useEffect(() => {
+  const getNotification = () => {
+    console.log("Getting Notifications")
     NotificationData();
     NotificationData2();
+  }
+
+  React.useEffect(() => {
+    areNotificationsHidden(getNotification)
   }, []);
 
   const NotificationData = async () => {

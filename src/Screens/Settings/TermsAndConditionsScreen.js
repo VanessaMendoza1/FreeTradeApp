@@ -21,9 +21,9 @@ import {
 
 const TermsAndConditionsScreen = ({navigation}) => {
     const [ termsAndConditionsContent, setTermsAndConditionsContent ] = React.useState("")
-    
+    console.log({termsAndConditionsContent})
     React.useEffect(() => {
-        getPolicy(setTermsAndConditionsContent)
+        getTermsAndConditions(setTermsAndConditionsContent)
     }, [])
 
     return (
