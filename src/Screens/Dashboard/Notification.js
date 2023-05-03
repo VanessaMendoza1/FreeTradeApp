@@ -26,7 +26,8 @@ const Notification = ({navigation}) => {
   }
 
   React.useEffect(() => {
-    areNotificationsHidden(getNotification)
+    // areNotificationsHidden(getNotification)
+    getNotification()
   }, []);
 
   const NotificationData = async () => {

@@ -30,6 +30,7 @@ import {
   toggleMarkFavourite, 
   isItemLiked
 } from '../Profile/OtherUserPostDetails'
+import { areNotificationsHidden } from '../../utils/appConfigurations'
 
 import axios from 'axios';
 
@@ -240,7 +241,7 @@ const PostScreen = ({navigation, route}) => {
           },
           data: data,
         };
-        axios(config)
+        let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
             navigation.goBack();
@@ -250,6 +251,8 @@ const PostScreen = ({navigation, route}) => {
             // console.warn(error);
             alert('Offer Sent');
           });
+
+        areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
       })
       .catch(err => console.warn(err));
   };
