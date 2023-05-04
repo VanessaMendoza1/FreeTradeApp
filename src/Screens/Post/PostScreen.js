@@ -528,6 +528,7 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer5}>
             <TouchableOpacity
               onPress={() => {
+                console.log({subdata})
                 if (subdata.length > 0) {
                   // createChatList(route.params.data.user);
                   navigation.navigate('StartConversation', {

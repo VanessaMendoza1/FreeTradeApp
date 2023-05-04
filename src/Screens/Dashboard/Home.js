@@ -57,7 +57,6 @@ const Home = ({navigation}) => {
   indexRef.current = active;
   const [activeField, setActiveField] = useState('Services');
   const UserData = useSelector(state => state.counter.data);
-  console.log({UserData})
   const AllPostData = useSelector(state => state.post.PostData);
   const ServiceAllData = useSelector(state => state.post.ServiceData);
   const SellingAllData = useSelector(state => state.post.SellingData);
@@ -351,6 +350,7 @@ const Home = ({navigation}) => {
             pagingEnabled
             data={ImageAds}
             horizontal
+            keyExtractor={(item, index) => String(index)}
             renderItem={({item, index}) => (
               <Ads
                 onPress={() => {
@@ -502,6 +502,7 @@ const Home = ({navigation}) => {
           <>
             {ServiceAllData.length >= 1 ? (
               <FlatList
+                keyExtractor={(item, index) => String(index)}
                 data={(searchValue == '') ? ServiceAllData : ServiceData}
                 contentContainerStyle={{paddingBottom: h('3%')}}
                 numColumns={3}
@@ -548,6 +549,7 @@ const Home = ({navigation}) => {
                 data={(searchValue == '') ? SellingAllData : SellingData}
                 contentContainerStyle={{paddingBottom: h('3%')}}
                 numColumns={3}
+                keyExtractor={(item, index) => String(index)}
                 renderItem={({item, index}) => {
                   // const lat1 = latitude; // Latitude of first coordinate
                   // const lon1 = longitude; // Longitude of first coordinate
@@ -596,6 +598,7 @@ const Home = ({navigation}) => {
                 data={(searchValue == '') ? TradingAllData : TradingData}
                 contentContainerStyle={{paddingBottom: h('3%')}}
                 numColumns={3}
+                keyExtractor={(item, index) => String(index)}
                 renderItem={({item}) => {
                   return (
                     <>

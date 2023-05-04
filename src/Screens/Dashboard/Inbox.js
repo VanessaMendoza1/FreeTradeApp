@@ -14,7 +14,7 @@ import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MessageHead from '../../Components/MessageHead';
 import { getCurrentTimeStamp } from '../../utils/time'
-
+import firestore from '@react-native-firebase/firestore';
 import {useSelector} from 'react-redux';
 import database from '@react-native-firebase/database';
 
@@ -85,6 +85,55 @@ const Inbox = ({navigation, route}) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    console.log({params: route.params})
+    let {
+      itemPrice,
+      itemImage,
+      sellersName,
+      sellersImage,
+      roomId,
+      id: otherUserId,
+    } = route.params.receiverData
+
+    setItemOfDiscussionImage(itemImage)
+    setItemOfDiscussionPrice(itemPrice)
+    // console.log(receiverData?.id) // PtElk401JWN4M6PnCIGonhNJaOt2
+    // console.log(userData?.UserID) // KaKBwexWyBX26BRoys6NaIMoBtV2
+    
+    // NOT NEEDED ANYMRORE
+    //   database()
+    //     .ref('/chatlist/' + receiverData?.id) // PtElk401JWN4M6PnCIGonhNJaOt2
+    //     .once('value')
+    //     .then(snapshot => {
+    //       console.log("THIS!!!!!!! 1111")
+    //       console.log({this: snapshot.val()})
+    //       // querySnapshot.forEach(snapshot => {
+    //       //   console.log("THIS!!!!!!! 1111")
+    //       //   console.log({this: Object.values(snapshot.val())})
+    //       // });
+    //     })
+
+    //   database()
+    //     .ref('/chatlist/' + userData?.UserID) // KaKBwexWyBX26BRoys6NaIMoBtV2
+    //     .once('value')
+    //     .then(snapshot => {
+    //       console.log("THIS!!!!!!! 2")
+    //       console.log({this: snapshot.val()})
+    //       // querySnapshot.forEach(snapshot => {
+    //       //   console.log("THIS!!!!!!! 1111")
+    //       //   console.log({this: Object.values(snapshot.val())})
+    //       // });
+    //     })
+
+      
+
+
+      // '/chatlist/' + receiverData?.id + '/' + userData?.UserID
+
+    console.log({itemPrice, itemImage, sellersName, sellersImage, otherUserId, roomId})
+  }, [])
+
   const AutSender = () => {
     let msgData = {
       roomId: receiverData.roomId,
@@ -122,6 +171,8 @@ const Inbox = ({navigation, route}) => {
   const [msg, setMsg] = React.useState('');
   const [disabled, setdisabled] = React.useState(false);
   const [allChat, setallChat] = React.useState([]);
+  const [itemOfDiscussionImage, setItemOfDiscussionImage] = React.useState('');
+  const [itemOfDiscussionPrice, setItemOfDiscussionPrice] = React.useState(0);
 
   React.useEffect(() => {
     console.log({allChat})
@@ -169,11 +220,28 @@ const Inbox = ({navigation, route}) => {
             <View style={styles.ProfileContainer2}>
               <Text style={styles.FontWork}>{receiverData.name}</Text>
             </View>
+          
+          </View>
+          
+          <View style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <Image
+              style={{width: 50, height: 50, resizeMode: 'stretch', borderRadius: 10, marginBottom: 2}}
+              source={{uri: itemOfDiscussionImage}}
+            />
+            <Text style={{textAlign: "center", color: "white"}}>
+              ${itemOfDiscussionPrice}
+            </Text>
           </View>
         </View>
         {/* header */}
 
         <View style={{flex: 1}}>
+          
           <FlatList
             style={{flex: 1}}
             data={allChat}
@@ -183,10 +251,12 @@ const Inbox = ({navigation, route}) => {
             renderItem={({item}) => {
               console.warn(userData.userid);
               return (
-                <MsgComponent
-                  sender={item.from == userData.UserID}
-                  item={item}
-                />
+                <>
+                  <MsgComponent
+                    sender={item.from == userData.UserID}
+                    item={item}
+                  />
+                </>
               );
             }}
           />

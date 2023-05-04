@@ -66,6 +66,7 @@ const MessageScreen = ({navigation}) => {
 
       {users &&
         users?.map((item, idx) => {
+          console.log({USERS: users})
           return (
             <MessageHead
               key={idx}

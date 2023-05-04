@@ -27,6 +27,7 @@ import {
   import LoadingScreen from '../../Components/LoadingScreen';
   
   import axios from 'axios';
+  import { areNotificationsHidden } from '../../utils/appConfigurations'
   
   const isItemLiked = (itemId, setLikedCallback) => {
     let currentUserId = auth().currentUser.uid
@@ -303,7 +304,7 @@ import {
             },
             data: data,
           };
-          axios(config)
+          let callBackIfNotificationsNotHidden = axios(config)
             .then(function (response) {
               console.log(JSON.stringify(response.data));
               navigation.goBack();
@@ -313,6 +314,8 @@ import {
               console.warn(error);
               alert('Offer Sent');
             });
+
+          areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
         })
         .catch(err => console.warn(err));
     };

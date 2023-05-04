@@ -34,8 +34,8 @@ const getPolicy = (callback) => getConfigurations(dataTypeForPolicy, callback)
 const getAboutUs = (callback) => getConfigurations(dataTypeForAboutUs, callback)
 const getContactUs = (callback) => getConfigurations(dataTypeForContactUs, callback)
 
-const areNotificationsHidden = (callback) => {
-    let currentUserId = auth().currentUser.uid
+const areNotificationsHidden = (callback, currentUserId = null) => {
+    if (currentUserId == null)currentUserId = auth().currentUser.uid
     firestore()
         .collection('Users')
         .doc(currentUserId)

@@ -32,57 +32,84 @@ const StartConversation = ({navigation, route}) => {
 
   const createChatList = data => {
     setloading(true);
-    let roomId = uuid.v4();
-    let SendData = {
-      roomId,
-      id: data.UserID,
-      name: data.name,
-      img: data.image,
-      emailId: data.email,
-      about: data.Bio,
-      lastMsg: txt,
-      Token: data.NotificationToken,
-    };
-    sendMsg(txt, settxt, setloading, userData, SendData)
+
     database()
       .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
       .once('value')
       .then(async snapshot => {
+        let roomId
         if (snapshot.val() == null) {
-
-          let myData = {
-            roomId,
-            id: userData.UserID,
-            name: userData.name,
-            img: userData.image,
-            emailId: userData.emails,
-            about: userData.Bio,
-            lastMsg: txt,
-            Token: userData.NotificationToken,
-          };
-          database()
-            .ref('/chatlist/' + data.UserID + '/' + userData.UserID)
-            .update(myData)
-            .then(() => console.log('Data updated.'));
-
-          data.lastMsg = txt;
-          data.roomId = roomId;
-
-          database()
-            .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
-            .update(SendData)
-            .then(() => console.log('Data updated.'));
-
-          navigation.navigate('Inbox', {receiverData: SendData});
-          setloading(false);
+          roomId = snapshot.val().roomId
         } else {
-          navigation.navigate('Inbox', {
-            receiverData: snapshot.val(),
-            txt: txt,
-          });
-          setloading(false);
+          roomId = uuid.v4();
         }
-      });
+        console.log({roomId})
+        let SendData = {
+          roomId,
+          id: data.UserID,
+          name: data.name,
+          img: data.image,
+          emailId: data.email,
+          about: data.Bio,
+          lastMsg: txt,
+          Token: data.NotificationToken,
+          
+          itemPrice: data.Price,
+          itemImage: data.images[0],
+          sellersName: data.user.name,
+          sellersImage: data.user.image,
+        };
+        sendMsg(txt, settxt, setloading, userData, SendData)
+        database()
+          .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
+          .once('value')
+          .then(async snapshot => {
+            if ((snapshot.val() == null) || (snapshot.val().itemPrice == null && snapshot.val().itemImage == null)) {
+              let myData = {
+                roomId,
+                id: userData.UserID,
+                name: userData.name,
+                img: userData.image,
+                emailId: userData.emails,
+                about: userData.Bio,
+                lastMsg: txt,
+                Token: userData.NotificationToken,
+                
+                itemPrice: data.Price,
+                itemImage: data.images[0],
+                sellersName: data.user.name,
+                sellersImage: data.user.image,
+              };
+              database()
+                .ref('/chatlist/' + data.UserID + '/' + userData.UserID)
+                .update(myData)
+                .then(() => console.log('Data updated.'));
+    
+              data.lastMsg = txt;
+              data.roomId = roomId;
+    
+              database()
+                .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
+                .update(SendData)
+                .then(() => console.log('Data updated.'));
+    
+              navigation.navigate('Inbox', {receiverData: SendData});
+              setloading(false);
+            } else {
+              navigation.navigate('Inbox', {
+                txt: txt,
+                receiverData: {
+                  ...snapshot.val(),
+                  itemPrice: data.Price,
+                  itemImage: data.images[0],
+                  sellersName: data.user.name,
+                  sellersImage: data.user.image,
+                }
+              });
+              setloading(false);
+            }
+          });
+      })
   };
 
   return (
@@ -135,7 +162,7 @@ const StartConversation = ({navigation, route}) => {
       {txt !== '' && (
         <Appbutton
           onPress={() => {
-            createChatList(route.params.data.user);
+            createChatList(route.params.data);
           }}
           text={'Send'}
         />
