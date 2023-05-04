@@ -47,6 +47,7 @@ import AboutUsScreen from '../Screens/Settings/AboutUsScreen'
 import PrivacyPolicyScreen from '../Screens/Settings/PrivacyPolicyScreen'
 import TermsAndConditionsScreen from '../Screens/Settings/TermsAndConditionsScreen'
 import ContactUsScreen from '../Screens/Settings/ContactUsScreen'
+import ToggleNotificationsScreen from '../Screens/Settings/ToggleNotificationsScreen';
 
 import TabNavigation from './TabNavigation';
 
@@ -93,6 +94,7 @@ const StackNavigation = () => {
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
         <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+        <Stack.Screen name="ToggleNotifications" component={ToggleNotificationsScreen} />
         <Stack.Screen
           name="BussinessAccountEdits"
           component={BussinessAccountEdits}

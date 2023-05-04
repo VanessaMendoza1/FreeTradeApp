@@ -144,30 +144,30 @@ const LocationScreen = ({navigation}) => {
           <Text style={{
             marginTop: 20,
             textAlign: "center",
-            fontSize: 20,
+            fontSize: 15,
           }}>
             Current Distance: {currentDistance} miles
           </Text>
           <Text style={{
             marginTop: 20,
             textAlign: "center",
-            fontSize: 20,
+            fontSize: 15,
           }}>
             Current Location: {currentLocation}
           </Text>
           
-          <Text style={{
+          {/* <Text style={{
             marginTop: 40,
             textAlign: "center",
             fontSize: 20,
-            fontWeight: "bold"
+            // fontWeight: "bold"
           }}>
             Set New Location And Distance
-          </Text>
+          </Text> */}
           <Text style={{
             marginTop: 40,
             textAlign: "center",
-            fontSize: 20,
+            fontSize: 15,
           }}>
             New Distance: {distance} miles
           </Text>
@@ -175,9 +175,9 @@ const LocationScreen = ({navigation}) => {
             style={{width: "94%", height: 100, alignSelf: "center"}}
             step={1}
             minimumValue={10}
-            maximumValue={100}
-            minimumTrackTintColor="#000000"
-            maximumTrackTintColor="#000000"
+            maximumValue={200}
+            minimumTrackTintColor={Colors.Primary}
+            maximumTrackTintColor={Colors.Primary}
             onValueChange={(value) => setDistance(value)}
           />
 
@@ -200,7 +200,7 @@ const LocationScreen = ({navigation}) => {
                 borderBottomWidth: h('0.2%'),
                 backgroundColor: 'white',
                 marginTop: h('2%'),
-
+                
                 borderBottomColor: Colors.Primary,
               },
               textInput: {

@@ -220,23 +220,21 @@ const Home = ({navigation}) => {
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
-    const lat1 = UserData.latitude; // Latitude of first coordinate
-    const lon1 = UserData.longitude; // Longitude of first coordinate
+    const lat1 = UserData.LocationFilter.latitude; // Latitude of first coordinate
+    const lon1 = UserData.LocationFilter.longitude; // Longitude of first coordinate
 
     await firestore()
       .collection('Post')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          console.log({HERE: documentSnapshot.data()})
-
           if (documentSnapshot.data()){
             const lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
             const lon2 = documentSnapshot.data().user.longitude;
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
   
             if (documentSnapshot.data().status === false) {
-              if (Math.ceil(distanceInKm) < 160) {
+              if (Math.ceil(distanceInKm) < UserData.LocationFilter.LocalDistance) {
                 let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
@@ -352,6 +350,7 @@ const Home = ({navigation}) => {
             pagingEnabled
             data={ImageAds}
             horizontal
+            keyExtractor={(item, index) => String(index)}
             renderItem={({item, index}) => (
               <Ads
                 onPress={() => {
@@ -435,9 +434,9 @@ const Home = ({navigation}) => {
             /> */}
           </View>
           <Text style={styles.LondonUkText}>
-            {UserData.location === ''
+            {UserData.LocationFilter.location === ''
               ? 'Enter Your Location'
-              : UserData.location}
+              : UserData.LocationFilter.location}
           </Text>
         </TouchableOpacity>
         {/* location meter */}
@@ -503,6 +502,7 @@ const Home = ({navigation}) => {
           <>
             {ServiceAllData.length >= 1 ? (
               <FlatList
+                keyExtractor={(item, index) => String(index)}
                 data={(searchValue == '') ? ServiceAllData : ServiceData}
                 contentContainerStyle={{paddingBottom: h('3%')}}
                 numColumns={3}
@@ -549,6 +549,7 @@ const Home = ({navigation}) => {
                 data={(searchValue == '') ? SellingAllData : SellingData}
                 contentContainerStyle={{paddingBottom: h('3%')}}
                 numColumns={3}
+                keyExtractor={(item, index) => String(index)}
                 renderItem={({item, index}) => {
                   // const lat1 = latitude; // Latitude of first coordinate
                   // const lon1 = longitude; // Longitude of first coordinate
@@ -597,6 +598,7 @@ const Home = ({navigation}) => {
                 data={(searchValue == '') ? TradingAllData : TradingData}
                 contentContainerStyle={{paddingBottom: h('3%')}}
                 numColumns={3}
+                keyExtractor={(item, index) => String(index)}
                 renderItem={({item}) => {
                   return (
                     <>

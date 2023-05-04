@@ -31,6 +31,7 @@ import {
 import LoadingScreen from '../../Components/LoadingScreen';
 
 import axios from 'axios';
+import { areNotificationsHidden } from '../../utils/appConfigurations'
 
 const UserPost = ({navigation, route}) => {
   console.warn(route.params.data.images);
@@ -260,7 +261,7 @@ const UserPost = ({navigation, route}) => {
           },
           data: data,
         };
-        axios(config)
+        let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
             navigation.navigate('Review');
@@ -268,6 +269,8 @@ const UserPost = ({navigation, route}) => {
           .catch(function (error) {
             console.warn(error);
           });
+
+        areNotificationsHidden(callBackIfNotificationsNotHidden, id)
       })
       .catch(err => console.warn(err));
   };

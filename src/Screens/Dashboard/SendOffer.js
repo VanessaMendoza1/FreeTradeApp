@@ -13,6 +13,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import Appbutton from '../../Components/Appbutton';
 import {useSelector, useDispatch} from 'react-redux';
+import { areNotificationsHidden } from '../../utils/appConfigurations'
 
 import axios from 'axios';
 
@@ -51,7 +52,8 @@ const SendOffer = ({navigation, route}) => {
           },
           data: data,
         };
-        axios(config)
+        
+        let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
             navigation.goBack();
@@ -60,6 +62,8 @@ const SendOffer = ({navigation, route}) => {
           .catch(function (error) {
             console.warn(error);
           });
+
+        areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
       })
       .catch(err => console.warn(err));
   };

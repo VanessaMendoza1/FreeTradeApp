@@ -12,13 +12,13 @@ const MsgComponent = props => {
   }, [item])
 
   const isMessageForCurrentUser = (messageData) => {
-    const currentUser = auth().currentUser.uid
-    return currentUser.id == messageData.to
+    const currentUser = auth().currentUser
+    return currentUser.uid == messageData.to
   }
 
   const isMessageForOtherUser = (messageData) => {
-    const currentUser = auth().currentUser.uid
-    return currentUser.id != messageData.to
+    const currentUser = auth().currentUser
+    return currentUser.uid != messageData.to
   }
 
   const setMessageSeenTime = (messageData) => {

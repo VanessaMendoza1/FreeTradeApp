@@ -45,7 +45,7 @@ const ContactUsScreen = ({navigation}) => {
                     </View>
                 </View>
                 <Text style={{backgroundColor: '#eee', textAlign: "center"}}>
-                    Call: {contactUsNumber}
+                    {contactUsNumber}
                 </Text>
             </>
         </ScrollView>
