@@ -39,9 +39,9 @@ const StartConversation = ({navigation, route}) => {
       .then(async snapshot => {
         let roomId
         if (snapshot.val() == null) {
-          roomId = snapshot.val().roomId
-        } else {
           roomId = uuid.v4();
+        } else {
+          roomId = snapshot.val().roomId
         }
         console.log({roomId})
         let SendData = {

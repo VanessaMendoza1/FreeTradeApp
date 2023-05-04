@@ -110,25 +110,25 @@ const FavouriteItemsScreen = ({navigation}) => {
 						<>
 							<Text style={styles.itemHeadings}>Selling Items Liked </Text>
 							<FlatList
-									data={favouriteSellingItems}
-									contentContainerStyle={{paddingBottom: h('3%')}}
-									numColumns={3}
-									renderItem={({item, index}) => {
+								data={favouriteSellingItems}
+								contentContainerStyle={{paddingBottom: h('3%')}}
+								numColumns={3}
+								renderItem={({item, index}) => {
 									return (
 										<>
 											<View
-													style={{
+												style={{
 													flex: 1,
 													margin: 2,
 													backgroundColor: '#fff',
 													height: h('19%'),
-													}}>
-													<ServiceItem
+												}}>
+												<ServiceItem
 													item={item}
 													onPress={() => {
-															navigation.navigate('PostScreen', {data: item});
+														navigation.navigate('PostScreen', {data: item});
 													}}
-													/>
+												/>
 											</View>
 										</>
 									);
@@ -137,7 +137,10 @@ const FavouriteItemsScreen = ({navigation}) => {
 							/>
 						</>
 					) : (
-						<Text style={styles.itemHeadings}>No selling item found in favourites</Text>
+						<>
+							<Text style={styles.itemHeadings}>No selling item found in favourites</Text>
+							<View style={{height: 50}}></View>
+						</>
 					)}
 
 					{favouriteServicesItems.length >= 1 ? (
@@ -148,30 +151,33 @@ const FavouriteItemsScreen = ({navigation}) => {
 								contentContainerStyle={{paddingBottom: h('3%')}}
 								numColumns={3}
 								renderItem={({item}) => {
-								return (
+									return (
 										<>
-										<View
+											<View
 												style={{
-												flex: 1,
-												margin: 2,
-												backgroundColor: '#fff',
-												height: h('19%'),
+													flex: 1,
+													margin: 2,
+													backgroundColor: '#fff',
+													height: h('19%'),
 												}}>
 												<ServiceItem
-												item={item}
-												onPress={() => {
+													item={item}
+													onPress={() => {
 														navigation.navigate('PostScreen', {data: item});
-												}}
+													}}
 												/>
-										</View>
+											</View>
 										</>
-								);
+									);
 								}}
 								keyExtractor={item => item.DocId}
 							/>
 						</>
 					) : (
-						<Text style={styles.itemHeadings}>No services item found in favourites</Text>
+						<>
+							<Text style={styles.itemHeadings}>No services item found in favourites</Text>
+							<View style={{height: 50}}></View>
+						</>
 					)}
 						
 					{favouriteTradingItems.length >= 1 ? (
@@ -205,7 +211,10 @@ const FavouriteItemsScreen = ({navigation}) => {
 							/>
 						</>
 					) : (
-						<Text style={styles.itemHeadings}>No trading item found in favourites</Text>
+						<>
+							<Text style={styles.itemHeadings}>No trading item found in favourites</Text>
+							<View style={{height: 80}}></View>
+						</>
 					)}
 				</View>
 			)}

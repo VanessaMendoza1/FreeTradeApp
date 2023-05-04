@@ -220,8 +220,8 @@ const Home = ({navigation}) => {
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
-    const lat1 = UserData.LocationFilter.latitude; // Latitude of first coordinate
-    const lon1 = UserData.LocationFilter.longitude; // Longitude of first coordinate
+    const lat1 = UserData?.LocationFilter?.latitude; // Latitude of first coordinate
+    const lon1 = UserData?.LocationFilter?.longitude; // Longitude of first coordinate
 
     await firestore()
       .collection('Post')
@@ -234,7 +234,7 @@ const Home = ({navigation}) => {
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
   
             if (documentSnapshot.data().status === false) {
-              if (Math.ceil(distanceInKm) < UserData.LocationFilter.LocalDistance) {
+              if (Math.ceil(distanceInKm) < UserData?.LocationFilter?.LocalDistance) {
                 let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
@@ -434,9 +434,9 @@ const Home = ({navigation}) => {
             /> */}
           </View>
           <Text style={styles.LondonUkText}>
-            {UserData.LocationFilter.location === ''
-              ? 'Enter Your Location'
-              : UserData.LocationFilter.location}
+            {(UserData?.LocationFilter?.location === '' || !UserData?.LocationFilter?.location)
+              ? 'Press To Set Search Location'
+              : UserData?.LocationFilter?.location}
           </Text>
         </TouchableOpacity>
         {/* location meter */}

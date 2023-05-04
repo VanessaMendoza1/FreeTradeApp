@@ -35,6 +35,44 @@ const SubscriptionPage = ({navigation}) => {
   const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
 
   React.useEffect(() => {
+    const MySubscriptionPackage = async () => {
+      let data = [];
+      await firestore()
+        .collection('sub')
+        .get()
+        .then(async querySnapshot => {
+          querySnapshot.forEach(documentSnapshot => {
+            if (documentSnapshot.data().userid === MyData.UserID) {
+              data.push(documentSnapshot.data());
+            }
+          });
+        });
+      await dispatch(SubDataAdd(data));
+      onDone();
+    };
+    const now = moment.utc();
+    var end = moment().add(30, 'days');
+    var days = now.diff(end, 'days');
+    let amount = 1.99
+    firestore()
+      .collection('sub')
+      .doc(MyData.UserID)
+      .set({
+        userid: MyData.UserID,
+        startDate: JSON.stringify(now),
+        endDate: JSON.stringify(end),
+        plan: plan,
+        price: amount === 999 ? '9.99$' : '1.99',
+        Cancel: false,
+      })
+      .then(() => {
+        MySubscriptionPackage();
+      })
+      .catch(err => {
+        console.warn(err);
+      });
+  }, [])
+  React.useEffect(() => {
     firestore()
       .collection('AppConfigurations')
       .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
