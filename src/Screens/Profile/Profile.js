@@ -205,6 +205,7 @@ const Profile = ({navigation}) => {
                 </View>
 
                 <View style={styles.BtoomTobCC}>
+                  
                   {/* <TouchableOpacity
                   onPress={() => {
                     setmode(true);
@@ -224,9 +225,22 @@ const Profile = ({navigation}) => {
                 </View>
               </View>
             </View>
-            <View style={styles.bottomPrflHeader}>
-              <Icon name="mail" size={30} color={Colors.Primary} />
-              <Text style={styles.EmailText}>Email Verified</Text>
+            <View style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 70
+            }}>
+              <View style={{marginLeft: 25,}}>
+                <Icon name="mail" size={30} color={Colors.Primary}/>
+              </View>
+              <View style={{...styles.bottomPrflHeader, flex: 1, paddingRight: 70}}>
+                <Text style={{...styles.EmailText, textAlign: "left"}}>
+                  <Text style={{...styles.IIICTxt,}}>{MyData.email}</Text>
+                </Text>
+                <Text>Email Verified</Text>
+              </View>
             </View>
           </View>
           {/* profileHeader */}
