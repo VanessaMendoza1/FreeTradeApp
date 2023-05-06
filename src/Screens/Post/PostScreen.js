@@ -35,7 +35,7 @@ import { areNotificationsHidden } from '../../utils/appConfigurations'
 import axios from 'axios';
 
 const PostScreen = ({navigation, route}) => {
-  console.warn(route.params.data.videUrl);
+  // console.warn(route.params.data.videUrl);
   const [loading, setloading] = React.useState(false);
   // console.warn(route.params.data.user);
   const [Sitem, setSitem] = React.useState([]);
@@ -557,7 +557,7 @@ const PostScreen = ({navigation, route}) => {
                     }
                   });
                 } else {
-                  alert('You need to buy Subscription');
+                  // alert('You need to buy Subscription');
                   navigation.navigate('SubscriptionPage');
                 }
 

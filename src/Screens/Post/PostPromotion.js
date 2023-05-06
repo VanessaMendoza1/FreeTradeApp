@@ -31,9 +31,9 @@ const PostPromotion = ({navigation, route}) => {
   console.warn(route.params.data.title);
   const dispatch = useDispatch();
   const [items, setItems] = React.useState([
-    {label: '$1 (1 ad for 15 days)', value: 100},
-    {label: '$5 (1 ad for 30 days)', value: 500},
-    {label: '$8 (2 ad for 30 days)', value: 800},
+    // {label: '$1 (1 ad for 15 days)', value: 100},
+    // {label: '$5 (1 ad for 30 days)', value: 500},
+    // {label: '$8 (2 ad for 30 days)', value: 800},
   ]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [open, setOpen] = React.useState(false);
