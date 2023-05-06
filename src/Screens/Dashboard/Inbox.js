@@ -219,6 +219,7 @@ const Inbox = ({navigation, route}) => {
                 />
               </View>
             </View>
+            
             <View style={styles.ProfileContainer2}>
               <Text style={styles.FontWork}>{receiverData.sellersName}</Text>
             </View>
@@ -330,6 +331,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   MiddleContainer: {
+    // display: "flex",
+    // flexDirection: "row",
     width: '70%',
     height: '100%',
     // backgroundColor: 'red',

@@ -151,8 +151,12 @@ const StartConversation = ({navigation, route}) => {
         </View> */}
 
         <View style={styles.MiddleContainer}>
-          <View style={styles.ProfileContainer}>
-            {/* <View style={styles.ProfileCC}>
+          {/* <View style={styles.ProfileContainer}> */}
+          <View style={{
+            display: 'flex',
+            flexDirection: "row"
+          }}>
+            <View style={styles.ProfileCC}>
               <Image
                 style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                 source={{
@@ -161,7 +165,7 @@ const StartConversation = ({navigation, route}) => {
                     : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                 }}
               />
-            </View> */}
+            </View>
           </View>
           <View style={styles.ProfileContainer2}>
             <Text style={styles.FontWork}>{receiverData.sellersName}</Text>
@@ -254,9 +258,42 @@ const styles = StyleSheet.create({
   MiddleContainer: {
     width: '60%',
     height: '100%',
+    display: "flex",
+    flexDirection: "row",
     // backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  ProfileContainer: {
+    width: '30%',
+    height: '100%',
+    // backgroundColor: 'green',
+
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ProfileContainer2: {
+    marginLeft: 20,
+    width: '82%',
+    height: '100%',
+    // backgroundColor: 'green',
+
+    justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  ProfileCC: {
+    width: 55,
+    height: 55,
+    borderRadius: 1000 / 2,
+    backgroundColor: '#fff3',
+    overflow: 'hidden',
+  },
+  BtnCCW: {
+    width: '20%',
+    height: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.Primary,
   },
   FontWork: {
     color: 'white',
