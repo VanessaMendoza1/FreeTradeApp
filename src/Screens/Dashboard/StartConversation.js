@@ -30,6 +30,28 @@ const StartConversation = ({navigation, route}) => {
   const [txt, settxt] = React.useState('');
   const userData = useSelector(state => state.counter.data);
 
+  const [itemOfDiscussionImage, setItemOfDiscussionImage] = React.useState('');
+  const [sellersImage, setSellersImage] = React.useState('');
+  const [itemOfDiscussionPrice, setItemOfDiscussionPrice] = React.useState(0);
+
+  const {receiverData, txt: _txt} = route.params;
+
+
+  React.useEffect(() => {
+    let {
+      itemPrice,
+      itemImage,
+      sellersName,
+      sellersImage: _sellersImage,
+      roomId,
+      id: otherUserId,
+    } = route.params.receiverData
+
+    setItemOfDiscussionImage(itemImage)
+    setItemOfDiscussionPrice(itemPrice)
+    setSellersImage(_sellersImage)
+    console.log({itemPrice, itemImage, sellersName, sellersImage, otherUserId, roomId})
+  }, [])
   const createChatList = data => {
     setloading(true);
 
@@ -39,9 +61,9 @@ const StartConversation = ({navigation, route}) => {
       .then(async snapshot => {
         let roomId
         if (snapshot.val() == null) {
-          roomId = snapshot.val().roomId
-        } else {
           roomId = uuid.v4();
+        } else {
+          roomId = snapshot.val().roomId
         }
         console.log({roomId})
         let SendData = {
@@ -111,6 +133,7 @@ const StartConversation = ({navigation, route}) => {
           });
       })
   };
+  console.log({sellersImage})
 
   return (
     <View style={styles.MainContaiiner}>
@@ -123,17 +146,56 @@ const StartConversation = ({navigation, route}) => {
           style={styles.LeftContainer}>
           <Icon name="arrow-back-outline" size={30} color="#ffff" />
         </TouchableOpacity>
-        <View style={styles.MiddleContainer}>
+        {/* <View style={styles.MiddleContainer}>
           <Text style={styles.FontWork}>Send Message</Text>
+        </View> */}
+
+        <View style={styles.MiddleContainer}>
+          {/* <View style={styles.ProfileContainer}> */}
+          <View style={{
+            display: 'flex',
+            flexDirection: "row"
+          }}>
+            <View style={styles.ProfileCC}>
+              <Image
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                source={{
+                  uri: sellersImage
+                    ? sellersImage
+                    : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.ProfileContainer2}>
+            <Text style={styles.FontWork}>{receiverData.sellersName}</Text>
+          </View>
+        
+        </View>
+        
+        <View style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <Image
+            style={{width: 50, height: 50, resizeMode: 'stretch', borderRadius: 10, marginBottom: 2}}
+            source={{uri: itemOfDiscussionImage}}
+          />
+          <Text style={{textAlign: "center", color: "white"}}>
+            ${itemOfDiscussionPrice}
+          </Text>
         </View>
       </View>
       {/* header */}
 
       <View style={styles.InputContainers}>
+        <Text style={{...styles.Txt123, marginBottom: 10}}>New Message</Text>
         <TextInput
           style={styles.inputCC}
-          placeholder="Enter Message"
-          placeholderTextColor={Colors.Primary}
+          // placeholder="Enter Message"
+          // placeholderTextColor={Colors.Primary}
           onChangeText={e => settxt(e)}
           value={txt}
         />
@@ -196,9 +258,42 @@ const styles = StyleSheet.create({
   MiddleContainer: {
     width: '60%',
     height: '100%',
+    display: "flex",
+    flexDirection: "row",
     // backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  ProfileContainer: {
+    width: '30%',
+    height: '100%',
+    // backgroundColor: 'green',
+
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ProfileContainer2: {
+    marginLeft: 20,
+    width: '82%',
+    height: '100%',
+    // backgroundColor: 'green',
+
+    justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  ProfileCC: {
+    width: 55,
+    height: 55,
+    borderRadius: 1000 / 2,
+    backgroundColor: '#fff3',
+    overflow: 'hidden',
+  },
+  BtnCCW: {
+    width: '20%',
+    height: '80%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.Primary,
   },
   FontWork: {
     color: 'white',
@@ -213,21 +308,23 @@ const styles = StyleSheet.create({
     paddingTop: h('1%'),
   },
   inputCC: {
-    width: '90%',
-    height: h('20%'),
+    alignSelf: "center",
+    width: '100%',
+    height: h('7%'),
     // backgroundColor: Colors.Primary,
     // alignSelf: 'center',
-    borderRadius: h('1%'),
-    borderColor: Colors.Primary,
+    borderRadius: h('1.5%'),
+    // borderColor: Colors.Primary,
+    borderColor: 'black',
     borderWidth: h('0.2%'),
     fontSize: h('2%'),
   },
   inputBtn: {
     // backgroundColor: Colors.Primary,
     width: '75%',
-    height: h('7%'),
+    height: h('5%'),
     marginTop: h('2%'),
-    borderRadius: h('0.5%'),
+    borderRadius: h('5%'),
     borderColor: Colors.Primary,
     borderWidth: h('0.2%'),
     justifyContent: 'center',

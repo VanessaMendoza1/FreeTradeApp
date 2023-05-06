@@ -74,8 +74,8 @@ const MessageScreen = ({navigation}) => {
                 console.log({item})
                 navigation.navigate('Inbox', {receiverData: item})
               }}
-              username={item.name}
-              img={item.img}
+              username={item.sellersName}
+              img={item.sellersImage}
             />
           );
         })}

@@ -23,8 +23,8 @@ import {useSelector, useDispatch} from 'react-redux';
 const Setting = ({navigation}) => {
   const [ isBusinessAccount, setIsBusinessAccount ] = React.useState(false)
   React.useEffect(() => {
-    // isUserHavingBussinessSubscription()
-    setIsBusinessAccount(true)
+    isUserHavingBussinessSubscription()
+    // setIsBusinessAccount(true)
   }, [])
   const MyData = useSelector(state => state.counter.data);
   console.warn(MyData.name);

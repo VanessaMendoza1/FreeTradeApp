@@ -44,9 +44,18 @@ const AboutUsScreen = ({navigation}) => {
                     </View>
                 </View>
 
-                <Text style={{backgroundColor: '#eee',}}>
-                    {aboutUsContent}
-                </Text>
+                <View style={{
+                    textAlign: "center",
+                    backgroundColor: "#eee",
+                    marginHorizontal: 10,
+                    // borderRadius: 10,
+                    // paddingVertical: 20,
+                    paddingHorizontal: 20,     
+                }}>
+                    <Text>
+                        {aboutUsContent}
+                    </Text>
+                </View>
             </>
         </ScrollView>
     )
@@ -56,7 +65,7 @@ const styles = StyleSheet.create({
     MainContainer: {
       flex: 1,
       backgroundColor: '#eee',
-      paddingBottom: 100,
+      paddingBottom: 30,
     },
     Header: {
       width: '100%',

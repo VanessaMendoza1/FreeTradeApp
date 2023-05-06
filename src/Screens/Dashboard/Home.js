@@ -5,6 +5,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  ScrollView
 } from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -24,6 +25,8 @@ import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Icons from '../../utils/icons';
+import Collapsible from 'react-native-collapsible';
+
 
 import {getPreciseDistance} from 'geolib';
 
@@ -47,6 +50,80 @@ const useInterval = (callback, delay) => {
   }, [delay]);
 };
 
+const SECTIONS = [
+  {
+    title: 'First',
+    content: 'Lorem ipsum...',
+  },
+  {
+    title: 'Second',
+    content: 'Lorem ipsum...',
+  },
+];
+
+const getCategoriesAndSubCategories = (callback) => {
+  let categoryAlongSubCategories = {}
+  firestore()
+    .collection('Category')
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        let categoryData = documentSnapshot.data()
+        let { title, subCategory } = categoryData
+        let subCategories = []
+        if (subCategory != null && subCategory != undefined && Array.isArray(subCategory)){
+          subCategory.map((categoryData) => {
+            let { title: subCategoryTitle } = categoryData
+            subCategories.push(subCategoryTitle)
+          })
+        }
+        categoryAlongSubCategories[ title ] = subCategories
+      });
+      console.log({categoryAlongSubCategories})
+
+      callback(categoryAlongSubCategories)
+
+    });
+}
+const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callback) => {
+  let collectionReferece = firestore()
+    .collection('Post')
+    .where('Category', '==', categoryName)
+    .where('SubCategory', '==', subCategoryName)
+  
+  let collectionRefereceWithoutSubCategory = firestore()
+    .collection('Post')
+    .where('Category', '==', categoryName)
+
+  let callbackAfterGettingData = (querySnapshot) => {
+    if (querySnapshot.empty){
+      console.log('NO ITEMS FOUND');
+      return
+    }
+    let filteredItemsThroughCategoryAndSubCategory = []
+    querySnapshot.forEach((doc) => {
+      // console.log(doc.id, doc.data());
+      let itemData = doc.data()
+      let itemId = doc.id // favouriteItemData.productId
+      filteredItemsThroughCategoryAndSubCategory.push({...doc.data(), id: doc.id})
+    })
+
+    console.log({filteredItemsThroughCategoryAndSubCategory})
+
+    callback(filteredItemsThroughCategoryAndSubCategory)
+  }
+
+  if (subCategoryName == null) {
+    collectionRefereceWithoutSubCategory
+      .get()
+      .then(callbackAfterGettingData)
+  } else {
+    collectionReferece
+      .get()
+      .then(callbackAfterGettingData)
+  }
+}
+
 const Home = ({navigation}) => {
   const [longitude, setLongitude] = React.useState(0);
   const [latitude, setlatitude] = React.useState(0);
@@ -67,6 +144,19 @@ const Home = ({navigation}) => {
   const [ServiceData, setServiceData] = React.useState(ServiceAllData);
   const [SellingData, setSellingData] = React.useState(SellingAllData);
   const [TradingData, setTradingData] = React.useState(TradingAllData);
+  const [ categoriesWithSubCategoryData, setCategoriesWithSubCategoryData ] = React.useState({})
+  const [ showCategoryAndSubCategory, setShowCategoryAndSubCategory ] = React.useState(false)
+  const [ showItemsFromCategoryAndSubCategory , setShowItemsFromCategoryAndSubCategory ] = React.useState(false)
+  const [ selectedCategory, setSelectedCategory ] = React.useState(null)
+  const [ selectedSubCategory, setSelectedSubCategory ] = React.useState(null)
+  const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
+  
+  
+  React.useEffect(() => {
+    getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
+  }, [])
+  
+
   // console.warn();
 
   // console.warn(UserData.AccountType);
@@ -220,8 +310,8 @@ const Home = ({navigation}) => {
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
-    const lat1 = UserData.LocationFilter.latitude; // Latitude of first coordinate
-    const lon1 = UserData.LocationFilter.longitude; // Longitude of first coordinate
+    const lat1 = UserData?.LocationFilter?.latitude; // Latitude of first coordinate
+    const lon1 = UserData?.LocationFilter?.longitude; // Longitude of first coordinate
 
     await firestore()
       .collection('Post')
@@ -234,7 +324,7 @@ const Home = ({navigation}) => {
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
   
             if (documentSnapshot.data().status === false) {
-              if (Math.ceil(distanceInKm) < UserData.LocationFilter.LocalDistance) {
+              if (Math.ceil(distanceInKm) < UserData?.LocationFilter?.LocalDistance) {
                 let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
@@ -329,6 +419,10 @@ const Home = ({navigation}) => {
 
       <View style={styles.mainContainer}>
         <Appheader
+          setShowItemsFromCategoryAndSubCategory={setShowItemsFromCategoryAndSubCategory}
+          showCategoryAndSubCategory={showCategoryAndSubCategory}
+          setShowCategoryAndSubCategory={setShowCategoryAndSubCategory}
+          setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
           onSearch={searchFilter}
           onMessage={() => {
             navigation.navigate('MessageScreen');
@@ -338,303 +432,462 @@ const Home = ({navigation}) => {
           }}
           noti={Notii.length >= 1}
         />
-        {/* && subdata[0].plan === 'Business' */}
-        <View style={styles.HeaderBar}>
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            // onViewableItemsChanged={onViewableItemsChangedHandler}
-            viewabilityConfig={{
-              itemVisiblePercentThreshold: 50,
-            }}
-            ref={imageRef}
-            pagingEnabled
-            data={ImageAds}
-            horizontal
-            keyExtractor={(item, index) => String(index)}
-            renderItem={({item, index}) => (
-              <Ads
-                onPress={() => {
-                  // await alert('It will take to User Screen');
-                  navigation.navigate('OtherUserProfile', {
-                    data: item.user,
-                  });
-                }}
-                data={item}
-              />
-            )}
-          />
-        </View>
-        
-        {/* {ImageAds.length > 0 ? (
-          <>
-            {subdata.length > 0 && (
-              <>
-                
-                {UserData.AccountType === 'Business' ? null : (
-                  <View style={styles.HeaderBar}>
+        {(() => {
+          if (showItemsFromCategoryAndSubCategory){
+            return (
+              <ScrollView>
+                <>
+                  <TouchableOpacity onPress={() => {
+                    setShowItemsFromCategoryAndSubCategory(false)
+                    setShowCategoryAndSubCategory(true)
+                    setItemsFromCategoryAndSubCategoryFilteration([])
+                    setSelectedCategory(null)
+                    setSelectedSubCategory(null)
+                  }}>
+                    <Text style={{
+                      textAlign: "center", 
+                      fontWeight: "bold",
+                      paddingVertical: 10,
+                      backgroundColor: "#eee",
+                      marginBottom: 10
+                    }}>
+                      Select Category And Sub-category Again
+                    </Text>
+                  </TouchableOpacity>
+                  {/* {itemsFromCategoryAndSubCategoryFilteration.map((item) => {
+                    return (
+                      <View>
+                        <Text>
+                          {JSON.stringify(item)}
+                        </Text>
+                      </View>
+                    )
+                  })} */}
+                  {itemsFromCategoryAndSubCategoryFilteration.length >= 1 ? (
                     <FlatList
-                      showsHorizontalScrollIndicator={false}
-                      // onViewableItemsChanged={onViewableItemsChangedHandler}
-                      viewabilityConfig={{
-                        itemVisiblePercentThreshold: 50,
+                      data={itemsFromCategoryAndSubCategoryFilteration}
+                      contentContainerStyle={{paddingBottom: h('3%')}}
+                      numColumns={3}
+                      keyExtractor={(item, index) => String(index)}
+                      renderItem={({item, index}) => {
+                        return (
+                          <>
+                            <View
+                              style={{
+                                flex: 1,
+                                margin: 2,
+                                backgroundColor: '#fff',
+                                height: h('19%'),
+                              }}>
+                              <ServiceItem
+                                item={item}
+                                onPress={() => {
+                                  navigation.navigate('PostScreen', {data: item});
+                                }}
+                              />
+                            </View>
+                          </>
+                        );
                       }}
-                      ref={imageRef}
-                      pagingEnabled
-                      data={ImageAds}
-                      horizontal
-                      renderItem={({item, index}) => (
-                        <Ads
-                          onPress={() => {
-                            alert('It will take to User Screen');
-                            // navigation.navigate('OtherUserProfile', {
-                            //   data: item.user,
-                            // });
-                          }}
-                          data={item}
-                        />
-                      )}
+                      keyExtractor={item => item.DocId}
                     />
-                  </View>
+                  ) : (
+                    <View style={styles.ViewMainFrame}>
+                      <Text>No search results. Please try changing your</Text>
+                      <Text>location to find in a different city.</Text>
+                    </View>
+                  )}
+                </>
+              </ScrollView>
+            )
+          } else if (showCategoryAndSubCategory){
+            return (
+              <ScrollView>
+                <>
+                  <TouchableOpacity onPress={() => {
+                    setShowItemsFromCategoryAndSubCategory(false)
+                    setShowCategoryAndSubCategory(false)
+                    setSelectedCategory(null)
+                    setSelectedSubCategory(null)
+                    setItemsFromCategoryAndSubCategoryFilteration([])
+                  }}>
+                    <Text style={{
+                      textAlign: "center", 
+                      fontWeight: "bold",
+                      paddingVertical: 10,
+                      backgroundColor: "#eee",
+                      marginBottom: 10
+                    }}>
+                      X All Categories
+                    </Text>
+                  </TouchableOpacity>
+                  <Collapsible collapsed={!showCategoryAndSubCategory}>
+                    
+                    {Object.keys(categoriesWithSubCategoryData).map((categoryName) => {
+                      return (
+                        <TouchableOpacity onPress={() => setSelectedCategory(categoryName)}>
+                          <Text style={{
+                            fontWeight: "bold",
+                            fontSize: 18,
+                            marginVertical: 12,
+                            paddingLeft: w("10%")
+                          }}>
+                            {categoryName}
+                          </Text>
+                          {(selectedCategory == categoryName) && (
+                            <>
+                              {categoriesWithSubCategoryData[categoryName].map((subCategoryName, index) => {
+                                return (
+                                  <TouchableOpacity onPress={() => {
+                                    setSelectedSubCategory(subCategoryName)
+                                    setSelectedCategory(categoryName)
+                                    setShowCategoryAndSubCategory(false)
+                                    setShowItemsFromCategoryAndSubCategory(true)
+                                    getItemsFromCategoryAndSubCategory(categoryName, subCategoryName, setItemsFromCategoryAndSubCategoryFilteration)
+                                  }}>
+                                    <Text style={{
+                                      // fontWeight: "bold",
+                                      fontSize: 18,
+                                      marginVertical: 12,
+                                      paddingLeft: w("15%")
+                                    }}>
+                                      {subCategoryName}
+                                    </Text>
+                                  </TouchableOpacity>
+                                )
+                              })}
+                              <TouchableOpacity onPress={() => {
+                                setSelectedSubCategory(null)
+                                setSelectedCategory(categoryName)
+                                setShowCategoryAndSubCategory(false)
+                                setShowItemsFromCategoryAndSubCategory(true)
+                                getItemsFromCategoryAndSubCategory(categoryName, null, setItemsFromCategoryAndSubCategoryFilteration)
+                              }}>
+                                <Text style={{
+                                  // fontWeight: "bold",
+                                  fontSize: 18,
+                                  marginVertical: 12,
+                                  paddingLeft: w("15%")
+                                }}>
+                                  Select all in {categoryName} !
+                                </Text>
+                              </TouchableOpacity>
+                            </>
+                          )
+                        }
+                        </TouchableOpacity>
+                      )
+                    })}
+                  </Collapsible>
+                </>
+              </ScrollView>
+            )
+          } else {
+            return (
+              <>
+                <View style={styles.HeaderBar}>
+                <FlatList
+                  showsHorizontalScrollIndicator={false}
+                  // onViewableItemsChanged={onViewableItemsChangedHandler}
+                  viewabilityConfig={{
+                    itemVisiblePercentThreshold: 50,
+                  }}
+                  ref={imageRef}
+                  pagingEnabled
+                  data={ImageAds}
+                  horizontal
+                  keyExtractor={(item, index) => String(index)}
+                  renderItem={({item, index}) => (
+                    <Ads
+                      onPress={() => {
+                        // await alert('It will take to User Screen');
+                        navigation.navigate('OtherUserProfile', {
+                          data: item.user,
+                        });
+                      }}
+                      data={item}
+                    />
+                  )}
+                />
+              </View>
+              
+              {/* {ImageAds.length > 0 ? (
+                <>
+                  {subdata.length > 0 && (
+                    <>
+                      
+                      {UserData.AccountType === 'Business' ? null : (
+                        <View style={styles.HeaderBar}>
+                          <FlatList
+                            showsHorizontalScrollIndicator={false}
+                            // onViewableItemsChanged={onViewableItemsChangedHandler}
+                            viewabilityConfig={{
+                              itemVisiblePercentThreshold: 50,
+                            }}
+                            ref={imageRef}
+                            pagingEnabled
+                            data={ImageAds}
+                            horizontal
+                            renderItem={({item, index}) => (
+                              <Ads
+                                onPress={() => {
+                                  alert('It will take to User Screen');
+                                  // navigation.navigate('OtherUserProfile', {
+                                  //   data: item.user,
+                                  // });
+                                }}
+                                data={item}
+                              />
+                            )}
+                          />
+                        </View>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : null} */}
+              {/* 
+            {ImageAds.length > 0 ? (
+              <View style={styles.HeaderBar}>
+                <FlatList
+                  showsHorizontalScrollIndicator={false}
+                  // onViewableItemsChanged={onViewableItemsChangedHandler}
+                  viewabilityConfig={{
+                    itemVisiblePercentThreshold: 50,
+                  }}
+                  ref={imageRef}
+                  pagingEnabled
+                  data={ImageAds}
+                  horizontal
+                  renderItem={({item, index}) => <Ads data={item} />}
+                />
+              </View>
+            ) : null} */}
+
+              {/* location meter */}
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('LocationScreen');
+                }}
+                style={styles.LocationMeter}>
+                <View style={styles.ImgContainer2}>
+                  {Icons.LocationIcon({
+                    tintColor: 'red',
+                  })}
+                  {/* <Image
+                    style={{width: '70%', height: '70%', resizeMode: 'contain'}}
+                    source={require('../../../assets/carimg.png')}
+                  /> */}
+                </View>
+                <Text style={styles.LondonUkText}>
+                  {(UserData?.LocationFilter?.location === '' || !UserData?.LocationFilter?.location)
+                    ? 'Press To Set Search Location'
+                    : UserData?.LocationFilter?.location}
+                </Text>
+              </TouchableOpacity>
+              {/* location meter */}
+              {/* button Containers */}
+              <View style={styles.BtnContainer}>
+                {activeField === 'Services' ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveField('Services');
+                    }}
+                    style={styles.Btn}>
+                    <Text style={styles.Txt1}>Services</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveField('Services');
+                    }}
+                    style={styles.Btn2}>
+                    <Text style={styles.Txt2}>Services</Text>
+                  </TouchableOpacity>
                 )}
+                {activeField === 'Selling' ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveField('Selling');
+                    }}
+                    style={styles.Btn}>
+                    <Text style={styles.Txt1}>Selling</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveField('Selling');
+                    }}
+                    style={styles.Btn2}>
+                    <Text style={styles.Txt2}>Selling</Text>
+                  </TouchableOpacity>
+                )}
+                {activeField === 'Trading' ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveField('Trading');
+                    }}
+                    style={styles.Btn}>
+                    <Text style={styles.Txt1}>Trading</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setActiveField('Trading');
+                    }}
+                    style={styles.Btn2}>
+                    <Text style={styles.Txt2}>Trading</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {/* button Containers */}
+
+
+              
+              {activeField === 'Services' && (
+                <>
+                  {ServiceAllData.length >= 1 ? (
+                    <FlatList
+                      keyExtractor={(item, index) => String(index)}
+                      data={(searchValue == '') ? ServiceAllData : ServiceData}
+                      contentContainerStyle={{paddingBottom: h('3%')}}
+                      numColumns={3}
+                      renderItem={({item}) => {
+                        const lat1 = latitude; // Latitude of first coordinate
+                        const lon1 = longitude; // Longitude of first coordinate
+                        const lat2 = item.user.latitude; // Latitude of second coordinate
+                        const lon2 = item.user.longitude;
+                        const distanceInKm = Distance(lat1, lon1, lat2, lon2);
+
+                        return (
+                          <>
+                            <View
+                              style={{
+                                flex: 1,
+                                margin: 2,
+                                backgroundColor: '#fff',
+                                height: h('19%'),
+                              }}>
+                              <ServiceItem
+                                item={item}
+                                onPress={() => {
+                                  navigation.navigate('PostScreen', {data: item});
+                                }}
+                              />
+                            </View>
+                          </>
+                        );
+                      }}
+                      keyExtractor={item => item.DocId}
+                    />
+                  ) : (
+                    <View style={styles.ViewMainFrame}>
+                      <Text>No search results. Please try changing your</Text>
+                      <Text>location to find in a different city.</Text>
+                    </View>
+                  )}
+                </>
+              )}
+              {activeField === 'Selling' && (
+                <>
+                  {SellingAllData.length >= 1 ? (
+                    <FlatList
+                      data={(searchValue == '') ? SellingAllData : SellingData}
+                      contentContainerStyle={{paddingBottom: h('3%')}}
+                      numColumns={3}
+                      keyExtractor={(item, index) => String(index)}
+                      renderItem={({item, index}) => {
+                        // const lat1 = latitude; // Latitude of first coordinate
+                        // const lon1 = longitude; // Longitude of first coordinate
+                        // const lat2 = item.user.latitude; // Latitude of second coordinate
+                        // const lon2 = item.user.longitude;
+                        // const distanceInKm = Distance(lat1, lon1, lat2, lon2);
+
+                        // const distnaceMile = getPreciseDistance(
+                        //   {latitude: latitude, longitude: longitude},
+                        //   {latitude: lat2, longitude: lon2},
+                        // );
+
+                        return (
+                          <>
+                            <View
+                              style={{
+                                flex: 1,
+                                margin: 2,
+                                backgroundColor: '#fff',
+                                height: h('19%'),
+                              }}>
+                              <ServiceItem
+                                item={item}
+                                onPress={() => {
+                                  navigation.navigate('PostScreen', {data: item});
+                                }}
+                              />
+                            </View>
+                          </>
+                        );
+                      }}
+                      keyExtractor={item => item.DocId}
+                    />
+                  ) : (
+                    <View style={styles.ViewMainFrame}>
+                      <Text>No search results. Please try changing your</Text>
+                      <Text>location to find in a different city.</Text>
+                    </View>
+                  )}
+                </>
+              )}
+              {activeField === 'Trading' && (
+                <>
+                  {TradingAllData.length >= 1 ? (
+                    <FlatList
+                      data={(searchValue == '') ? TradingAllData : TradingData}
+                      contentContainerStyle={{paddingBottom: h('3%')}}
+                      numColumns={3}
+                      keyExtractor={(item, index) => String(index)}
+                      renderItem={({item}) => {
+                        return (
+                          <>
+                            <View
+                              style={{
+                                flex: 1,
+                                margin: 2,
+                                backgroundColor: '#fff',
+                                height: h('19%'),
+                              }}>
+                              <ServiceItem
+                                item={item}
+                                onPress={() => {
+                                  navigation.navigate('PostScreen', {data: item});
+                                }}
+                              />
+                            </View>
+                          </>
+                        );
+                      }}
+                      keyExtractor={item => item.DocId}
+                    />
+                  ) : (
+                    <View style={styles.ViewMainFrame}>
+                      <Text>No search results. Please try changing your</Text>
+                      <Text>location to find in a different city.</Text>
+                    </View>
+                  )}
+                </>
+              )}
               </>
-            )}
-          </>
-        ) : null} */}
-        {/* 
-      {ImageAds.length > 0 ? (
-        <View style={styles.HeaderBar}>
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            // onViewableItemsChanged={onViewableItemsChangedHandler}
-            viewabilityConfig={{
-              itemVisiblePercentThreshold: 50,
-            }}
-            ref={imageRef}
-            pagingEnabled
-            data={ImageAds}
-            horizontal
-            renderItem={({item, index}) => <Ads data={item} />}
-          />
-        </View>
-      ) : null} */}
-
-        {/* location meter */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('LocationScreen');
-          }}
-          style={styles.LocationMeter}>
-          <View style={styles.ImgContainer2}>
-            {Icons.LocationIcon({
-              tintColor: 'red',
-            })}
-            {/* <Image
-              style={{width: '70%', height: '70%', resizeMode: 'contain'}}
-              source={require('../../../assets/carimg.png')}
-            /> */}
-          </View>
-          <Text style={styles.LondonUkText}>
-            {UserData.LocationFilter.location === ''
-              ? 'Enter Your Location'
-              : UserData.LocationFilter.location}
-          </Text>
-        </TouchableOpacity>
-        {/* location meter */}
-        {/* button Containers */}
-        <View style={styles.BtnContainer}>
-          {activeField === 'Services' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Services');
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Services</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Services');
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Services</Text>
-            </TouchableOpacity>
-          )}
-          {activeField === 'Selling' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Selling');
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Selling</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Selling');
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Selling</Text>
-            </TouchableOpacity>
-          )}
-          {activeField === 'Trading' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Trading');
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Trading</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Trading');
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Trading</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        {/* button Containers */}
-
-
+            )
+          }
+        })()}
         
-        {activeField === 'Services' && (
-          <>
-            {ServiceAllData.length >= 1 ? (
-              <FlatList
-                keyExtractor={(item, index) => String(index)}
-                data={(searchValue == '') ? ServiceAllData : ServiceData}
-                contentContainerStyle={{paddingBottom: h('3%')}}
-                numColumns={3}
-                renderItem={({item}) => {
-                  const lat1 = latitude; // Latitude of first coordinate
-                  const lon1 = longitude; // Longitude of first coordinate
-                  const lat2 = item.user.latitude; // Latitude of second coordinate
-                  const lon2 = item.user.longitude;
-                  const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
-                  return (
-                    <>
-                      <View
-                        style={{
-                          flex: 1,
-                          margin: 2,
-                          backgroundColor: '#fff',
-                          height: h('19%'),
-                        }}>
-                        <ServiceItem
-                          item={item}
-                          onPress={() => {
-                            navigation.navigate('PostScreen', {data: item});
-                          }}
-                        />
-                      </View>
-                    </>
-                  );
-                }}
-                keyExtractor={item => item.DocId}
-              />
-            ) : (
-              <View style={styles.ViewMainFrame}>
-                <Text>No search results. Please try changing your</Text>
-                <Text>location to find in a different city.</Text>
-              </View>
-            )}
-          </>
-        )}
-        {activeField === 'Selling' && (
-          <>
-            {SellingAllData.length >= 1 ? (
-              <FlatList
-                data={(searchValue == '') ? SellingAllData : SellingData}
-                contentContainerStyle={{paddingBottom: h('3%')}}
-                numColumns={3}
-                keyExtractor={(item, index) => String(index)}
-                renderItem={({item, index}) => {
-                  // const lat1 = latitude; // Latitude of first coordinate
-                  // const lon1 = longitude; // Longitude of first coordinate
-                  // const lat2 = item.user.latitude; // Latitude of second coordinate
-                  // const lon2 = item.user.longitude;
-                  // const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
-                  // const distnaceMile = getPreciseDistance(
-                  //   {latitude: latitude, longitude: longitude},
-                  //   {latitude: lat2, longitude: lon2},
-                  // );
-
-                  return (
-                    <>
-                      <View
-                        style={{
-                          flex: 1,
-                          margin: 2,
-                          backgroundColor: '#fff',
-                          height: h('19%'),
-                        }}>
-                        <ServiceItem
-                          item={item}
-                          onPress={() => {
-                            navigation.navigate('PostScreen', {data: item});
-                          }}
-                        />
-                      </View>
-                    </>
-                  );
-                }}
-                keyExtractor={item => item.DocId}
-              />
-            ) : (
-              <View style={styles.ViewMainFrame}>
-                <Text>No search results. Please try changing your</Text>
-                <Text>location to find in a different city.</Text>
-              </View>
-            )}
-          </>
-        )}
-        {activeField === 'Trading' && (
-          <>
-            {TradingAllData.length >= 1 ? (
-              <FlatList
-                data={(searchValue == '') ? TradingAllData : TradingData}
-                contentContainerStyle={{paddingBottom: h('3%')}}
-                numColumns={3}
-                keyExtractor={(item, index) => String(index)}
-                renderItem={({item}) => {
-                  return (
-                    <>
-                      <View
-                        style={{
-                          flex: 1,
-                          margin: 2,
-                          backgroundColor: '#fff',
-                          height: h('19%'),
-                        }}>
-                        <ServiceItem
-                          item={item}
-                          onPress={() => {
-                            navigation.navigate('PostScreen', {data: item});
-                          }}
-                        />
-                      </View>
-                    </>
-                  );
-                }}
-                keyExtractor={item => item.DocId}
-              />
-            ) : (
-              <View style={styles.ViewMainFrame}>
-                <Text>No search results. Please try changing your</Text>
-                <Text>location to find in a different city.</Text>
-              </View>
-            )}
-          </>
-        )}
       </View>
     </>
   );
 };
 
 export default Home;
+
+export { getCategoriesAndSubCategories }
 
 const styles = StyleSheet.create({
   mainContainer: {

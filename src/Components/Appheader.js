@@ -4,13 +4,21 @@ import {w, h} from 'react-native-responsiveness';
 import Colors from '../utils/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const Appheader = ({onSearch, onMessage, onNotification, noti}) => {
+
+const Appheader = ({onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
   console.warn(noti);
+
   return (
     <View style={styles.HeaderContainer}>
       <TouchableOpacity
         onPress={() => {
-          alert('No Categories added');
+          if (showCategoryAndSubCategory){
+            setShowCategoryAndSubCategory(false)
+            setShowItemsFromCategoryAndSubCategory(false)
+          } else {
+            setShowCategoryAndSubCategory(true)
+            setShowItemsFromCategoryAndSubCategory(false)
+          }
         }}
         style={styles.ViewCOntaier}>
         <Icon name="menu-outline" size={50} color="#ffff" />

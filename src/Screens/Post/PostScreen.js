@@ -35,7 +35,7 @@ import { areNotificationsHidden } from '../../utils/appConfigurations'
 import axios from 'axios';
 
 const PostScreen = ({navigation, route}) => {
-  console.warn(route.params.data.videUrl);
+  // console.warn(route.params.data.videUrl);
   const [loading, setloading] = React.useState(false);
   // console.warn(route.params.data.user);
   const [Sitem, setSitem] = React.useState([]);
@@ -104,7 +104,13 @@ const PostScreen = ({navigation, route}) => {
       .once('value')
       .then(snapshot => {
         if (snapshot.val() == null) {
-          let roomId = uuid.v4();
+          // let roomId = uuid.v4();
+          let roomId
+          if (snapshot.val() == null) {
+            roomId = uuid.v4();
+          } else {
+            roomId = snapshot.val().roomId
+          }
           let myData = {
             roomId,
             id: userData.UserID,
@@ -533,9 +539,25 @@ const PostScreen = ({navigation, route}) => {
                   // createChatList(route.params.data.user);
                   navigation.navigate('StartConversation', {
                     data: route.params.data,
+                    receiverData: {
+                      // roomId,
+                      // lastMsg: txt,
+                      // route.params.data.user.image
+                      id: route.params.data.UserID,
+                      name: route.params.data.name,
+                      img: route.params.data.image,
+                      emailId: route.params.data.email,
+                      about: route.params.data.Bio,
+                      Token: route.params.data.NotificationToken,
+                      
+                      itemPrice: route.params.data.Price,
+                      itemImage: route.params.data.images[0],
+                      sellersName: route.params.data.user.name,
+                      sellersImage: route.params.data.user.image,
+                    }
                   });
                 } else {
-                  alert('You need to buy Subscription');
+                  // alert('You need to buy Subscription');
                   navigation.navigate('SubscriptionPage');
                 }
 

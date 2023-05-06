@@ -5,7 +5,8 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
-    ScrollView
+    ScrollView,
+    Linking
 } from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -18,13 +19,16 @@ import {
     getPolicy,
     getAboutUs,
     getContactUs,
+    getContactUsEmail
 } from "../../utils/appConfigurations"
 
 const ContactUsScreen = ({navigation}) => {
-    const [ contactUsNumber, setContactUsNumber ] = React.useState("")
+    const [ contactUs, setContactUs ] = React.useState("")
+    const [ contactUsEmail, setContactUsEmail ] = React.useState("")
     
     React.useEffect(() => {
-        getContactUs(setContactUsNumber)
+        getContactUs(setContactUs)
+        getContactUsEmail(setContactUsEmail)
     }, [])
 
     return (
@@ -44,9 +48,31 @@ const ContactUsScreen = ({navigation}) => {
                         </View>
                     </View>
                 </View>
-                <Text style={{backgroundColor: '#eee', textAlign: "center"}}>
-                    {contactUsNumber}
-                </Text>
+                <TouchableOpacity style={{
+                    textAlign: "center",
+                    backgroundColor: "#D3D3D3",
+                    marginHorizontal: 10,
+                    borderRadius: 10,
+                    paddingVertical: 20,
+                    paddingHorizontal: 20,     
+                }}
+                    onPress={() => Linking.openURL(`mailto:${contactUsEmail}`) }
+                    title={"Reporting something"}
+                >
+                    <Text style={{
+                        textAlign: "left",
+                        fontSize: 17
+                    }}>
+                        {contactUs}
+                    </Text>
+                    <Text style={{
+                        textAlign: "left",
+                        fontSize: 17,
+                        marginTop: 10
+                    }}>
+                        Email <Text style={{color: Colors.Primary}}>{contactUsEmail}</Text>
+                    </Text>
+                </TouchableOpacity>
             </>
         </ScrollView>
     )
@@ -55,7 +81,7 @@ const ContactUsScreen = ({navigation}) => {
 const styles = StyleSheet.create({
     MainContainer: {
       flex: 1,
-      backgroundColor: '#eee',
+      backgroundColor: 'white',
       paddingBottom: 100,
     },
     Header: {

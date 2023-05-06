@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
   Modal,
+  TouchableHighlight
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -25,7 +26,28 @@ import {SubDataAdd} from '../../redux/subSlicer';
 import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
 
+const getSubscriptionTarriff = (setIndividualSubscriptionPricing, setBusinessSubscriptionPricing) => {
+  firestore()
+    .collection('AppConfigurations')
+    .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        const subscriptionData = documentSnapshot.data()
+        if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
+          setIndividualSubscriptionPricing(subscriptionData.value)
+        } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
+          setBusinessSubscriptionPricing(subscriptionData.value)
+        }
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
+
 const SubscriptionPage = ({navigation}) => {
+  const dispatch = useDispatch()
   const [sub, setsub] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [plan, setplan] = React.useState('Personal');
@@ -35,23 +57,7 @@ const SubscriptionPage = ({navigation}) => {
   const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
 
   React.useEffect(() => {
-    firestore()
-      .collection('AppConfigurations')
-      .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
-      .get()
-      .then(async querySnapshot => {
-        querySnapshot.forEach(documentSnapshot => {
-          const subscriptionData = documentSnapshot.data()
-          if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
-            setIndividualSubscriptionPricing(subscriptionData.value)
-          } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
-            setBusinessSubscriptionPricing(subscriptionData.value)
-          }
-        })
-        .then((err) => {
-          console.log(err)
-        })
-      });
+    getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
   }, [])
 
 
@@ -87,36 +93,48 @@ const SubscriptionPage = ({navigation}) => {
         </View>
         {/* header */}
 
-        <View style={styles.MainContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              setplan('Personal');
-              setsub(!sub);
-            }}
-            style={styles.mainViewCC}>
-            <Text style={styles.mainText123}>Personal Plan ${individualSubscriptionPricing}/Month</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setplan('Business');
-              setsub(!sub);
-            }}
-            style={styles.mainViewCC}>
-            <Text style={styles.mainText123}>Business Plan ${businessSubscriptionPricing}/Month</Text>
-            <Text style={styles.mainText1233}>Let’s grow your business!</Text>
-          </TouchableOpacity>
-        </View>
-
-        {MyData.BussinessDetails === true && (
+        
+        {(MyData.BussinessDetails === true) ? (
+        // {(false) ? (
           <View style={styles.LastPageCC}>
             <TouchableOpacity
               onPress={() => {
-                alert('IN Progress');
+                alert('To be done');
               }}
               style={styles.mainViewCC2}>
               <Text style={styles.mainText12}>Cancel Subscription</Text>
             </TouchableOpacity>
           </View>
+        ) : (
+          <>
+            <View style={styles.MainContainer}>
+              <View style={{...styles.LastPageCC, marginBottom: 100}}>
+                <Text style={{...styles.mainText123, textAlign: "center"}}>You currently don't have any subscription</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.mainViewCC}
+                onPress={() => {
+                  // setModalVisible(true)
+                  setplan('Personal');
+                  setsub(!sub);
+                }}
+              >
+                <Text style={styles.mainText123}>Personal Plan ${individualSubscriptionPricing}/Month</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  // setModalVisible(true)
+                  setplan('Business');
+                  setsub(!sub);
+                }}
+                style={styles.mainViewCC}
+              >
+                <Text style={styles.mainText123}>Business Plan ${businessSubscriptionPricing}/Month</Text>
+                <Text style={styles.mainText1233}>Let’s grow your business!</Text>
+              </TouchableOpacity>
+            </View>
+            
+          </>
         )}
       </ImageBackground>
 
@@ -132,7 +150,7 @@ const SubscriptionPage = ({navigation}) => {
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Stripe</Text>
             <PaymentScreen
-              amount={plan === 'Personal' ? 199 : 999}
+              amount={plan === 'Personal' ? individualSubscriptionPricing : businessSubscriptionPricing}
               plan={plan}
               onDone={() => {
                 setModalVisible(!modalVisible);
@@ -261,6 +279,8 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading}) {
   );
 }
 
+export { getSubscriptionTarriff }
+
 const styles = StyleSheet.create({
   imgBg: {
     width: '100%',
@@ -377,7 +397,7 @@ const styles = StyleSheet.create({
   },
   LastPageCC: {
     width: '100%',
-    height: h('10%'),
+    height: h('50%'),
     // backgroundColor: 'red',
     position: 'absolute',
     bottom: 0,

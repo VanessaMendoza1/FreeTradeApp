@@ -40,18 +40,61 @@ import moment from 'moment';
 import CreatePaymentIntent from '../../utils/stripe';
 import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
 
+const getAdsPrices = (callback) => {
+  let adsPrices = []
+  firestore()
+    .collection('AppConfigurations')
+    .where('dataType', '==', 'adsTariff')
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        const addTariffData = documentSnapshot.data()
+        let tariffs = addTariffData.value
+        tariffs.map((tariffData) => {
+          let { charges, duration, numberOfAds } = tariffData
+          adsPrices.push({label: `$${charges} (${numberOfAds} ads for ${duration} days)`, value: charges})
+        })
+        adsPrices = adsPrices.filter((item) => item != "")
+        callback(adsPrices)
+      })
+      .then((err) => {
+        console.log(err)
+      })
+    });
+
+  firestore()
+    .collection('Category')
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        let categoryData = documentSnapshot.data()
+        let { title, subCategory } = categoryData
+        let subCategories = []
+        if (subCategory != null && subCategory != undefined && Array.isArray(subCategory)){
+          subCategory.map((categoryData) => {
+            let { title: subCategoryTitle } = categoryData
+            subCategories.push(subCategoryTitle)
+          })
+        }
+        adsPrices.push(``)
+      });
+      console.log({adsPrices})
+
+      callback(adsPrices)
+
+    });
+}
+
 const Postad = ({navigation}) => {
+
+  
   const dispatch = useDispatch();
   const [activeField, setActiveField] = React.useState('Personal');
   const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
   const [toggleCheckBox2, setToggleCheckBox2] = React.useState(false);
   const [toggleCheckBox3, setToggleCheckBox3] = React.useState(false);
   const [modalVisble, setmodalVisble] = React.useState(false);
-  const [items, setItems] = React.useState([
-    {label: '$1 (1 ad for 15 days)', value: 100},
-    {label: '$5 (1 ad for 30 days)', value: 500},
-    {label: '$8 (2 ad for 30 days)', value: 800},
-  ]);
+  const [items, setItems] = React.useState([]);
 
   const [modalVisible, setModalVisible] = React.useState(false);
 
@@ -69,6 +112,9 @@ const Postad = ({navigation}) => {
   const MyData = useSelector(state => state.counter.data);
   const subdata = useSelector(state => state.sub.subdata);
 
+  React.useEffect(() => {
+    getAdsPrices(setItems)
+  }, [])
   // console.warn(subdata[0].plan === 'Business');
   // console.warn(value);
 
@@ -491,6 +537,7 @@ const Postad = ({navigation}) => {
               ) : null}
 
               <View style={styles.space} />
+              
               <View style={{zIndex: 2000}}>
                 <DropDownPicker
                   open={open}
@@ -500,6 +547,7 @@ const Postad = ({navigation}) => {
                   zIndex={3000}
                   setValue={setValue}
                   setItems={setItems}
+                  itemKey={(item) => item}
                   style={{
                     borderWidth: h('0.3%'),
                     borderColor: Colors.Primary,
@@ -662,6 +710,8 @@ function PaymentScreen({navigation, amount, onDone, onLoading}) {
 }
 
 export default Postad;
+
+export { getAdsPrices }
 
 const styles = StyleSheet.create({
   mainContainer: {

@@ -25,7 +25,7 @@ import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {PostAdd} from '../../redux/postSlice';
 import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
-
+import { getCategoriesAndSubCategories } from '../Dashboard/Home'
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
     {label: 'Baby Care', value: 'Baby Care'},
@@ -58,14 +58,53 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [brand, setbrand] = React.useState('');
   const [Description, setDescription] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
+  const [isUserHavingLocation, setIsUserHavingLocation] = React.useState((MyData.latitude && MyData.longitude) ? true : false)
+  const [entireCategoryAndSubCategoryData, setEntireCategoryAndSubCategoryData] = React.useState({})
+  
+  React.useEffect(() => {
+    setValue2({})
+    setValue3({})
+    if (Object.keys(entireCategoryAndSubCategoryData).length > 0 && value != null){
+      let relatedSubCategories = entireCategoryAndSubCategoryData[value]
+      let subCategories = []
+      relatedSubCategories.map((subCategory) => {
+        subCategories.push({label: subCategory, value: subCategory})
+      })
+      setItems2(subCategories)
+    }
+  }, [value])
+
+  const flattenCategoriesForDropDown = (data) => {
+    let categories = []
+    Object.keys(data).map((categoryName) => {
+      categories.push({label:categoryName, value: categoryName})
+    })
+    setEntireCategoryAndSubCategoryData(data)
+    setItems(categories)
+  }
+  React.useEffect(() => {
+    getCategoriesAndSubCategories(flattenCategoriesForDropDown)
+  }, [])
+
   console.log({MyData})
   // console.warn(MyData.latitude);
   const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
 
+  
   const onSubmit = () => {
     let POstId = uuid.v4();
     setloading(true);
+    console.log("DNASJDSAJ")
+    console.log("DNASJDSAJ")
+    console.log("DNASJDSAJ")
+    console.log({MyData, route: route.params, value, value2, value3, brand, Description, POstId})
+    if (!isUserHavingLocation) {
+      alert("Please set your location in settings first")
+      setloading(false);
+      navigation.navigate("Setting")
+      return
+    }
     firestore()
       .collection('Post')
       .doc(POstId)
@@ -84,8 +123,8 @@ const PostSubmitDetails = ({navigation, route}) => {
         DocId: POstId,
         Discount: 0,
         status: false,
-        latitude: MyData.latitude,
-        longitude: MyData.longitude,
+        latitude: MyData.latitude ? MyData.latitude : "No Location Set By User",
+        longitude: MyData.longitude ? MyData.longitude : "No Location Set By User",
         Notification: MyData.NotificationToken,
         videUrl: route.params.VideoUrl,
       })

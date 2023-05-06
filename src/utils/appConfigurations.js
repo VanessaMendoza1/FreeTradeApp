@@ -6,6 +6,7 @@ const dataTypeForTermsAndConditions = "TermsAndConditions"
 const dataTypeForPolicy = "Policy"
 const dataTypeForAboutUs = "AboutUs"
 const dataTypeForContactUs = "ContactUs"
+const dataTypeForContactUsEmail = "ContactUsEmail"
 
 const getConfigurations = (dataType, callback) => {
     firestore()
@@ -33,6 +34,8 @@ const getTermsAndConditions = (callback) => getConfigurations(dataTypeForTermsAn
 const getPolicy = (callback) => getConfigurations(dataTypeForPolicy, callback)
 const getAboutUs = (callback) => getConfigurations(dataTypeForAboutUs, callback)
 const getContactUs = (callback) => getConfigurations(dataTypeForContactUs, callback)
+const getContactUsEmail = (callback) => getConfigurations(dataTypeForContactUsEmail, callback)
+
 
 const areNotificationsHidden = (callback, currentUserId = null) => {
     if (currentUserId == null)currentUserId = auth().currentUser.uid
@@ -98,5 +101,6 @@ export {
     getAboutUs,
     getContactUs,
     areNotificationsHidden,
-    toggleHideNotification
+    toggleHideNotification,
+    getContactUsEmail
 }

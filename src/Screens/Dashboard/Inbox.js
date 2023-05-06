@@ -91,13 +91,14 @@ const Inbox = ({navigation, route}) => {
       itemPrice,
       itemImage,
       sellersName,
-      sellersImage,
+      sellersImage: _sellersImage,
       roomId,
       id: otherUserId,
     } = route.params.receiverData
 
     setItemOfDiscussionImage(itemImage)
     setItemOfDiscussionPrice(itemPrice)
+    setSellersImage(_sellersImage)
     // console.log(receiverData?.id) // PtElk401JWN4M6PnCIGonhNJaOt2
     // console.log(userData?.UserID) // KaKBwexWyBX26BRoys6NaIMoBtV2
     
@@ -172,6 +173,7 @@ const Inbox = ({navigation, route}) => {
   const [disabled, setdisabled] = React.useState(false);
   const [allChat, setallChat] = React.useState([]);
   const [itemOfDiscussionImage, setItemOfDiscussionImage] = React.useState('');
+  const [sellersImage, setSellersImage] = React.useState('');
   const [itemOfDiscussionPrice, setItemOfDiscussionPrice] = React.useState(0);
 
   React.useEffect(() => {
@@ -210,15 +212,16 @@ const Inbox = ({navigation, route}) => {
                 <Image
                   style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                   source={{
-                    uri: receiverData.img
-                      ? receiverData.img
+                    uri: sellersImage
+                      ? sellersImage
                       : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                   }}
                 />
               </View>
             </View>
+            
             <View style={styles.ProfileContainer2}>
-              <Text style={styles.FontWork}>{receiverData.name}</Text>
+              <Text style={styles.FontWork}>{receiverData.sellersName}</Text>
             </View>
           
           </View>
@@ -328,6 +331,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   MiddleContainer: {
+    // display: "flex",
+    // flexDirection: "row",
     width: '70%',
     height: '100%',
     // backgroundColor: 'red',

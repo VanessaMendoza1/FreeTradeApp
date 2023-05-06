@@ -20,6 +20,7 @@ import ReportPopup from '../../Components/ReportPopup';
 import firestore from '@react-native-firebase/firestore';
 import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {useSelector, useDispatch} from 'react-redux';
+import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
 
 import {SubDataAdd} from '../../redux/subSlicer';
 
@@ -204,6 +205,7 @@ const Profile = ({navigation}) => {
                 </View>
 
                 <View style={styles.BtoomTobCC}>
+                  
                   {/* <TouchableOpacity
                   onPress={() => {
                     setmode(true);
@@ -223,14 +225,28 @@ const Profile = ({navigation}) => {
                 </View>
               </View>
             </View>
-            <View style={styles.bottomPrflHeader}>
-              <Icon name="mail" size={30} color={Colors.Primary} />
-              <Text style={styles.EmailText}>Email Verified</Text>
+            <View style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              height: 70
+            }}>
+              <View style={{marginLeft: 25,}}>
+                <Icon name="mail" size={30} color={Colors.Primary}/>
+              </View>
+              <View style={{...styles.bottomPrflHeader, flex: 1, paddingRight: 70}}>
+                <Text style={{...styles.EmailText, textAlign: "left"}}>
+                  <Text style={{...styles.IIICTxt,}}>{MyData.email}</Text>
+                </Text>
+                <Text>Email Verified</Text>
+              </View>
             </View>
           </View>
           {/* profileHeader */}
 
           <View style={styles.linebar} />
+
           {MyData.AccountType === 'Bussiness' && (
             <>
               <View style={styles.adminMode}>
@@ -244,7 +260,7 @@ const Profile = ({navigation}) => {
                   <Icon name="call" size={25} color="#ffff" />
                   <Text style={styles.numberadmin}>
                     {MyData.Phone
-                      ? MyData.Phone
+                      ? formatPhoneNumber(MyData.Phone)
                       : 'Add All Details from Setting'}
                   </Text>
                 </TouchableOpacity>
@@ -287,8 +303,8 @@ const Profile = ({navigation}) => {
                 MyData.bussinessHoursto &&
                 MyData.bussinessdaysFrom &&
                 MyData.bussinessdaysto ? (
-                  <View style={styles.MainCCor}>
-                    <View style={styles.IconCCR}>
+                  <View style={{...styles.MainCCor, height: h('10%')}}>
+                    <View style={{...styles.IconCCR, paddingBottom: 15}}>
                       <Icon name="calendar" size={25} color={Colors.Primary} />
                     </View>
                     <View style={styles.IconCCR2}>
@@ -300,13 +316,21 @@ const Profile = ({navigation}) => {
                         {MyData.bussinessHoursto
                           ? MyData.bussinessHoursto
                           : 'Add from Seeting'}{' '}
-                        &{' '}
+                        {'\n'}
                         {MyData.bussinessdaysFrom
                           ? MyData.bussinessdaysFrom
                           : 'Add from Seeting'}{' '}
                         -{' '}
                         {MyData.bussinessdaysto
                           ? MyData.bussinessdaysto
+                          : 'Add from Seeting'}{' '}
+                        {' '}
+                        {'\n'}
+                        {MyData.closedDaysFrom
+                          ? "Closed: " + MyData.closedDaysFrom
+                          : 'Add from Seeting'}{' '}
+                        {MyData.closedDaysto
+                          ? " till " +MyData.closedDaysto
                           : 'Add from Seeting'}{' '}
                       </Text>
                     </View>
@@ -636,7 +660,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: h('2%'),
+    marginTop: h('4%'),
     marginBottom: h('2%'),
   },
   Btn: {

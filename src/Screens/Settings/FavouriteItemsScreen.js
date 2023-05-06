@@ -105,108 +105,129 @@ const FavouriteItemsScreen = ({navigation}) => {
 						</View>
 					</View>
 					
-					
-					{favouriteSellingItems.length >= 1 ? (
+					{((favouriteSellingItems.length == 0) && (favouriteServicesItems.length == 0) && (favouriteTradingItems.length == 0)) ? (
+						<Text style={{
+							...styles.itemHeadings,
+							height: h("100%"),
+							marginTop: h("35%"),
+						}}>No favourites found</Text>
+					) : (
 						<>
-							<Text style={styles.itemHeadings}>Selling Items Liked </Text>
-							<FlatList
+						
+						{favouriteSellingItems.length >= 1 ? (
+							<>
+								<Text style={styles.itemHeadings}>Selling Items Liked </Text>
+								<FlatList
 									data={favouriteSellingItems}
 									contentContainerStyle={{paddingBottom: h('3%')}}
 									numColumns={3}
 									renderItem={({item, index}) => {
-									return (
-										<>
-											<View
+										return (
+											<>
+												<View
 													style={{
-													flex: 1,
-													margin: 2,
-													backgroundColor: '#fff',
-													height: h('19%'),
+														flex: 1,
+														margin: 2,
+														backgroundColor: '#fff',
+														height: h('19%'),
 													}}>
 													<ServiceItem
-													item={item}
-													onPress={() => {
+														item={item}
+														onPress={() => {
 															navigation.navigate('PostScreen', {data: item});
-													}}
+														}}
 													/>
-											</View>
-										</>
-									);
-								}}
-								keyExtractor={item => item.DocId}
-							/>
+												</View>
+											</>
+										);
+									}}
+									keyExtractor={item => item.DocId}
+								/>
+							</>
+						) : (
+							<>
+								{/* <Text style={styles.itemHeadings}>No selling item found in favourites</Text> */}
+								<View style={{height: 50}}></View>
+							</>
+						)}
+	
+						{favouriteServicesItems.length >= 1 ? (
+							<>
+								<Text style={styles.itemHeadings}>Services Liked </Text>
+								<FlatList
+									data={favouriteServicesItems}
+									contentContainerStyle={{paddingBottom: h('3%')}}
+									numColumns={3}
+									renderItem={({item}) => {
+										return (
+											<>
+												<View
+													style={{
+														flex: 1,
+														margin: 2,
+														backgroundColor: '#fff',
+														height: h('19%'),
+													}}>
+													<ServiceItem
+														item={item}
+														onPress={() => {
+															navigation.navigate('PostScreen', {data: item});
+														}}
+													/>
+												</View>
+											</>
+										);
+									}}
+									keyExtractor={item => item.DocId}
+								/>
+							</>
+						) : (
+							<>
+								{/* <Text style={styles.itemHeadings}>No services item found in favourites</Text> */}
+								<View style={{height: 50}}></View>
+							</>
+						)}
+							
+						{favouriteTradingItems.length >= 1 ? (
+							<>
+								<Text style={styles.itemHeadings}>Trading Items Liked </Text>
+								<FlatList
+									data={favouriteTradingItems}
+									contentContainerStyle={{paddingBottom: h('3%')}}
+									numColumns={3}
+									renderItem={({item}) => {
+										return (
+											<>
+												<View
+													style={{
+														flex: 1,
+														margin: 2,
+														backgroundColor: '#fff',
+														height: h('19%'),
+													}}>
+													<ServiceItem
+														item={item}
+														onPress={() => {
+															navigation.navigate('PostScreen', {data: item});
+														}}
+													/>
+												</View>
+											</>
+										);
+									}}
+									keyExtractor={item => item.DocId}
+								/>
+							</>
+						) : (
+							<>
+								{/* <Text style={styles.itemHeadings}>No trading item found in favourites</Text> */}
+								<View style={{height: 80}}></View>
+							</>
+						)}
 						</>
-					) : (
-						<Text style={styles.itemHeadings}>No selling item found in favourites</Text>
 					)}
-
-					{favouriteServicesItems.length >= 1 ? (
-						<>
-							<Text style={styles.itemHeadings}>Services Liked </Text>
-							<FlatList
-								data={favouriteServicesItems}
-								contentContainerStyle={{paddingBottom: h('3%')}}
-								numColumns={3}
-								renderItem={({item}) => {
-								return (
-										<>
-										<View
-												style={{
-												flex: 1,
-												margin: 2,
-												backgroundColor: '#fff',
-												height: h('19%'),
-												}}>
-												<ServiceItem
-												item={item}
-												onPress={() => {
-														navigation.navigate('PostScreen', {data: item});
-												}}
-												/>
-										</View>
-										</>
-								);
-								}}
-								keyExtractor={item => item.DocId}
-							/>
-						</>
-					) : (
-						<Text style={styles.itemHeadings}>No services item found in favourites</Text>
-					)}
-						
-					{favouriteTradingItems.length >= 1 ? (
-						<>
-							<Text style={styles.itemHeadings}>Trading Items Liked </Text>
-							<FlatList
-								data={favouriteTradingItems}
-								contentContainerStyle={{paddingBottom: h('3%')}}
-								numColumns={3}
-								renderItem={({item}) => {
-									return (
-										<>
-											<View
-												style={{
-													flex: 1,
-													margin: 2,
-													backgroundColor: '#fff',
-													height: h('19%'),
-												}}>
-												<ServiceItem
-													item={item}
-													onPress={() => {
-														navigation.navigate('PostScreen', {data: item});
-													}}
-												/>
-											</View>
-										</>
-									);
-								}}
-								keyExtractor={item => item.DocId}
-							/>
-						</>
-					) : (
-						<Text style={styles.itemHeadings}>No trading item found in favourites</Text>
-					)}
+					
+					
 				</View>
 			)}
 		</KeyboardAvoidingScrollView>
