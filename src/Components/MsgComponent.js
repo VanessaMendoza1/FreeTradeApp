@@ -52,7 +52,7 @@ const MsgComponent = props => {
             alignSelf: isMessageForCurrentUser(item) ? 'flex-start' : 'flex-end',
             padding: 10,
             // borderWidth:1,
-            backgroundColor: isMessageForCurrentUser(item) ? Colors.Primary : '#0005'
+            backgroundColor: isMessageForCurrentUser(item) ? Colors.Primary : '#D3D3D3'
           },
         ]}>
         <Text
