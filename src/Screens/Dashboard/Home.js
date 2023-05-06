@@ -24,7 +24,6 @@ import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Icons from '../../utils/icons';
-// import Accordion from 'react-native-collapsible/Accordion';
 import Collapsible from 'react-native-collapsible';
 
 
