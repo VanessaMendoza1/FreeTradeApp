@@ -5,7 +5,8 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
-    ScrollView
+    ScrollView,
+    Linking
 } from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -47,14 +48,17 @@ const ContactUsScreen = ({navigation}) => {
                         </View>
                     </View>
                 </View>
-                <View style={{
+                <TouchableOpacity style={{
                     textAlign: "center",
                     backgroundColor: "#D3D3D3",
                     marginHorizontal: 10,
                     borderRadius: 10,
                     paddingVertical: 20,
                     paddingHorizontal: 20,     
-                }}>
+                }}
+                    onPress={() => Linking.openURL(`mailto:${contactUsEmail}`) }
+                    title={"Reporting something"}
+                >
                     <Text style={{
                         textAlign: "left",
                         fontSize: 17
@@ -68,7 +72,7 @@ const ContactUsScreen = ({navigation}) => {
                     }}>
                         Email <Text style={{color: Colors.Primary}}>{contactUsEmail}</Text>
                     </Text>
-                </View>
+                </TouchableOpacity>
             </>
         </ScrollView>
     )
