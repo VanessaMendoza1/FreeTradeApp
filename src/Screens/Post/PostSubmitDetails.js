@@ -25,7 +25,7 @@ import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {PostAdd} from '../../redux/postSlice';
 import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
-
+import { getCategoriesAndSubCategories } from '../Dashboard/Home'
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
     {label: 'Baby Care', value: 'Baby Care'},
@@ -59,7 +59,33 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [Description, setDescription] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
   const [isUserHavingLocation, setIsUserHavingLocation] = React.useState((MyData.latitude && MyData.longitude) ? true : false)
+  const [entireCategoryAndSubCategoryData, setEntireCategoryAndSubCategoryData] = React.useState({})
   
+  React.useEffect(() => {
+    setValue2({})
+    setValue3({})
+    if (Object.keys(entireCategoryAndSubCategoryData).length > 0 && value != null){
+      let relatedSubCategories = entireCategoryAndSubCategoryData[value]
+      let subCategories = []
+      relatedSubCategories.map((subCategory) => {
+        subCategories.push({label: subCategory, value: subCategory})
+      })
+      setItems2(subCategories)
+    }
+  }, [value])
+
+  const flattenCategoriesForDropDown = (data) => {
+    let categories = []
+    Object.keys(data).map((categoryName) => {
+      categories.push({label:categoryName, value: categoryName})
+    })
+    setEntireCategoryAndSubCategoryData(data)
+    setItems(categories)
+  }
+  React.useEffect(() => {
+    getCategoriesAndSubCategories(flattenCategoriesForDropDown)
+  }, [])
+
   console.log({MyData})
   // console.warn(MyData.latitude);
   const dispatch = useDispatch();

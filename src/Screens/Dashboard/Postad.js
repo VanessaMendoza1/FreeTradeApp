@@ -94,14 +94,7 @@ const Postad = ({navigation}) => {
   const [toggleCheckBox2, setToggleCheckBox2] = React.useState(false);
   const [toggleCheckBox3, setToggleCheckBox3] = React.useState(false);
   const [modalVisble, setmodalVisble] = React.useState(false);
-  const [items, setItems] = React.useState([
-    {label: '$1 (1 ad for 15 days)', value: 100},
-    {label: '$5 (1 ad for 30 days)', value: 500},
-    {label: '$8 (2 ad for 30 days)', value: 800},
-  ]);
-  React.useEffect(() => {
-    console.log({ITEMS: items})
-  }, [items])
+  const [items, setItems] = React.useState([]);
 
   const [modalVisible, setModalVisible] = React.useState(false);
 
@@ -717,6 +710,8 @@ function PaymentScreen({navigation, amount, onDone, onLoading}) {
 }
 
 export default Postad;
+
+export { getAdsPrices }
 
 const styles = StyleSheet.create({
   mainContainer: {

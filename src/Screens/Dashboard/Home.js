@@ -5,6 +5,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  ScrollView
 } from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -77,7 +78,6 @@ const getCategoriesAndSubCategories = (callback) => {
           })
         }
         categoryAlongSubCategories[ title ] = subCategories
-        categoryAlongSubCategories[ title + "1" ] = subCategories
       });
       console.log({categoryAlongSubCategories})
 
@@ -435,148 +435,152 @@ const Home = ({navigation}) => {
         {(() => {
           if (showItemsFromCategoryAndSubCategory){
             return (
-              <>
-                <TouchableOpacity onPress={() => {
-                  setShowItemsFromCategoryAndSubCategory(false)
-                  setShowCategoryAndSubCategory(true)
-                  setItemsFromCategoryAndSubCategoryFilteration([])
-                  setSelectedCategory(null)
-                  setSelectedSubCategory(null)
-                }}>
-                  <Text style={{
-                    textAlign: "center", 
-                    fontWeight: "bold",
-                    paddingVertical: 10,
-                    backgroundColor: "#eee",
-                    marginBottom: 10
+              <ScrollView>
+                <>
+                  <TouchableOpacity onPress={() => {
+                    setShowItemsFromCategoryAndSubCategory(false)
+                    setShowCategoryAndSubCategory(true)
+                    setItemsFromCategoryAndSubCategoryFilteration([])
+                    setSelectedCategory(null)
+                    setSelectedSubCategory(null)
                   }}>
-                    Select Category And Sub-category Again
-                  </Text>
-                </TouchableOpacity>
-                {/* {itemsFromCategoryAndSubCategoryFilteration.map((item) => {
-                  return (
-                    <View>
-                      <Text>
-                        {JSON.stringify(item)}
-                      </Text>
+                    <Text style={{
+                      textAlign: "center", 
+                      fontWeight: "bold",
+                      paddingVertical: 10,
+                      backgroundColor: "#eee",
+                      marginBottom: 10
+                    }}>
+                      Select Category And Sub-category Again
+                    </Text>
+                  </TouchableOpacity>
+                  {/* {itemsFromCategoryAndSubCategoryFilteration.map((item) => {
+                    return (
+                      <View>
+                        <Text>
+                          {JSON.stringify(item)}
+                        </Text>
+                      </View>
+                    )
+                  })} */}
+                  {itemsFromCategoryAndSubCategoryFilteration.length >= 1 ? (
+                    <FlatList
+                      data={itemsFromCategoryAndSubCategoryFilteration}
+                      contentContainerStyle={{paddingBottom: h('3%')}}
+                      numColumns={3}
+                      keyExtractor={(item, index) => String(index)}
+                      renderItem={({item, index}) => {
+                        return (
+                          <>
+                            <View
+                              style={{
+                                flex: 1,
+                                margin: 2,
+                                backgroundColor: '#fff',
+                                height: h('19%'),
+                              }}>
+                              <ServiceItem
+                                item={item}
+                                onPress={() => {
+                                  navigation.navigate('PostScreen', {data: item});
+                                }}
+                              />
+                            </View>
+                          </>
+                        );
+                      }}
+                      keyExtractor={item => item.DocId}
+                    />
+                  ) : (
+                    <View style={styles.ViewMainFrame}>
+                      <Text>No search results. Please try changing your</Text>
+                      <Text>location to find in a different city.</Text>
                     </View>
-                  )
-                })} */}
-                {itemsFromCategoryAndSubCategoryFilteration.length >= 1 ? (
-                  <FlatList
-                    data={itemsFromCategoryAndSubCategoryFilteration}
-                    contentContainerStyle={{paddingBottom: h('3%')}}
-                    numColumns={3}
-                    keyExtractor={(item, index) => String(index)}
-                    renderItem={({item, index}) => {
-                      return (
-                        <>
-                          <View
-                            style={{
-                              flex: 1,
-                              margin: 2,
-                              backgroundColor: '#fff',
-                              height: h('19%'),
-                            }}>
-                            <ServiceItem
-                              item={item}
-                              onPress={() => {
-                                navigation.navigate('PostScreen', {data: item});
-                              }}
-                            />
-                          </View>
-                        </>
-                      );
-                    }}
-                    keyExtractor={item => item.DocId}
-                  />
-                ) : (
-                  <View style={styles.ViewMainFrame}>
-                    <Text>No search results. Please try changing your</Text>
-                    <Text>location to find in a different city.</Text>
-                  </View>
-                )}
-              </>
+                  )}
+                </>
+              </ScrollView>
             )
           } else if (showCategoryAndSubCategory){
             return (
-              <>
-                <TouchableOpacity onPress={() => {
-                  setShowItemsFromCategoryAndSubCategory(false)
-                  setShowCategoryAndSubCategory(false)
-                  setSelectedCategory(null)
-                  setSelectedSubCategory(null)
-                  setItemsFromCategoryAndSubCategoryFilteration([])
-                }}>
-                  <Text style={{
-                    textAlign: "center", 
-                    fontWeight: "bold",
-                    paddingVertical: 10,
-                    backgroundColor: "#eee",
-                    marginBottom: 10
+              <ScrollView>
+                <>
+                  <TouchableOpacity onPress={() => {
+                    setShowItemsFromCategoryAndSubCategory(false)
+                    setShowCategoryAndSubCategory(false)
+                    setSelectedCategory(null)
+                    setSelectedSubCategory(null)
+                    setItemsFromCategoryAndSubCategoryFilteration([])
                   }}>
-                    X All Categories
-                  </Text>
-                </TouchableOpacity>
-                <Collapsible collapsed={!showCategoryAndSubCategory}>
-                  
-                  {Object.keys(categoriesWithSubCategoryData).map((categoryName) => {
-                    return (
-                      <TouchableOpacity onPress={() => setSelectedCategory(categoryName)}>
-                        <Text style={{
-                          fontWeight: "bold",
-                          fontSize: 18,
-                          marginVertical: 12,
-                          paddingLeft: w("10%")
-                        }}>
-                          {categoryName}
-                        </Text>
-                        {(selectedCategory == categoryName) && (
-                          <>
-                            {categoriesWithSubCategoryData[categoryName].map((subCategoryName, index) => {
-                              return (
-                                <TouchableOpacity onPress={() => {
-                                  setSelectedSubCategory(subCategoryName)
-                                  setSelectedCategory(categoryName)
-                                  setShowCategoryAndSubCategory(false)
-                                  setShowItemsFromCategoryAndSubCategory(true)
-                                  getItemsFromCategoryAndSubCategory(categoryName, subCategoryName, setItemsFromCategoryAndSubCategoryFilteration)
-                                }}>
-                                  <Text style={{
-                                    // fontWeight: "bold",
-                                    fontSize: 18,
-                                    marginVertical: 12,
-                                    paddingLeft: w("15%")
+                    <Text style={{
+                      textAlign: "center", 
+                      fontWeight: "bold",
+                      paddingVertical: 10,
+                      backgroundColor: "#eee",
+                      marginBottom: 10
+                    }}>
+                      X All Categories
+                    </Text>
+                  </TouchableOpacity>
+                  <Collapsible collapsed={!showCategoryAndSubCategory}>
+                    
+                    {Object.keys(categoriesWithSubCategoryData).map((categoryName) => {
+                      return (
+                        <TouchableOpacity onPress={() => setSelectedCategory(categoryName)}>
+                          <Text style={{
+                            fontWeight: "bold",
+                            fontSize: 18,
+                            marginVertical: 12,
+                            paddingLeft: w("10%")
+                          }}>
+                            {categoryName}
+                          </Text>
+                          {(selectedCategory == categoryName) && (
+                            <>
+                              {categoriesWithSubCategoryData[categoryName].map((subCategoryName, index) => {
+                                return (
+                                  <TouchableOpacity onPress={() => {
+                                    setSelectedSubCategory(subCategoryName)
+                                    setSelectedCategory(categoryName)
+                                    setShowCategoryAndSubCategory(false)
+                                    setShowItemsFromCategoryAndSubCategory(true)
+                                    getItemsFromCategoryAndSubCategory(categoryName, subCategoryName, setItemsFromCategoryAndSubCategoryFilteration)
                                   }}>
-                                    {subCategoryName}
-                                  </Text>
-                                </TouchableOpacity>
-                              )
-                            })}
-                            <TouchableOpacity onPress={() => {
-                              setSelectedSubCategory(null)
-                              setSelectedCategory(categoryName)
-                              setShowCategoryAndSubCategory(false)
-                              setShowItemsFromCategoryAndSubCategory(true)
-                              getItemsFromCategoryAndSubCategory(categoryName, null, setItemsFromCategoryAndSubCategoryFilteration)
-                            }}>
-                              <Text style={{
-                                // fontWeight: "bold",
-                                fontSize: 18,
-                                marginVertical: 12,
-                                paddingLeft: w("15%")
+                                    <Text style={{
+                                      // fontWeight: "bold",
+                                      fontSize: 18,
+                                      marginVertical: 12,
+                                      paddingLeft: w("15%")
+                                    }}>
+                                      {subCategoryName}
+                                    </Text>
+                                  </TouchableOpacity>
+                                )
+                              })}
+                              <TouchableOpacity onPress={() => {
+                                setSelectedSubCategory(null)
+                                setSelectedCategory(categoryName)
+                                setShowCategoryAndSubCategory(false)
+                                setShowItemsFromCategoryAndSubCategory(true)
+                                getItemsFromCategoryAndSubCategory(categoryName, null, setItemsFromCategoryAndSubCategoryFilteration)
                               }}>
-                                Select all in {categoryName} !
-                              </Text>
-                            </TouchableOpacity>
-                          </>
-                        )
-                      }
-                      </TouchableOpacity>
-                    )
-                  })}
-                </Collapsible>
-              </>
+                                <Text style={{
+                                  // fontWeight: "bold",
+                                  fontSize: 18,
+                                  marginVertical: 12,
+                                  paddingLeft: w("15%")
+                                }}>
+                                  Select all in {categoryName} !
+                                </Text>
+                              </TouchableOpacity>
+                            </>
+                          )
+                        }
+                        </TouchableOpacity>
+                      )
+                    })}
+                  </Collapsible>
+                </>
+              </ScrollView>
             )
           } else {
             return (
@@ -882,6 +886,8 @@ const Home = ({navigation}) => {
 };
 
 export default Home;
+
+export { getCategoriesAndSubCategories }
 
 const styles = StyleSheet.create({
   mainContainer: {

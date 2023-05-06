@@ -25,6 +25,7 @@ import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
 
 import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import LoadingScreen from '../../Components/LoadingScreen';
+import { getAdsPrices } from '../Dashboard/Postad'
 
 const PostPromotion = ({navigation, route}) => {
   console.warn(route.params.data.title);
@@ -42,6 +43,10 @@ const PostPromotion = ({navigation, route}) => {
 
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
+
+  React.useEffect(() => {
+    getAdsPrices(setItems)
+  }, [])
 
   const adposted = () => {
     setloading(true);
