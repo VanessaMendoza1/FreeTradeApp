@@ -11,8 +11,15 @@ import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Appbutton from '../Components/Appbutton';
 import Colors from '../utils/Colors';
-
+import { getSubscriptionTarriff } from '../Screens/Settings/SubscriptionPage'
 const SubModal = ({visible, onPress, Plan}) => {
+
+  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
+  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
+  React.useEffect(() => {
+    getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
+  }, [])
+
   return (
     <>
       {visible ? (
@@ -26,7 +33,7 @@ const SubModal = ({visible, onPress, Plan}) => {
               {Plan === 'Personal' ? 'Personal Plan' : 'Business Plan'}
             </Text>
             <Text style={styles.Contran2}>
-              {Plan === 'Personal' ? '$1.99/month' : '$9.99/month'}
+              {Plan === 'Personal' ? `${individualSubscriptionPricing}/Month` : `${businessSubscriptionPricing}/Month`}
             </Text>
             {/* abc */}
             {Plan === 'Personal' && (

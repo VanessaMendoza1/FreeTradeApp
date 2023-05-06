@@ -20,6 +20,7 @@ import ReportPopup from '../../Components/ReportPopup';
 import firestore from '@react-native-firebase/firestore';
 import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {useSelector, useDispatch} from 'react-redux';
+import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
 
 import {SubDataAdd} from '../../redux/subSlicer';
 
@@ -231,6 +232,7 @@ const Profile = ({navigation}) => {
           {/* profileHeader */}
 
           <View style={styles.linebar} />
+
           {MyData.AccountType === 'Bussiness' && (
             <>
               <View style={styles.adminMode}>
@@ -244,7 +246,7 @@ const Profile = ({navigation}) => {
                   <Icon name="call" size={25} color="#ffff" />
                   <Text style={styles.numberadmin}>
                     {MyData.Phone
-                      ? MyData.Phone
+                      ? formatPhoneNumber(MyData.Phone)
                       : 'Add All Details from Setting'}
                   </Text>
                 </TouchableOpacity>

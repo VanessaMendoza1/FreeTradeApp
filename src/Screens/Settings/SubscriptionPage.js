@@ -25,6 +25,26 @@ import {SubDataAdd} from '../../redux/subSlicer';
 import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
 
+const getSubscriptionTarriff = (setIndividualSubscriptionPricing, setBusinessSubscriptionPricing) => {
+  firestore()
+    .collection('AppConfigurations')
+    .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        const subscriptionData = documentSnapshot.data()
+        if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
+          setIndividualSubscriptionPricing(subscriptionData.value)
+        } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
+          setBusinessSubscriptionPricing(subscriptionData.value)
+        }
+      })
+      .then((err) => {
+        console.log(err)
+      })
+    });
+}
+
 const SubscriptionPage = ({navigation}) => {
   const [sub, setsub] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -73,23 +93,24 @@ const SubscriptionPage = ({navigation}) => {
       });
   }, [])
   React.useEffect(() => {
-    firestore()
-      .collection('AppConfigurations')
-      .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
-      .get()
-      .then(async querySnapshot => {
-        querySnapshot.forEach(documentSnapshot => {
-          const subscriptionData = documentSnapshot.data()
-          if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
-            setIndividualSubscriptionPricing(subscriptionData.value)
-          } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
-            setBusinessSubscriptionPricing(subscriptionData.value)
-          }
-        })
-        .then((err) => {
-          console.log(err)
-        })
-      });
+    getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
+    // firestore()
+    //   .collection('AppConfigurations')
+    //   .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
+    //   .get()
+    //   .then(async querySnapshot => {
+    //     querySnapshot.forEach(documentSnapshot => {
+    //       const subscriptionData = documentSnapshot.data()
+    //       if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
+    //         setIndividualSubscriptionPricing(subscriptionData.value)
+    //       } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
+    //         setBusinessSubscriptionPricing(subscriptionData.value)
+    //       }
+    //     })
+    //     .then((err) => {
+    //       console.log(err)
+    //     })
+    //   });
   }, [])
 
 
@@ -125,27 +146,9 @@ const SubscriptionPage = ({navigation}) => {
         </View>
         {/* header */}
 
-        <View style={styles.MainContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              setplan('Personal');
-              setsub(!sub);
-            }}
-            style={styles.mainViewCC}>
-            <Text style={styles.mainText123}>Personal Plan ${individualSubscriptionPricing}/Month</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setplan('Business');
-              setsub(!sub);
-            }}
-            style={styles.mainViewCC}>
-            <Text style={styles.mainText123}>Business Plan ${businessSubscriptionPricing}/Month</Text>
-            <Text style={styles.mainText1233}>Let’s grow your business!</Text>
-          </TouchableOpacity>
-        </View>
+        
 
-        {MyData.BussinessDetails === true && (
+        {(MyData.BussinessDetails === true) ? (
           <View style={styles.LastPageCC}>
             <TouchableOpacity
               onPress={() => {
@@ -155,6 +158,31 @@ const SubscriptionPage = ({navigation}) => {
               <Text style={styles.mainText12}>Cancel Subscription</Text>
             </TouchableOpacity>
           </View>
+        ) : (
+          <>
+            <View style={styles.MainContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  setplan('Personal');
+                  setsub(!sub);
+                }}
+                style={styles.mainViewCC}>
+                <Text style={styles.mainText123}>Personal Plan ${individualSubscriptionPricing}/Month</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setplan('Business');
+                  setsub(!sub);
+                }}
+                style={styles.mainViewCC}>
+                <Text style={styles.mainText123}>Business Plan ${businessSubscriptionPricing}/Month</Text>
+                <Text style={styles.mainText1233}>Let’s grow your business!</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{...styles.LastPageCC, height: h('80%')}}>
+              <Text style={{...styles.mainText123, textAlign: "center"}}>You currently don't have any subscription</Text>
+            </View>
+          </>
         )}
       </ImageBackground>
 
@@ -299,6 +327,8 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading}) {
   );
 }
 
+export { getSubscriptionTarriff }
+
 const styles = StyleSheet.create({
   imgBg: {
     width: '100%',
@@ -415,7 +445,7 @@ const styles = StyleSheet.create({
   },
   LastPageCC: {
     width: '100%',
-    height: h('10%'),
+    height: h('50%'),
     // backgroundColor: 'red',
     position: 'absolute',
     bottom: 0,
