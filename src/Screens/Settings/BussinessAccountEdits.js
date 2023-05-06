@@ -93,6 +93,11 @@ const BussinessAccountEdits = ({navigation}) => {
   const [open4, setOpen4] = React.useState(false);
   const [value4, setValue4] = React.useState(null);
 
+  const [closedFromDayModalVisibility, setClosedFromDayModalVisibility] = React.useState(false)
+  const [closedToDayModalVisibility, setClosedToDayModalVisibility] = React.useState(false)
+  const [closedFromDayModalValue, setClosedFromDayModalValue] = React.useState(null)
+  const [closedToDayModalValue, setClosedToDayModalValue] = React.useState(null)
+
   const [Business, setBusiness] = React.useState('');
   const [Address, setAddress] = React.useState('');
   const [Website, setWebsite] = React.useState('');
@@ -155,6 +160,8 @@ const BussinessAccountEdits = ({navigation}) => {
           Phone: Phone,
           bussinessdaysFrom: value3,
           bussinessdaysto: value4,
+          closedDaysFrom: closedFromDayModalValue,
+          closedDaysto: closedToDayModalValue,
           bussinessHoursFrom: value,
           bussinessHoursto: value2,
           AccountType: 'Bussiness',
@@ -360,7 +367,7 @@ const BussinessAccountEdits = ({navigation}) => {
                 <Text>Close</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.markText}>
+            <Text style={{...styles.markText, marginBottom: 20}}>
               Add {modalType === 'Hours' ? 'Business Hours' : 'Days'}
             </Text>
             {/* hors */}
@@ -413,58 +420,127 @@ const BussinessAccountEdits = ({navigation}) => {
             )}
 
             {modalType !== 'Hours' && (
-              <View style={styles.workingHours}>
-                <Text style={styles.markText}>Business Days</Text>
+              <>
+              
+                <View style={styles.workingHours}>
+                  <Text style={styles.markText}>Business Days</Text>
 
-                <View
-                  style={[
-                    styles.FromTo,
-                    {
-                      minHeight: open
-                        ? (items.length + 1) * heightDropItem
-                        : heightDropItem,
-                    },
-                  ]}>
-                  <View style={styles.leftCC3}>
-                    <View style={{zIndex: 2000}}>
-                      <DropDownPicker
-                        open={open3}
-                        placeholder="from"
-                        value={value3}
-                        items={items3}
-                        setOpen={setOpen3}
-                        setValue={setValue3}
-                        setItems={setItems3}
-                        style={{
-                          borderColor: Colors.Primary,
-                          backgroundColor: 'white',
-                          width: '90%',
-                        }}
-                      />
+                  <View
+                    style={[
+                      styles.FromTo,
+                      {
+                        minHeight: open
+                          ? (items.length + 1) * heightDropItem
+                          : heightDropItem,
+                      },
+                    ]}>
+                    <View style={styles.leftCC3}>
+                      <View style={{zIndex: 2000}}>
+                        <DropDownPicker
+                          open={open3}
+                          placeholder="from"
+                          value={value3}
+                          items={items3}
+                          setOpen={setOpen3}
+                          setValue={setValue3}
+                          setItems={setItems3}
+                          maxHeight={120}
+                          style={{
+                            borderColor: Colors.Primary,
+                            backgroundColor: 'white',
+                            width: '90%',
+                          }}
+                        />
+                      </View>
                     </View>
-                  </View>
-                  <View style={styles.leftCC3}>
-                    <View style={{zIndex: 2000}}>
-                      <DropDownPicker
-                        open={open4}
-                        placeholder="To"
-                        value={value4}
-                        items={items4}
-                        setOpen={setOpen4}
-                        setValue={setValue4}
-                        setItems={setItems4}
-                        style={{
-                          borderColor: Colors.Primary,
+                    <View style={styles.leftCC3}>
+                      <View style={{zIndex: 2000}}>
+                        <DropDownPicker
+                          open={open4}
+                          placeholder="To"
+                          value={value4}
+                          items={items4}
+                          setOpen={setOpen4}
+                          setValue={setValue4}
+                          setItems={setItems4}
+                          maxHeight={120}
+                          style={{
+                            borderColor: Colors.Primary,
 
-                          backgroundColor: 'white',
-                          width: '90%',
-                          borderRadius: h(0),
-                        }}
-                      />
+                            backgroundColor: 'white',
+                            width: '90%',
+                            borderRadius: h(0),
+                          }}
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
+
+
+                          {/* HERE !!! */}
+                <View style={{
+                    ...styles.workingHours,
+                    marginTop: 100
+                  }}>
+                  <Text style={styles.markText}>Closed Days</Text>
+
+                  <View
+                    style={[
+                      styles.FromTo,
+                      {
+                        minHeight: open
+                          ? (items.length + 1) * heightDropItem
+                          : heightDropItem,
+                      },
+                      
+                    ]}>
+
+                    <View style={styles.leftCC3}>
+                      <View style={{zIndex: 2001}}>
+                        <DropDownPicker
+                          open={closedFromDayModalVisibility}
+                          placeholder="from"
+                          value={closedFromDayModalValue}
+                          items={items3}
+                          setOpen={setClosedFromDayModalVisibility}
+                          setValue={setClosedFromDayModalValue}
+                          setItems={setItems3}
+                          maxHeight={120}
+                          // style={{backgroundColor: "pink"}}
+                          // containerProps={{backgroundColor: "pink"}}
+                          style={{
+                            borderColor: Colors.Primary,
+                            backgroundColor: 'white',
+                            width: '90%',
+                          }}
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.leftCC3}>
+                      <View style={{zIndex: 2000}}>
+                        <DropDownPicker
+                          open={closedToDayModalVisibility}
+                          placeholder="To"
+                          value={closedToDayModalValue}
+                          items={items4}
+                          setOpen={setClosedToDayModalVisibility}
+                          setValue={setClosedToDayModalValue}
+                          setItems={setItems4}
+                          maxHeight={120}
+                          style={{
+                            borderColor: Colors.Primary,
+
+                            backgroundColor: 'white',
+                            width: '90%',
+                            borderRadius: h(0),
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </>
             )}
 
             {/* hors */}
@@ -621,7 +697,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: '100%',
-    height: h('60%'),
+    height: h('90%'),
     backgroundColor: 'white',
     alignItems: 'center',
   },

@@ -289,8 +289,8 @@ const Profile = ({navigation}) => {
                 MyData.bussinessHoursto &&
                 MyData.bussinessdaysFrom &&
                 MyData.bussinessdaysto ? (
-                  <View style={styles.MainCCor}>
-                    <View style={styles.IconCCR}>
+                  <View style={{...styles.MainCCor, height: h('10%')}}>
+                    <View style={{...styles.IconCCR, paddingBottom: 15}}>
                       <Icon name="calendar" size={25} color={Colors.Primary} />
                     </View>
                     <View style={styles.IconCCR2}>
@@ -302,13 +302,21 @@ const Profile = ({navigation}) => {
                         {MyData.bussinessHoursto
                           ? MyData.bussinessHoursto
                           : 'Add from Seeting'}{' '}
-                        &{' '}
+                        {'\n'}
                         {MyData.bussinessdaysFrom
                           ? MyData.bussinessdaysFrom
                           : 'Add from Seeting'}{' '}
                         -{' '}
                         {MyData.bussinessdaysto
                           ? MyData.bussinessdaysto
+                          : 'Add from Seeting'}{' '}
+                        {' '}
+                        {'\n'}
+                        {MyData.closedDaysFrom
+                          ? "Closed: " + MyData.closedDaysFrom
+                          : 'Add from Seeting'}{' '}
+                        {MyData.closedDaysto
+                          ? " till " +MyData.closedDaysto
                           : 'Add from Seeting'}{' '}
                       </Text>
                     </View>
@@ -638,7 +646,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: h('2%'),
+    marginTop: h('4%'),
     marginBottom: h('2%'),
   },
   Btn: {
