@@ -56,8 +56,7 @@ const ContactUsScreen = ({navigation}) => {
                     paddingVertical: 20,
                     paddingHorizontal: 20,     
                 }}
-                    onPress={() => Linking.openURL(`mailto:${contactUsEmail}`) }
-                    title={"Reporting something"}
+                    onPress={() => Linking.openURL(`mailto:${contactUsEmail}`)}
                 >
                     <Text style={{
                         textAlign: "left",

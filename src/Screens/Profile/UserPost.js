@@ -327,7 +327,14 @@ const UserPost = ({navigation, route}) => {
                 </View>
               </View>
 
-              <SliderBox images={imgeUrl2} />
+              <SliderBox
+                images={imgeUrl2}
+                onCurrentImagePressed={index => {
+                  let imageData = imgeUrl2[index]
+                  navigation.navigate('ImageScreen', {data: imageData});
+                  console.warn(`image ${index} pressed`)
+                }}
+              />
 
               <View style={styles.HeadingTextContainer}>
                 <Text style={styles.HeadingText}>

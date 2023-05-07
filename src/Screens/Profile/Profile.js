@@ -236,9 +236,9 @@ const Profile = ({navigation}) => {
                 <Icon name="mail" size={30} color={Colors.Primary}/>
               </View>
               <View style={{...styles.bottomPrflHeader, flex: 1, paddingRight: 70}}>
-                <Text style={{...styles.EmailText, textAlign: "left"}}>
+                {/* <Text style={{...styles.EmailText, textAlign: "left"}}>
                   <Text style={{...styles.IIICTxt,}}>{MyData.email}</Text>
-                </Text>
+                </Text>  // HIDDEN EMAIL ADDRESS */}
                 <Text>Email Verified</Text>
               </View>
             </View>

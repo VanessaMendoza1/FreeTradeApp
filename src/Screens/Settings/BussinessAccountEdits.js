@@ -330,7 +330,7 @@ const BussinessAccountEdits = ({navigation}) => {
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={openCamera(setShowUploadBox, setloading, setImgeUrl, updateDetails)}>
+            onPress={() => openCamera(setShowUploadBox, setloading, setImgeUrl, updateDetails)}>
             <Text>From Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity

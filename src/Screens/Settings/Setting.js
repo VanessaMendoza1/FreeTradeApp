@@ -107,7 +107,7 @@ const Setting = ({navigation}) => {
             })}
           </SettingItem> */}
 
-          {isBusinessAccount ? (
+          { isBusinessAccount ? (
             <SettingItem
               onPress={() => {
                 navigation.navigate('BussinessAccountEdits');
