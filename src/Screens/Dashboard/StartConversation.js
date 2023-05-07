@@ -115,7 +115,7 @@ const StartConversation = ({navigation, route}) => {
                 .update(SendData)
                 .then(() => console.log('Data updated.'));
     
-              navigation.navigate('Inbox', {receiverData: SendData});
+              // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
               setloading(false);
             } else {
               navigation.navigate('Inbox', {
