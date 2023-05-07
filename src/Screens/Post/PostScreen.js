@@ -629,7 +629,7 @@ const PostScreen = ({navigation, route}) => {
           )}
 
           <View style={styles.HeadingTextContainer7}>
-            <Text style={styles.SimiliarText}>Other Items</Text>
+            <Text style={styles.SimiliarText}>Similar Items</Text>
           </View>
           <View style={styles.HeadingTextContainer8}>
             {Sitem.length >= 1 && (

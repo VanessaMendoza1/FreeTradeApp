@@ -279,8 +279,11 @@ const PostPromotion = ({navigation, route}) => {
             text={'Start Promotion'}
             onPress={() => {
               // adposted();
-
-              setModalVisible(!modalVisible);
+              if (toggleCheckBox3){
+                setModalVisible(true);
+              } else {
+                alert('Please accept the Terms & Condition ');
+              }
 
               // navigation.navigate('MakePost');
             }}
@@ -293,7 +296,7 @@ const PostPromotion = ({navigation, route}) => {
         visible={modalVisible}
         onRequestClose={() => {
           alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
+          setModalVisible(false);
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
@@ -304,14 +307,15 @@ const PostPromotion = ({navigation, route}) => {
                 setloading(true);
               }}
               onDone={() => {
-                setModalVisible(!modalVisible);
+                adposted()
                 PostAd();
+                setModalVisible(false);
               }}
             />
             <TouchableOpacity
               style={[styles.button, styles.buttonClose]}
               onPress={() => {
-                setModalVisible(!modalVisible);
+                setModalVisible(false);
               }}>
               <Text style={styles.textStyle}>Cancel</Text>
             </TouchableOpacity>
