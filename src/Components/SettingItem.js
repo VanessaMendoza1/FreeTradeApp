@@ -12,9 +12,9 @@ const SettingItem = ({text, children, onPress}) => {
       <View style={styles.MiddleContaineer}>
         <Text style={styles.mainText}>{text}</Text>
       </View>
-      <View style={styles.ArrowContaineer}>
+      {/* <View style={styles.ArrowContaineer}>
         <Icon name="arrow-forward-outline" size={30} color={Colors.Primary} />
-      </View>
+      </View> */}
     </TouchableOpacity>
   );
 };
