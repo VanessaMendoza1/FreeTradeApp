@@ -22,6 +22,7 @@ import CreatePaymentIntent from '../../utils/stripe';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
 import {SubDataAdd} from '../../redux/subSlicer';
+import auth from '@react-native-firebase/auth';
 
 import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
@@ -46,6 +47,31 @@ const getSubscriptionTarriff = (setIndividualSubscriptionPricing, setBusinessSub
     })
 }
 
+const getSubscriptionDetails = async (setIsSubscriptionValid) => {
+  const currentUserId = auth().currentUser.uid
+  let isSubscriptionValid = false;
+  await firestore()
+    .collection('sub')
+    .get()
+    .then(async querySnapshot => {
+      
+      querySnapshot.forEach(documentSnapshot => {
+        if (documentSnapshot.data().userid === currentUserId) {
+          const now = moment.utc();
+          var end = JSON.parse(documentSnapshot.data().endDate);
+          var days = now.diff(end, 'days');
+          console.log({days})
+          if (days >= 1) {
+            isSubscriptionValid = true
+          }
+        }
+      });
+      setIsSubscriptionValid(isSubscriptionValid)
+    });
+
+  
+};
+
 const SubscriptionPage = ({navigation}) => {
   const dispatch = useDispatch()
   const [sub, setsub] = React.useState(false);
@@ -55,11 +81,11 @@ const SubscriptionPage = ({navigation}) => {
   const [loading, setloading] = React.useState(false);
   const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
   const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
-
+  const [isSubscriptionValid, setIsSubscriptionValid] = React.useState(false)
   React.useEffect(() => {
+    getSubscriptionDetails(setIsSubscriptionValid)
     getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
   }, [])
-
 
   return (
     <>
@@ -94,7 +120,7 @@ const SubscriptionPage = ({navigation}) => {
         {/* header */}
 
         
-        {(MyData.BussinessDetails === true) ? (
+        {isSubscriptionValid ? (
         // {(false) ? (
           <View style={styles.LastPageCC}>
             <TouchableOpacity

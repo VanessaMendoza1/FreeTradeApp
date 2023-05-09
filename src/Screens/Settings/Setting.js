@@ -17,10 +17,11 @@ import Appbutton from '../../Components/Appbutton';
 import SettingItem from '../../Components/SettingItem';
 import Icons from '../../utils/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
 
 const Setting = ({navigation}) => {
+  const dispatch = useDispatch()
   const [ isBusinessAccount, setIsBusinessAccount ] = React.useState(false)
   // const [ loading, setloading ] = React.useState(false)
   React.useEffect(() => {
@@ -32,6 +33,7 @@ const Setting = ({navigation}) => {
 
   const clearAll = async () => {
     try {
+      await dispatch(DataInsert({}));
       await AsyncStorage.clear();
       navigation.replace('Login');
     } catch (e) {
