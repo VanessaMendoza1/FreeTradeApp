@@ -23,6 +23,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import Appbutton from '../../Components/Appbutton';
 import { sendMsg } from './Inbox'
+import { all } from 'axios';
 
 const StartConversation = ({navigation, route}) => {
   //   console.warn(route.params.data.Notification !== '');
@@ -113,21 +114,26 @@ const StartConversation = ({navigation, route}) => {
               database()
                 .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
                 .update(SendData)
-                .then(() => console.log('Data updated.'));
-    
+                .then(() => {
+                  console.log('Data updated.')
+                  alert("Message Sent")
+                  navigation.goBack();
+                });
               // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
               setloading(false);
             } else {
-              navigation.navigate('Inbox', {
-                txt: txt,
-                receiverData: {
-                  ...snapshot.val(),
-                  itemPrice: data.Price,
-                  itemImage: data.images[0],
-                  sellersName: data.user.name,
-                  sellersImage: data.user.image,
-                }
-              });
+              alert("Message Sent")
+              navigation.goBack();
+              // navigation.navigate('Inbox', {
+              //   txt: txt,
+              //   receiverData: {
+              //     ...snapshot.val(),
+              //     itemPrice: data.Price,
+              //     itemImage: data.images[0],
+              //     sellersName: data.user.name,
+              //     sellersImage: data.user.image,
+              //   }
+              // });
               setloading(false);
             }
           });

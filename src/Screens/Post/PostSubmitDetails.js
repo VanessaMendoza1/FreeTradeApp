@@ -105,6 +105,7 @@ const PostSubmitDetails = ({navigation, route}) => {
       navigation.navigate("Setting")
       return
     }
+    console.log({LAT: MyData.latitude, LONG: MyData.longitude})
     firestore()
       .collection('Post')
       .doc(POstId)

@@ -124,6 +124,86 @@ const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callb
   }
 }
 
+const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, setServiceData, setSellingData, setTradingData, searchText) => {
+  let tradingData = []
+  let sellingData = []
+  let serviceData = []
+  firestore()
+    .collection('Post')
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        let postData = {...documentSnapshot.data(), id: documentSnapshot.id}
+        // console.log({postData})
+        let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType, Title } = postData
+        // if (user){
+          // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
+          const searchLatitude = userData?.LocationFilter?.latitude;
+          const searchLongitude = userData?.LocationFilter?.longitude;
+          const searchDistanceLimit = userData?.LocationFilter?.LocalDistance
+          const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
+          // console.log({Title})
+          if (Title && Title != ""){
+            Title = Title.toLowerCase()
+          }
+          if (searchText && searchText != ""){
+            searchText = searchText.toLowerCase()
+          }
+          // let isSearchQueryMatched = searchText != "" && (Title.includes(searchText) || Title == searchText)
+          if (searchText != ""){
+            // console.log("TRIGGERED IF")
+            // console.log({searchText, Title})
+            if (Title && (Title.includes(searchText) || Title == searchText)){
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log({searchText, Title, status, distanceInKm, searchDistanceLimit, activeField})
+              if (status == false){
+                if (distanceInKm <= searchDistanceLimit){
+                  
+                    if (PostType === 'Trading' && activeField == "Trading") {
+                      tradingData.push(postData);
+                    }
+                    if (PostType === 'Selling' && activeField == "Selling") {
+                      sellingData.push(postData);
+                    }
+                    if (PostType === 'Service' && activeField == "Services") {
+                      serviceData.push(postData);
+                    }
+
+                }
+              }
+            }
+          } else {
+            console.log("TRIGGERED ELSE")
+            console.log({searchText})
+            if (status == false){
+              if (distanceInKm <= searchDistanceLimit){
+                  if (PostType === 'Trading' && activeField == "Trading") {
+                    tradingData.push(postData);
+                  }
+                  if (PostType === 'Selling' && activeField == "Selling") {
+                    sellingData.push(postData);
+                  }
+                  if (PostType === 'Service' && activeField == "Services") {
+                    serviceData.push(postData);
+                  }
+              }
+            }
+          }  
+      });
+
+      console.log({TradingData12: tradingData, sellingData12: sellingData, ServiceData12: serviceData})
+
+      setServiceData(serviceData)
+      setSellingData(sellingData)
+      setTradingData(tradingData)
+
+    });
+}
+
 const Home = ({navigation}) => {
   const [longitude, setLongitude] = React.useState(0);
   const [latitude, setlatitude] = React.useState(0);
@@ -139,7 +219,7 @@ const Home = ({navigation}) => {
   const SellingAllData = useSelector(state => state.post.SellingData);
   const TradingAllData = useSelector(state => state.post.TradingData);
   const [Notii, setNotii] = React.useState('');
-
+  console.log({SellingAllData})
   const [searchValue, setSearchValue] = React.useState('');
   const [ServiceData, setServiceData] = React.useState(ServiceAllData);
   const [SellingData, setSellingData] = React.useState(SellingAllData);
@@ -151,10 +231,25 @@ const Home = ({navigation}) => {
   const [ selectedSubCategory, setSelectedSubCategory ] = React.useState(null)
   const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
   
+  React.useEffect(() => {
+    console.log({activeField})
+    showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
+  }, [activeField])
+
+  React.useEffect(() => {
+    setSelectedSubCategory(null)
+    setItemsFromCategoryAndSubCategoryFilteration([])
+  }, [selectedCategory])
+
+  // React.useEffect(() => {
+  //   setItemsFromCategoryAndSubCategoryFilteration([])
+  // }, [selectedSubCategory])
   
   React.useEffect(() => {
     getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
+    showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
   }, [])
+  
   
 
   // console.warn();
@@ -324,7 +419,8 @@ const Home = ({navigation}) => {
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
   
             if (documentSnapshot.data().status === false) {
-              if (Math.ceil(distanceInKm) < UserData?.LocationFilter?.LocalDistance) {
+              console.log("DISTANCE FOUND IS " + distanceInKm + " WHEREAS USER HAS SET DISTANCE TO " + UserData?.LocationFilter?.LocalDistance)
+              if (Math.ceil(distanceInKm) <= UserData?.LocationFilter?.LocalDistance) {
                 let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
@@ -366,10 +462,13 @@ const Home = ({navigation}) => {
     }
   }, [focus]);
 
+  console.log({SellingAllData1: SellingAllData})
+
   const searchFilter = text => {
     if (activeField === 'Services') {
       console.warn('This ran');
       console.log({TEXT: text})
+      console.log({SEARCHtEXT: searchText})
       const newData = ServiceData.filter(item => {
         let itemTitle = item.Title.toLowerCase()
         let searchText = text.toLowerCase()
@@ -392,6 +491,7 @@ const Home = ({navigation}) => {
       const newData = SellingData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });
+      
       if (text.trim().length === 0) {
         setSellingData(SellingAllData);
       } else {
@@ -419,11 +519,12 @@ const Home = ({navigation}) => {
 
       <View style={styles.mainContainer}>
         <Appheader
+          setSearchValue={setSearchValue}
           setShowItemsFromCategoryAndSubCategory={setShowItemsFromCategoryAndSubCategory}
           showCategoryAndSubCategory={showCategoryAndSubCategory}
           setShowCategoryAndSubCategory={setShowCategoryAndSubCategory}
           setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
-          onSearch={searchFilter}
+          onSearch={(text) => showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, text)}
           onMessage={() => {
             navigation.navigate('MessageScreen');
           }}
@@ -507,7 +608,7 @@ const Home = ({navigation}) => {
                   <TouchableOpacity onPress={() => {
                     setShowItemsFromCategoryAndSubCategory(false)
                     setShowCategoryAndSubCategory(false)
-                    setSelectedCategory(null)
+                    // setSelectedCategory(null)
                     setSelectedSubCategory(null)
                     setItemsFromCategoryAndSubCategoryFilteration([])
                   }}>
@@ -525,7 +626,13 @@ const Home = ({navigation}) => {
                     
                     {Object.keys(categoriesWithSubCategoryData).map((categoryName) => {
                       return (
-                        <TouchableOpacity onPress={() => setSelectedCategory(categoryName)}>
+                        <TouchableOpacity onPress={() => {
+                          if (selectedCategory == categoryName){
+                            setSelectedCategory(null)
+                          } else {
+                            setSelectedCategory(categoryName)
+                          }
+                        }}>
                           <Text style={{
                             fontWeight: "bold",
                             fontSize: 18,
@@ -556,7 +663,7 @@ const Home = ({navigation}) => {
                                   </TouchableOpacity>
                                 )
                               })}
-                              <TouchableOpacity onPress={() => {
+                              {/* <TouchableOpacity onPress={() => {
                                 setSelectedSubCategory(null)
                                 setSelectedCategory(categoryName)
                                 setShowCategoryAndSubCategory(false)
@@ -571,7 +678,7 @@ const Home = ({navigation}) => {
                                 }}>
                                   Select all in {categoryName} !
                                 </Text>
-                              </TouchableOpacity>
+                              </TouchableOpacity> */}
                             </>
                           )
                         }
@@ -746,10 +853,11 @@ const Home = ({navigation}) => {
               
               {activeField === 'Services' && (
                 <>
-                  {ServiceAllData.length >= 1 ? (
+                  {ServiceData.length >= 1 ? (
                     <FlatList
                       keyExtractor={(item, index) => String(index)}
-                      data={(searchValue == '') ? ServiceAllData : ServiceData}
+                      // data={(searchValue == '') ? ServiceAllData : ServiceData} // ServiceData SellingData TradingData
+                      data={ServiceData}
                       contentContainerStyle={{paddingBottom: h('3%')}}
                       numColumns={3}
                       renderItem={({item}) => {
@@ -790,9 +898,10 @@ const Home = ({navigation}) => {
               )}
               {activeField === 'Selling' && (
                 <>
-                  {SellingAllData.length >= 1 ? (
+                  {SellingData.length >= 1 ? (
                     <FlatList
-                      data={(searchValue == '') ? SellingAllData : SellingData}
+                      // data={(searchValue == '') ? SellingAllData : SellingData} // ServiceData SellingData TradingData
+                      data={SellingData} // ServiceData SellingData TradingData
                       contentContainerStyle={{paddingBottom: h('3%')}}
                       numColumns={3}
                       keyExtractor={(item, index) => String(index)}
@@ -807,6 +916,8 @@ const Home = ({navigation}) => {
                         //   {latitude: latitude, longitude: longitude},
                         //   {latitude: lat2, longitude: lon2},
                         // );
+
+                        console.log({SellingAllData})
 
                         return (
                           <>
@@ -839,9 +950,10 @@ const Home = ({navigation}) => {
               )}
               {activeField === 'Trading' && (
                 <>
-                  {TradingAllData.length >= 1 ? (
+                  {TradingData.length >= 1 ? (
                     <FlatList
-                      data={(searchValue == '') ? TradingAllData : TradingData}
+                      // data={(searchValue == '') ? TradingAllData : TradingData} // ServiceData SellingData TradingData
+                      data={TradingData} // ServiceData SellingData TradingData
                       contentContainerStyle={{paddingBottom: h('3%')}}
                       numColumns={3}
                       keyExtractor={(item, index) => String(index)}

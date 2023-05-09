@@ -53,19 +53,17 @@ const getAdsPrices = callback => {
     .where('dataType', '==', 'adsTariff')
     .get()
     .then(async querySnapshot => {
-      querySnapshot
-        .forEach(documentSnapshot => {
-          const addTariffData = documentSnapshot.data();
-          let tariffs = addTariffData.value;
-          tariffs.map(tariffData => {
-            let {charges, duration, numberOfAds} = tariffData;
-            adsPrices.push({
-              label: `$${charges} (${numberOfAds} ads for ${duration} days)`,
-              value: charges,
-            });
-          });
-          adsPrices = adsPrices.filter(item => item != '');
-          callback(adsPrices);
+
+      querySnapshot.forEach(documentSnapshot => {
+        const addTariffData = documentSnapshot.data()
+        let tariffs = addTariffData.value
+        tariffs.map((tariffData) => {
+          let { charges, duration, numberOfAds } = tariffData
+          if (numberOfAds > 1){
+            adsPrices.push({label: `$${charges} (${numberOfAds} ads for ${duration} days)`, value: charges})
+          } else {
+            adsPrices.push({label: `$${charges} (${numberOfAds} ad for ${duration} days)`, value: charges})
+          }
         })
         .then(err => {
           console.log(err);

@@ -22,6 +22,7 @@ import CreatePaymentIntent from '../../utils/stripe';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
 import {SubDataAdd} from '../../redux/subSlicer';
+import auth from '@react-native-firebase/auth';
 
 import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
@@ -58,6 +59,31 @@ const getSubscriptionTarriff = (
     });
 };
 
+const getSubscriptionDetails = async (setIsSubscriptionValid) => {
+  const currentUserId = auth().currentUser.uid
+  let isSubscriptionValid = false;
+  await firestore()
+    .collection('sub')
+    .get()
+    .then(async querySnapshot => {
+      
+      querySnapshot.forEach(documentSnapshot => {
+        if (documentSnapshot.data().userid === currentUserId) {
+          const now = moment.utc();
+          var end = JSON.parse(documentSnapshot.data().endDate);
+          var days = now.diff(end, 'days');
+          console.log({days})
+          if (days >= 1) {
+            isSubscriptionValid = true
+          }
+        }
+      });
+      setIsSubscriptionValid(isSubscriptionValid)
+    });
+
+  
+};
+
 const SubscriptionPage = ({navigation}) => {
   const dispatch = useDispatch();
   const [sub, setsub] = React.useState(false);
@@ -65,17 +91,15 @@ const SubscriptionPage = ({navigation}) => {
   const [plan, setplan] = React.useState('Personal');
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
-  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] =
-    React.useState(9.99);
-  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] =
-    React.useState(1.99);
 
+  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
+  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
+  const [isSubscriptionValid, setIsSubscriptionValid] = React.useState(false)
   React.useEffect(() => {
-    getSubscriptionTarriff(
-      setIndividualSubscriptionPricing,
-      setBusinessSubscriptionPricing,
-    );
-  }, []);
+    getSubscriptionDetails(setIsSubscriptionValid)
+    getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
+  }, [])
+
 
   return (
     <>
@@ -109,8 +133,9 @@ const SubscriptionPage = ({navigation}) => {
         </View>
         {/* header */}
 
-        {MyData.BussinessDetails === false ? (
-          // {(false) ? (
+        {isSubscriptionValid ? (
+        // {(false) ? (
+
           <View style={styles.LastPageCC}>
             <TouchableOpacity
               onPress={() => {
@@ -222,8 +247,6 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
     // setloading(false);
     axios
       .get(
-
-        https://umeraftabdev.com/FreeTradeApi/public/api/subscribe?card_number=4242 4242 4242 4242&email=shakilgalaxy@gmail.com&expiry=04/24&cvc=125
         `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
           cardData.number
         }&email=${email}&amount=${

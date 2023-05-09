@@ -17,11 +17,13 @@ import Appbutton from '../../Components/Appbutton';
 import SettingItem from '../../Components/SettingItem';
 import Icons from '../../utils/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
 
 const Setting = ({navigation}) => {
+  const dispatch = useDispatch()
   const [ isBusinessAccount, setIsBusinessAccount ] = React.useState(false)
+  // const [ loading, setloading ] = React.useState(false)
   React.useEffect(() => {
     isUserHavingBussinessSubscription()
     // setIsBusinessAccount(true)
@@ -31,6 +33,7 @@ const Setting = ({navigation}) => {
 
   const clearAll = async () => {
     try {
+      await dispatch(DataInsert({}));
       await AsyncStorage.clear();
       navigation.replace('Login');
     } catch (e) {
@@ -40,11 +43,13 @@ const Setting = ({navigation}) => {
     console.log('Done.');
   };
 
-  const isUserHavingBussinessSubscription = async () => {
+  const isUserHavingBussinessSubscription = () => {
+    console.log("TRIGGERED")
     let currentUserId = auth().currentUser.uid
-    await firestore()
+    firestore()
       .collection('Users')
       .doc(currentUserId)
+      .get()
       .then(documentSnapshot => {
         if (documentSnapshot.exists) {
           let userData = documentSnapshot.data()
@@ -55,10 +60,12 @@ const Setting = ({navigation}) => {
         }
       })
       .catch(err => {
-        setloading(false);
+        // setloading(false);
         console.warn(err);
       });
   }
+
+  console.log({IMAGE: MyData.image})
 
   return (
     <ScrollView>
