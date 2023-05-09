@@ -124,6 +124,52 @@ const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callb
   }
 }
 
+const showItemsThroughLocationFilterWithoutSearchText = (userData, setServiceData, setSellingData, setTradingData) => {
+  let tradingData = []
+  let sellingData = []
+  let serviceData = []
+  firestore()
+    .collection('Post')
+    .get()
+    .then(async querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        let postData = documentSnapshot.data()
+        let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType } = postData
+        // if (user){
+          // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
+          const searchLatitude = userData?.LocationFilter?.latitude;
+          const searchLongitude = userData?.LocationFilter?.longitude;
+          const searchDistanceLimit = userData?.LocationFilter?.LocalDistance
+          const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
+  
+          if (status == false){
+            if (distanceInKm <= searchDistanceLimit){
+              if (documentSnapshot.data().status === false) {
+                if (PostType === 'Trading') {
+                  tradingData.push(postData);
+                }
+                if (PostType === 'Selling') {
+                  sellingData.push(postData);
+                }
+                if (PostType === 'Service') {
+                  serviceData.push(postData);
+                }
+              }
+            }
+          }
+        // }
+
+      });
+
+      console.log({TradingData12: tradingData, sellingData12: sellingData, ServiceData12: serviceData})
+
+      setServiceData(serviceData)
+      setSellingData(sellingData)
+      setTradingData(tradingData)
+
+    });
+}
+
 const Home = ({navigation}) => {
   const [longitude, setLongitude] = React.useState(0);
   const [latitude, setlatitude] = React.useState(0);
@@ -139,7 +185,7 @@ const Home = ({navigation}) => {
   const SellingAllData = useSelector(state => state.post.SellingData);
   const TradingAllData = useSelector(state => state.post.TradingData);
   const [Notii, setNotii] = React.useState('');
-
+  console.log({SellingAllData})
   const [searchValue, setSearchValue] = React.useState('');
   const [ServiceData, setServiceData] = React.useState(ServiceAllData);
   const [SellingData, setSellingData] = React.useState(SellingAllData);
@@ -162,7 +208,9 @@ const Home = ({navigation}) => {
   
   React.useEffect(() => {
     getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
+    showItemsThroughLocationFilterWithoutSearchText(UserData, setServiceData, setSellingData, setTradingData)
   }, [])
+  
   
 
   // console.warn();
@@ -375,10 +423,13 @@ const Home = ({navigation}) => {
     }
   }, [focus]);
 
+  console.log({SellingAllData1: SellingAllData})
+
   const searchFilter = text => {
     if (activeField === 'Services') {
       console.warn('This ran');
       console.log({TEXT: text})
+      console.log({SEARCHtEXT: searchText})
       const newData = ServiceData.filter(item => {
         let itemTitle = item.Title.toLowerCase()
         let searchText = text.toLowerCase()
@@ -401,6 +452,7 @@ const Home = ({navigation}) => {
       const newData = SellingData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });
+      
       if (text.trim().length === 0) {
         setSellingData(SellingAllData);
       } else {
@@ -761,10 +813,11 @@ const Home = ({navigation}) => {
               
               {activeField === 'Services' && (
                 <>
-                  {ServiceAllData.length >= 1 ? (
+                  {ServiceData.length >= 1 ? (
                     <FlatList
                       keyExtractor={(item, index) => String(index)}
-                      data={(searchValue == '') ? ServiceAllData : ServiceData}
+                      // data={(searchValue == '') ? ServiceAllData : ServiceData} // ServiceData SellingData TradingData
+                      data={ServiceData}
                       contentContainerStyle={{paddingBottom: h('3%')}}
                       numColumns={3}
                       renderItem={({item}) => {
@@ -805,9 +858,10 @@ const Home = ({navigation}) => {
               )}
               {activeField === 'Selling' && (
                 <>
-                  {SellingAllData.length >= 1 ? (
+                  {SellingData.length >= 1 ? (
                     <FlatList
-                      data={(searchValue == '') ? SellingAllData : SellingData}
+                      // data={(searchValue == '') ? SellingAllData : SellingData} // ServiceData SellingData TradingData
+                      data={SellingData} // ServiceData SellingData TradingData
                       contentContainerStyle={{paddingBottom: h('3%')}}
                       numColumns={3}
                       keyExtractor={(item, index) => String(index)}
@@ -822,6 +876,8 @@ const Home = ({navigation}) => {
                         //   {latitude: latitude, longitude: longitude},
                         //   {latitude: lat2, longitude: lon2},
                         // );
+
+                        console.log({SellingAllData})
 
                         return (
                           <>
@@ -854,9 +910,10 @@ const Home = ({navigation}) => {
               )}
               {activeField === 'Trading' && (
                 <>
-                  {TradingAllData.length >= 1 ? (
+                  {TradingData.length >= 1 ? (
                     <FlatList
-                      data={(searchValue == '') ? TradingAllData : TradingData}
+                      // data={(searchValue == '') ? TradingAllData : TradingData} // ServiceData SellingData TradingData
+                      data={TradingData} // ServiceData SellingData TradingData
                       contentContainerStyle={{paddingBottom: h('3%')}}
                       numColumns={3}
                       keyExtractor={(item, index) => String(index)}
