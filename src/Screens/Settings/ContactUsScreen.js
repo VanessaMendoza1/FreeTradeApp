@@ -8,6 +8,7 @@ import {
     ScrollView,
     Linking
 } from 'react-native';
+import { openComposer } from "react-native-email-link";
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../../utils/Colors';
@@ -56,7 +57,14 @@ const ContactUsScreen = ({navigation}) => {
                     paddingVertical: 20,
                     paddingHorizontal: 20,     
                 }}
-                    onPress={() => Linking.openURL(`mailto:${contactUsEmail}`)}
+                    onPress={() => {
+                        openComposer({
+                            to: contactUsEmail,
+                            subject: "I have a question",
+                            body: "Hi, can you help me with...",
+                        });
+                        // Linking.openURL(`mailto:${contactUsEmail}`)
+                    }}
                 >
                     <Text style={{
                         textAlign: "left",
