@@ -26,26 +26,38 @@ import auth from '@react-native-firebase/auth';
 
 import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
+import axios from 'axios';
 
-const getSubscriptionTarriff = (setIndividualSubscriptionPricing, setBusinessSubscriptionPricing) => {
+import {
+  CreditCardInput,
+  LiteCreditCardInput,
+} from 'react-native-credit-card-input';
+
+const getSubscriptionTarriff = (
+  setIndividualSubscriptionPricing,
+  setBusinessSubscriptionPricing,
+) => {
   firestore()
     .collection('AppConfigurations')
-    .where('dataType', 'in', ['IndividualSubscriptionTariff', 'BusinessSubscriptionTariff'])
+    .where('dataType', 'in', [
+      'IndividualSubscriptionTariff',
+      'BusinessSubscriptionTariff',
+    ])
     .get()
     .then(async querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        const subscriptionData = documentSnapshot.data()
-        if (subscriptionData.dataType == 'IndividualSubscriptionTariff'){
-          setIndividualSubscriptionPricing(subscriptionData.value)
-        } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff'){
-          setBusinessSubscriptionPricing(subscriptionData.value)
+        const subscriptionData = documentSnapshot.data();
+        if (subscriptionData.dataType == 'IndividualSubscriptionTariff') {
+          setIndividualSubscriptionPricing(subscriptionData.value);
+        } else if (subscriptionData.dataType == 'BusinessSubscriptionTariff') {
+          setBusinessSubscriptionPricing(subscriptionData.value);
         }
-      })
+      });
     })
-    .catch((err) => {
-      console.log(err)
-    })
-}
+    .catch(err => {
+      console.log(err);
+    });
+};
 
 const getSubscriptionDetails = async (setIsSubscriptionValid) => {
   const currentUserId = auth().currentUser.uid
@@ -73,12 +85,13 @@ const getSubscriptionDetails = async (setIsSubscriptionValid) => {
 };
 
 const SubscriptionPage = ({navigation}) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [sub, setsub] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [plan, setplan] = React.useState('Personal');
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
+
   const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
   const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
   const [isSubscriptionValid, setIsSubscriptionValid] = React.useState(false)
@@ -86,6 +99,7 @@ const SubscriptionPage = ({navigation}) => {
     getSubscriptionDetails(setIsSubscriptionValid)
     getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
   }, [])
+
 
   return (
     <>
@@ -119,9 +133,9 @@ const SubscriptionPage = ({navigation}) => {
         </View>
         {/* header */}
 
-        
         {isSubscriptionValid ? (
         // {(false) ? (
+
           <View style={styles.LastPageCC}>
             <TouchableOpacity
               onPress={() => {
@@ -135,7 +149,9 @@ const SubscriptionPage = ({navigation}) => {
           <>
             <View style={styles.MainContainer}>
               <View style={{...styles.LastPageCC, marginBottom: 100}}>
-                <Text style={{...styles.mainText123, textAlign: "center"}}>You currently don't have any subscription</Text>
+                <Text style={{...styles.mainText123, textAlign: 'center'}}>
+                  You currently don't have any subscription
+                </Text>
               </View>
               <TouchableOpacity
                 style={styles.mainViewCC}
@@ -143,9 +159,10 @@ const SubscriptionPage = ({navigation}) => {
                   // setModalVisible(true)
                   setplan('Personal');
                   setsub(!sub);
-                }}
-              >
-                <Text style={styles.mainText123}>Personal Plan ${individualSubscriptionPricing}/Month</Text>
+                }}>
+                <Text style={styles.mainText123}>
+                  Personal Plan ${individualSubscriptionPricing}/Month
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -153,13 +170,15 @@ const SubscriptionPage = ({navigation}) => {
                   setplan('Business');
                   setsub(!sub);
                 }}
-                style={styles.mainViewCC}
-              >
-                <Text style={styles.mainText123}>Business Plan ${businessSubscriptionPricing}/Month</Text>
-                <Text style={styles.mainText1233}>Let’s grow your business!</Text>
+                style={styles.mainViewCC}>
+                <Text style={styles.mainText123}>
+                  Business Plan ${businessSubscriptionPricing}/Month
+                </Text>
+                <Text style={styles.mainText1233}>
+                  Let’s grow your business!
+                </Text>
               </TouchableOpacity>
             </View>
-            
           </>
         )}
       </ImageBackground>
@@ -176,8 +195,13 @@ const SubscriptionPage = ({navigation}) => {
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Stripe</Text>
             <PaymentScreen
-              amount={plan === 'Personal' ? individualSubscriptionPricing : businessSubscriptionPricing}
+              amount={
+                plan === 'Personal'
+                  ? individualSubscriptionPricing
+                  : businessSubscriptionPricing
+              }
               plan={plan}
+              email={MyData.email}
               onDone={() => {
                 setModalVisible(!modalVisible);
                 setloading(false);
@@ -189,6 +213,7 @@ const SubscriptionPage = ({navigation}) => {
                 }
               }}
             />
+
             <TouchableOpacity
               style={[styles.button, styles.buttonClose]}
               onPress={() => {
@@ -205,11 +230,41 @@ const SubscriptionPage = ({navigation}) => {
 
 export default SubscriptionPage;
 
-function PaymentScreen({navigation, amount, plan, onDone, onLoading}) {
+function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
   const dispatch = useDispatch();
   const {confirmPayment} = useStripe();
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
+  const [cardData, setCardData] = React.useState('');
+
+  const _createToken = async Token => {
+    console.warn(cardData.number);
+    console.warn(email);
+    console.warn(amount);
+    console.warn(cardData.expiry);
+    console.warn(cardData.cvc);
+
+    // setloading(false);
+    axios
+      .get(
+        `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
+          cardData.number
+        }&email=${email}&amount=${
+          amount * 100
+        }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
+          cardData.cvc
+        }`,
+      )
+      .then(res => {
+        if (res.data.message === 'Payment successfull.') {
+          // alert('ALL CLEAR');
+          onDone();
+        }
+      })
+      .catch(err => {
+        alert('something went wrong');
+      });
+  };
 
   const MySubscriptionPackage = async () => {
     let data = [];
@@ -254,50 +309,22 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading}) {
 
   return (
     <>
-      {loading ? <LoadingScreen /> : null}
-      <CardField
-        postalCodeEnabled={false}
-        placeholders={{
-          number: '4242 4242 4242 4242',
-        }}
-        cardStyle={{
-          backgroundColor: '#FFFFFF',
-          textColor: '#000000',
-        }}
-        style={{
-          width: '100%',
-          height: 50,
-          marginVertical: 30,
-        }}
-        onCardChange={async cardDetails => {
-          console.warn(cardDetails.complete);
-        }}
-        onFocus={focusedField => {
-          console.log('focusField', focusedField);
-        }}
-      />
+      <View style={{width: '100%', height: '65%'}}>
+        <CreditCardInput
+          onChange={({values}) => {
+            // console.warn(values);
+            setCardData(values);
+          }}
+        />
+      </View>
 
       <TouchableOpacity
         style={[styles.button, styles.buttonClose]}
         onPress={async () => {
-          setloading(true);
-          // onLoading();
-          let d1 = {
-            amount: amount,
-          };
-          try {
-            const res = await CreatePaymentIntent(d1);
-            console.warn(res.data.paymentIntent);
-            if (res?.data?.paymentIntent) {
-              let req = await confirmPayment(res?.data?.paymentIntent, {
-                paymentMethodType: 'Card',
-              });
-              console.warn(req);
-              await uploadSubscription();
-            }
-          } catch (error) {
-            console.warn(error);
-          }
+          onLoading();
+
+          _createToken();
+          // await uploadSubscription();
         }}>
         <Text style={styles.textStyle}>Submit</Text>
       </TouchableOpacity>
@@ -305,7 +332,7 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading}) {
   );
 }
 
-export { getSubscriptionTarriff }
+export {getSubscriptionTarriff};
 
 const styles = StyleSheet.create({
   imgBg: {
@@ -388,8 +415,8 @@ const styles = StyleSheet.create({
     fontSize: h('2.2%'),
   },
   modalView: {
-    width: w('90%'),
-    height: h('40%'),
+    width: w('100%'),
+    height: h('60%'),
     backgroundColor: 'white',
     borderRadius: h('0.7%'),
     alignItems: 'center',

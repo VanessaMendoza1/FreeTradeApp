@@ -15,6 +15,10 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import CheckBox from '@react-native-community/checkbox';
 import Appbutton from '../../Components/Appbutton';
 import PopupModal from '../../Components/PopupModal';
+import {
+  CreditCardInput,
+  LiteCreditCardInput,
+} from 'react-native-credit-card-input';
 
 import {useSelector, useDispatch} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
@@ -25,7 +29,8 @@ import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
 
 import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import LoadingScreen from '../../Components/LoadingScreen';
-import { getAdsPrices } from '../Dashboard/Postad'
+import {getAdsPrices} from '../Dashboard/Postad';
+import axios from 'axios';
 
 const PostPromotion = ({navigation, route}) => {
   console.warn(route.params.data.title);
@@ -45,8 +50,8 @@ const PostPromotion = ({navigation, route}) => {
   const [loading, setloading] = React.useState(false);
 
   React.useEffect(() => {
-    getAdsPrices(setItems)
-  }, [])
+    getAdsPrices(setItems);
+  }, []);
 
   const adposted = () => {
     setloading(true);
@@ -77,7 +82,7 @@ const PostPromotion = ({navigation, route}) => {
   };
 
   const PostAd = async () => {
-    console.warn('HEHHE');
+    // console.warn('HEHHE');
     const now = moment.utc();
     var end = moment().add(value === 100 ? 15 : 30, 'days');
     var days = now.diff(end, 'days');
@@ -279,7 +284,7 @@ const PostPromotion = ({navigation, route}) => {
             text={'Start Promotion'}
             onPress={() => {
               // adposted();
-              if (toggleCheckBox3){
+              if (toggleCheckBox3) {
                 setModalVisible(true);
               } else {
                 alert('Please accept the Terms & Condition ');
@@ -303,13 +308,13 @@ const PostPromotion = ({navigation, route}) => {
             <Text style={styles.modalText}>Stripe</Text>
             <PaymentScreen
               amount={value}
+              email={MyData.email}
               onLoading={() => {
                 setloading(true);
               }}
               onDone={() => {
-                adposted()
+                setModalVisible(!modalVisible);
                 PostAd();
-                setModalVisible(false);
               }}
             />
             <TouchableOpacity
@@ -325,55 +330,59 @@ const PostPromotion = ({navigation, route}) => {
     </>
   );
 };
-function PaymentScreen({navigation, amount, onDone, onLoading}) {
+function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
   const {confirmPayment} = useStripe();
-  const [loading, setloading] = React.useState(false);
+  const {createToken} = useStripe();
+  const [cardData, setCardData] = React.useState('');
+
+  const _createToken = async Token => {
+    console.warn(cardData.number);
+    console.warn(email);
+    console.warn(amount);
+    console.warn(cardData.expiry);
+    console.warn(cardData.cvc);
+
+    // setloading(false);
+    axios
+      .get(
+        `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
+          cardData.number
+        }&email=${email}&amount=${
+          amount * 100
+        }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
+          cardData.cvc
+        }`,
+      )
+      .then(res => {
+        if (res.data.message === 'Payment successfull.') {
+          // alert('ALL CLEAR');
+          onDone();
+        }
+      })
+      .catch(err => {
+        alert('something went wrong');
+      });
+  };
+
+
 
   return (
     <>
-      {loading ? <LoadingScreen /> : null}
-      <CardField
-        postalCodeEnabled={false}
-        placeholders={{
-          number: '4242 4242 4242 4242',
-        }}
-        cardStyle={{
-          backgroundColor: '#FFFFFF',
-          textColor: '#000000',
-        }}
-        style={{
-          width: '100%',
-          height: 50,
-          marginVertical: 30,
-        }}
-        onCardChange={async cardDetails => {
-          console.warn(cardDetails.complete);
-        }}
-        onFocus={focusedField => {
-          console.log('focusField', focusedField);
-        }}
-      />
+      <View style={{width: '100%', height: '65%'}}>
+        <CreditCardInput
+          onChange={({values}) => {
+            // console.warn(values);
+            setCardData(values);
+          }}
+        />
+      </View>
 
       <TouchableOpacity
         style={[styles.button, styles.buttonClose]}
         onPress={async () => {
-          setloading(true);
-          let d1 = {
-            amount: amount,
-          };
-          try {
-            const res = await CreatePaymentIntent(d1);
-            console.warn(res.data.paymentIntent);
-            if (res?.data?.paymentIntent) {
-              let req = await confirmPayment(res?.data?.paymentIntent, {
-                paymentMethodType: 'Card',
-              });
-              console.warn(req);
-              await onDone();
-            }
-          } catch (error) {
-            console.warn(error);
-          }
+          onLoading();
+
+          _createToken();
         }}>
         <Text style={styles.textStyle}>Submit</Text>
       </TouchableOpacity>
@@ -494,8 +503,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#0009',
   },
   modalView: {
-    width: w('90%'),
-    height: h('40%'),
+    width: w('100%'),
+    height: h('60%'),
     backgroundColor: 'white',
     borderRadius: h('0.7%'),
     alignItems: 'center',
