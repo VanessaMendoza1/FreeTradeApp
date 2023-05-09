@@ -22,7 +22,7 @@ const checkIfNewMessagesAvailable = (callback) => {
       })
 }
 
-const Appheader = ({onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
+const Appheader = ({setSearchValue, onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
   console.warn(noti);
   const [ isHavingNewMessages, setIsHavingNewMessages ] = React.useState(false)
 
@@ -69,7 +69,10 @@ const Appheader = ({onSearch, onMessage, onNotification, noti, showCategoryAndSu
         </View>
         <TextInput
           placeholder="Service/Sell/Trade"
-          onChangeText={text => onSearch(text)}
+          onChangeText={text => {
+            onSearch(text)
+            setSearchValue(text)
+          }}
           returnKeyType='search'
           style={styles.Txtinput}
           placeholderTextColor={Colors.Primary}

@@ -124,7 +124,7 @@ const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callb
   }
 }
 
-const showItemsThroughLocationFilterWithoutSearchText = (userData, setServiceData, setSellingData, setTradingData) => {
+const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, setServiceData, setSellingData, setTradingData, searchText) => {
   let tradingData = []
   let sellingData = []
   let serviceData = []
@@ -134,31 +134,65 @@ const showItemsThroughLocationFilterWithoutSearchText = (userData, setServiceDat
     .then(async querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
         let postData = documentSnapshot.data()
-        let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType } = postData
+        // console.log({postData})
+        let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType, Title } = postData
         // if (user){
           // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
           const searchLatitude = userData?.LocationFilter?.latitude;
           const searchLongitude = userData?.LocationFilter?.longitude;
           const searchDistanceLimit = userData?.LocationFilter?.LocalDistance
           const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
-  
-          if (status == false){
-            if (distanceInKm <= searchDistanceLimit){
-              if (documentSnapshot.data().status === false) {
-                if (PostType === 'Trading') {
-                  tradingData.push(postData);
-                }
-                if (PostType === 'Selling') {
-                  sellingData.push(postData);
-                }
-                if (PostType === 'Service') {
-                  serviceData.push(postData);
+          // console.log({Title})
+          if (Title && Title != ""){
+            Title = Title.toLowerCase()
+          }
+          if (searchText && searchText != ""){
+            searchText = searchText.toLowerCase()
+          }
+          // let isSearchQueryMatched = searchText != "" && (Title.includes(searchText) || Title == searchText)
+          if (searchText != ""){
+            // console.log("TRIGGERED IF")
+            // console.log({searchText, Title})
+            if (Title && (Title.includes(searchText) || Title == searchText)){
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log("MATCHED")
+              console.log({searchText, Title, status, distanceInKm, searchDistanceLimit, activeField})
+              if (status == false){
+                if (distanceInKm <= searchDistanceLimit){
+                  
+                    if (PostType === 'Trading' && activeField == "Trading") {
+                      tradingData.push(postData);
+                    }
+                    if (PostType === 'Selling' && activeField == "Selling") {
+                      sellingData.push(postData);
+                    }
+                    if (PostType === 'Service' && activeField == "Services") {
+                      serviceData.push(postData);
+                    }
+
                 }
               }
             }
-          }
-        // }
-
+          } else {
+            console.log("TRIGGERED ELSE")
+            console.log({searchText})
+            if (status == false){
+              if (distanceInKm <= searchDistanceLimit){
+                  if (PostType === 'Trading' && activeField == "Trading") {
+                    tradingData.push(postData);
+                  }
+                  if (PostType === 'Selling' && activeField == "Selling") {
+                    sellingData.push(postData);
+                  }
+                  if (PostType === 'Service' && activeField == "Services") {
+                    serviceData.push(postData);
+                  }
+              }
+            }
+          }  
       });
 
       console.log({TradingData12: tradingData, sellingData12: sellingData, ServiceData12: serviceData})
@@ -198,6 +232,11 @@ const Home = ({navigation}) => {
   const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
   
   React.useEffect(() => {
+    console.log({activeField})
+    showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
+  }, [activeField])
+
+  React.useEffect(() => {
     setSelectedSubCategory(null)
     setItemsFromCategoryAndSubCategoryFilteration([])
   }, [selectedCategory])
@@ -208,7 +247,7 @@ const Home = ({navigation}) => {
   
   React.useEffect(() => {
     getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
-    showItemsThroughLocationFilterWithoutSearchText(UserData, setServiceData, setSellingData, setTradingData)
+    showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
   }, [])
   
   
@@ -480,11 +519,12 @@ const Home = ({navigation}) => {
 
       <View style={styles.mainContainer}>
         <Appheader
+          setSearchValue={setSearchValue}
           setShowItemsFromCategoryAndSubCategory={setShowItemsFromCategoryAndSubCategory}
           showCategoryAndSubCategory={showCategoryAndSubCategory}
           setShowCategoryAndSubCategory={setShowCategoryAndSubCategory}
           setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
-          onSearch={searchFilter}
+          onSearch={(text) => showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, text)}
           onMessage={() => {
             navigation.navigate('MessageScreen');
           }}
