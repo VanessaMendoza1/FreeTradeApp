@@ -27,7 +27,7 @@ function App() {
     <>
       <StripeProvider
         publishableKey={
-          'pk_test_51JijtpJDks9SBIkvsf4qsTVNV45mKeLCzimZZr5612wAuXz8oWvsfCaOzDbMAjtyOplGa9Qu16EfTsdzWgBtmCCo00DbZBUYgy'
+          'pk_test_51LVATzKAtBxeYOh2C6iUKzhSHbqomNedxQvTh047tFhL2PZd9mumtzqHdzaJIMXMfOpa1vxN2ySGXdZSLJTLvm7700VWcNkhIA'
         }>
         <Provider store={store}>
           <StatusBar />

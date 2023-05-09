@@ -18,6 +18,12 @@ import Appbutton from '../../Components/Appbutton';
 import PopupModal from '../../Components/PopupModal';
 import ImagePicker from 'react-native-image-crop-picker';
 import VideoPlayer from 'react-native-video-player';
+import {
+  CreditCardInput,
+  LiteCreditCardInput,
+} from 'react-native-credit-card-input';
+
+import axios from 'axios';
 
 import * as ImagePickers from 'react-native-image-picker';
 
@@ -40,26 +46,30 @@ import moment from 'moment';
 import CreatePaymentIntent from '../../utils/stripe';
 import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
 
-const getAdsPrices = (callback) => {
-  let adsPrices = []
+const getAdsPrices = callback => {
+  let adsPrices = [];
   firestore()
     .collection('AppConfigurations')
     .where('dataType', '==', 'adsTariff')
     .get()
     .then(async querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        const addTariffData = documentSnapshot.data()
-        let tariffs = addTariffData.value
-        tariffs.map((tariffData) => {
-          let { charges, duration, numberOfAds } = tariffData
-          adsPrices.push({label: `$${charges} (${numberOfAds} ads for ${duration} days)`, value: charges})
+      querySnapshot
+        .forEach(documentSnapshot => {
+          const addTariffData = documentSnapshot.data();
+          let tariffs = addTariffData.value;
+          tariffs.map(tariffData => {
+            let {charges, duration, numberOfAds} = tariffData;
+            adsPrices.push({
+              label: `$${charges} (${numberOfAds} ads for ${duration} days)`,
+              value: charges,
+            });
+          });
+          adsPrices = adsPrices.filter(item => item != '');
+          callback(adsPrices);
         })
-        adsPrices = adsPrices.filter((item) => item != "")
-        callback(adsPrices)
-      })
-      .then((err) => {
-        console.log(err)
-      })
+        .then(err => {
+          console.log(err);
+        });
     });
 
   firestore()
@@ -67,27 +77,28 @@ const getAdsPrices = (callback) => {
     .get()
     .then(async querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        let categoryData = documentSnapshot.data()
-        let { title, subCategory } = categoryData
-        let subCategories = []
-        if (subCategory != null && subCategory != undefined && Array.isArray(subCategory)){
-          subCategory.map((categoryData) => {
-            let { title: subCategoryTitle } = categoryData
-            subCategories.push(subCategoryTitle)
-          })
+        let categoryData = documentSnapshot.data();
+        let {title, subCategory} = categoryData;
+        let subCategories = [];
+        if (
+          subCategory != null &&
+          subCategory != undefined &&
+          Array.isArray(subCategory)
+        ) {
+          subCategory.map(categoryData => {
+            let {title: subCategoryTitle} = categoryData;
+            subCategories.push(subCategoryTitle);
+          });
         }
-        adsPrices.push(``)
+        adsPrices.push(``);
       });
-      console.log({adsPrices})
+      console.log({adsPrices});
 
-      callback(adsPrices)
-
+      callback(adsPrices);
     });
-}
+};
 
 const Postad = ({navigation}) => {
-
-  
   const dispatch = useDispatch();
   const [activeField, setActiveField] = React.useState('Personal');
   const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
@@ -111,10 +122,11 @@ const Postad = ({navigation}) => {
 
   const MyData = useSelector(state => state.counter.data);
   const subdata = useSelector(state => state.sub.subdata);
+  // console.warn(MyData);
 
   React.useEffect(() => {
-    getAdsPrices(setItems)
-  }, [])
+    getAdsPrices(setItems);
+  }, []);
   // console.warn(subdata[0].plan === 'Business');
   // console.warn(value);
 
@@ -537,7 +549,7 @@ const Postad = ({navigation}) => {
               ) : null}
 
               <View style={styles.space} />
-              
+
               <View style={{zIndex: 2000}}>
                 <DropDownPicker
                   open={open}
@@ -547,7 +559,7 @@ const Postad = ({navigation}) => {
                   zIndex={3000}
                   setValue={setValue}
                   setItems={setItems}
-                  itemKey={(item) => item}
+                  itemKey={item => item}
                   style={{
                     borderWidth: h('0.3%'),
                     borderColor: Colors.Primary,
@@ -631,6 +643,7 @@ const Postad = ({navigation}) => {
                 <Text style={styles.modalText}>Stripe</Text>
                 <PaymentScreen
                   amount={value}
+                  email={MyData.email}
                   onLoading={() => {
                     setloading(true);
                   }}
@@ -655,12 +668,84 @@ const Postad = ({navigation}) => {
   );
 };
 
-function PaymentScreen({navigation, amount, onDone, onLoading}) {
+function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
   const {confirmPayment} = useStripe();
+  const {createToken} = useStripe();
+  const [cardData, setCardData] = React.useState('');
+
+  const _createToken = async Token => {
+    // console.warn(cardData.number);
+    // console.warn(email);
+    // console.warn(amount);
+    // console.warn(cardData.expiry);
+    // console.warn(cardData.cvc);
+    // console.warn(cardData.number)
+    const {error, token} = await createToken(buildTestTokenParams());
+
+    if (error) {
+      alert(`Error code: ${error.code}`, error.message);
+      console.warn(`Error: ${JSON.stringify(error)}`);
+    } else if (token) {
+      // console.warn(token);
+      axios
+        .get(
+          `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
+            cardData.number
+          }&email=${email}&amount=${
+            amount * 100
+          }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
+            cardData.cvc
+          }`,
+        )
+        .then(res => {
+          if (res.data.message === 'Payment successfull.') {
+            // alert('ALL CLEAR');
+            onDone();
+          }
+        })
+        .catch(err => {
+          alert('something went wrong');
+        });
+    }
+  };
+
+  function buildTestTokenParams() {
+    switch ('Card') {
+      case 'Pii':
+        return {
+          type: 'Pii',
+          personalId: '000000000',
+        };
+      case 'Card':
+        return {
+          type: 'Card',
+          name: 'David Wallace',
+          currency: 'usd',
+        };
+      case 'BankAccount':
+        return {
+          type: 'BankAccount',
+          accountNumber: '000123456789',
+          routingNumber: '110000000', // Routing number is REQUIRED for US bank accounts
+          country: 'US',
+          currency: 'usd',
+        };
+      default:
+        throw new Error(`Unsupported token type`);
+    }
+  }
 
   return (
     <>
-      <CardField
+      <View style={{width: '100%', height: '65%'}}>
+        <CreditCardInput
+          onChange={({values}) => {
+            // console.warn(values);
+            setCardData(values);
+          }}
+        />
+      </View>
+      {/* <CardField
         postalCodeEnabled={false}
         placeholders={{
           number: '4242 4242 4242 4242',
@@ -674,34 +759,75 @@ function PaymentScreen({navigation, amount, onDone, onLoading}) {
           height: 50,
           marginVertical: 30,
         }}
-        onCardChange={async cardDetails => {
-          console.warn(cardDetails.complete);
+        onCardChange={async card => {
+          setCardData(card);
+          // console.warn(cardDetails);
         }}
         onFocus={focusedField => {
           console.log('focusField', focusedField);
         }}
+      /> */}
+
+      {/* <TextInput
+        style={{
+          width: '95%',
+          height: '13%',
+          // backgroundColor: 'red',
+          marginTop: 10,
+          marginBottom: 10,
+          borderColor: Colors.Primary,
+          borderWidth: 2,
+          borderRadius: 2,
+        }}
       />
+      <TextInput
+        style={{
+          width: '95%',
+          height: '13%',
+          // backgroundColor: 'red',
+          marginTop: 10,
+          marginBottom: 10,
+          borderColor: Colors.Primary,
+          borderWidth: 2,
+          borderRadius: 2,
+        }}
+      />
+      <TextInput
+        style={{
+          width: '95%',
+          height: '13%',
+          // backgroundColor: 'red',
+          marginTop: 10,
+          marginBottom: 10,
+          borderColor: Colors.Primary,
+          borderWidth: 2,
+          borderRadius: 2,
+        }}
+      /> */}
 
       <TouchableOpacity
         style={[styles.button, styles.buttonClose]}
         onPress={async () => {
           onLoading();
-          let d1 = {
-            amount: amount,
-          };
-          try {
-            const res = await CreatePaymentIntent(d1);
-            console.warn(res.data.paymentIntent);
-            if (res?.data?.paymentIntent) {
-              let req = await confirmPayment(res?.data?.paymentIntent, {
-                paymentMethodType: 'Card',
-              });
-              console.warn(req);
-              await onDone();
-            }
-          } catch (error) {
-            console.warn(error);
-          }
+
+          // console.warn(formatString(cardData.expiry))
+          _createToken();
+          // let d1 = {
+          //   amount: amount,
+          // };
+          // try {
+          //   const res = await CreatePaymentIntent(d1);
+          //   console.warn(res.data.paymentIntent);
+          //   if (res?.data?.paymentIntent) {
+          //     let req = await confirmPayment(res?.data?.paymentIntent, {
+          //       paymentMethodType: 'Card',
+          //     });
+          //     console.warn(req);
+          //     await
+          //   }
+          // } catch (error) {
+          //   console.warn(error);
+          // }
         }}>
         <Text style={styles.textStyle}>Submit</Text>
       </TouchableOpacity>
@@ -711,7 +837,7 @@ function PaymentScreen({navigation, amount, onDone, onLoading}) {
 
 export default Postad;
 
-export { getAdsPrices }
+export {getAdsPrices};
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -915,8 +1041,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#0009',
   },
   modalView: {
-    width: w('90%'),
-    height: h('40%'),
+    width: w('100%'),
+    height: h('60%'),
     backgroundColor: 'white',
     borderRadius: h('0.7%'),
     alignItems: 'center',
