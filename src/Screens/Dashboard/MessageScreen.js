@@ -15,6 +15,15 @@ import {useSelector, useDispatch} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import uuid from 'react-native-uuid';
+import auth from '@react-native-firebase/auth';
+
+const removeNewMessagesAvailableDot = () => {
+  const currentUserId = auth().currentUser.uid
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .update({hasUnseenMessages: null})
+}
 
 const MessageScreen = ({navigation}) => {
   // const [inboxData, setInboxData] = useState(inboxDataSet);
@@ -27,6 +36,10 @@ const MessageScreen = ({navigation}) => {
   const [allUserBackup, setallUserBackup] = useState([]);
 
   const Userdata = useSelector(state => state.counter.data);
+
+  React.useEffect(() => {
+    removeNewMessagesAvailableDot()
+  }, [])
 
   const getAllUser = () => {
     database()

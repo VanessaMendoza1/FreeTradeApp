@@ -22,6 +22,7 @@ import {useSelector, useDispatch} from 'react-redux';
 
 const Setting = ({navigation}) => {
   const [ isBusinessAccount, setIsBusinessAccount ] = React.useState(false)
+  // const [ loading, setloading ] = React.useState(false)
   React.useEffect(() => {
     isUserHavingBussinessSubscription()
     // setIsBusinessAccount(true)
@@ -40,11 +41,13 @@ const Setting = ({navigation}) => {
     console.log('Done.');
   };
 
-  const isUserHavingBussinessSubscription = async () => {
+  const isUserHavingBussinessSubscription = () => {
+    console.log("TRIGGERED")
     let currentUserId = auth().currentUser.uid
-    await firestore()
+    firestore()
       .collection('Users')
       .doc(currentUserId)
+      .get()
       .then(documentSnapshot => {
         if (documentSnapshot.exists) {
           let userData = documentSnapshot.data()
@@ -55,7 +58,7 @@ const Setting = ({navigation}) => {
         }
       })
       .catch(err => {
-        setloading(false);
+        // setloading(false);
         console.warn(err);
       });
   }

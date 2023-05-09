@@ -226,19 +226,14 @@ const Profile = ({navigation}) => {
               </View>
             </View>
             <View style={{
-              display: "flex",
-              flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               height: 70
             }}>
-              <View style={{marginLeft: 25,}}>
+              <View>
                 <Icon name="mail" size={30} color={Colors.Primary}/>
               </View>
-              <View style={{...styles.bottomPrflHeader, flex: 1, paddingRight: 70}}>
-                {/* <Text style={{...styles.EmailText, textAlign: "left"}}>
-                  <Text style={{...styles.IIICTxt,}}>{MyData.email}</Text>
-                </Text>  // HIDDEN EMAIL ADDRESS */}
+              <View style={styles.bottomPrflHeader}>
                 <Text>Email Verified</Text>
               </View>
             </View>
@@ -326,11 +321,8 @@ const Profile = ({navigation}) => {
                           : 'Add from Seeting'}{' '}
                         {' '}
                         {'\n'}
-                        {MyData.closedDaysFrom
-                          ? "Closed: " + MyData.closedDaysFrom
-                          : 'Add from Seeting'}{' '}
-                        {MyData.closedDaysto
-                          ? " till " +MyData.closedDaysto
+                        {MyData.closedDays
+                          ? "Closed: " + MyData.closedDays
                           : 'Add from Seeting'}{' '}
                       </Text>
                     </View>

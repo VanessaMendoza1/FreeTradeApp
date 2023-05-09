@@ -282,7 +282,7 @@ const EditAccount = ({navigation}) => {
       setloading(false);
     }
   };
-
+  console.log({IMAGE:MyData.image})
   return (
     <KeyboardAvoidingScrollView>
       {loading ? (

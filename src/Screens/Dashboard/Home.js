@@ -151,6 +151,14 @@ const Home = ({navigation}) => {
   const [ selectedSubCategory, setSelectedSubCategory ] = React.useState(null)
   const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
   
+  React.useEffect(() => {
+    setSelectedSubCategory(null)
+    setItemsFromCategoryAndSubCategoryFilteration([])
+  }, [selectedCategory])
+
+  // React.useEffect(() => {
+  //   setItemsFromCategoryAndSubCategoryFilteration([])
+  // }, [selectedSubCategory])
   
   React.useEffect(() => {
     getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
@@ -324,7 +332,8 @@ const Home = ({navigation}) => {
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
   
             if (documentSnapshot.data().status === false) {
-              if (Math.ceil(distanceInKm) < UserData?.LocationFilter?.LocalDistance) {
+              console.log("DISTANCE FOUND IS " + distanceInKm + " WHEREAS USER HAS SET DISTANCE TO " + UserData?.LocationFilter?.LocalDistance)
+              if (Math.ceil(distanceInKm) <= UserData?.LocationFilter?.LocalDistance) {
                 let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
@@ -507,7 +516,7 @@ const Home = ({navigation}) => {
                   <TouchableOpacity onPress={() => {
                     setShowItemsFromCategoryAndSubCategory(false)
                     setShowCategoryAndSubCategory(false)
-                    setSelectedCategory(null)
+                    // setSelectedCategory(null)
                     setSelectedSubCategory(null)
                     setItemsFromCategoryAndSubCategoryFilteration([])
                   }}>
@@ -525,7 +534,13 @@ const Home = ({navigation}) => {
                     
                     {Object.keys(categoriesWithSubCategoryData).map((categoryName) => {
                       return (
-                        <TouchableOpacity onPress={() => setSelectedCategory(categoryName)}>
+                        <TouchableOpacity onPress={() => {
+                          if (selectedCategory == categoryName){
+                            setSelectedCategory(null)
+                          } else {
+                            setSelectedCategory(categoryName)
+                          }
+                        }}>
                           <Text style={{
                             fontWeight: "bold",
                             fontSize: 18,
@@ -556,7 +571,7 @@ const Home = ({navigation}) => {
                                   </TouchableOpacity>
                                 )
                               })}
-                              <TouchableOpacity onPress={() => {
+                              {/* <TouchableOpacity onPress={() => {
                                 setSelectedSubCategory(null)
                                 setSelectedCategory(categoryName)
                                 setShowCategoryAndSubCategory(false)
@@ -571,7 +586,7 @@ const Home = ({navigation}) => {
                                 }}>
                                   Select all in {categoryName} !
                                 </Text>
-                              </TouchableOpacity>
+                              </TouchableOpacity> */}
                             </>
                           )
                         }

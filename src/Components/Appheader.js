@@ -3,10 +3,32 @@ import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../utils/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
+const checkIfNewMessagesAvailable = (callback) => {
+  const currentUserId = auth().currentUser.uid
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          let userData = documentSnapshot.data()
+          if (userData.hasUnseenMessages && userData.hasUnseenMessages == true){
+            callback(true)
+          }
+        }
+      })
+}
 
 const Appheader = ({onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
   console.warn(noti);
+  const [ isHavingNewMessages, setIsHavingNewMessages ] = React.useState(false)
+
+  React.useEffect(() => {
+    checkIfNewMessagesAvailable(setIsHavingNewMessages)
+  }, [])
 
   return (
     <View style={styles.HeaderContainer}>
@@ -24,7 +46,20 @@ const Appheader = ({onSearch, onMessage, onNotification, noti, showCategoryAndSu
         <Icon name="menu-outline" size={50} color="#ffff" />
       </TouchableOpacity>
       <TouchableOpacity onPress={onMessage} style={styles.ViewCOntaier2}>
-        <Icon name="chatbox" size={30} color="#ffff" />
+        <Icon name="chatbox" size={30} color="#ffff"/>
+        {isHavingNewMessages && (
+          <View style={{
+            width: 13,
+            height: 13, 
+            backgroundColor: "red",
+            position: "absolute",
+            bottom: 22,
+            right: 19,
+            borderRadius: 10,
+            borderColor: "black",
+            borderWidth: 1
+          }}></View>
+        )}
       </TouchableOpacity>
 
       <View style={styles.ViewCOntaier3}>
@@ -56,9 +91,17 @@ const Appheader = ({onSearch, onMessage, onNotification, noti, showCategoryAndSu
         {noti ? (
           <>
             <Icon name="notifications" size={30} color="#fff" />
-            <View style={styles.Elips}>
-              <Icon name="ellipse" size={15} color="red" />
-            </View>
+            <View style={{
+              width: 13,
+              height: 13, 
+              backgroundColor: "red",
+              position: "absolute",
+              bottom: 20,
+              right: 18,
+              borderRadius: 10,
+              borderColor: "black",
+              borderWidth: 1
+            }}></View>
           </>
         ) : (
           <Icon name="notifications" size={30} color="#ffff" />

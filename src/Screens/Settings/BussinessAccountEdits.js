@@ -94,8 +94,7 @@ const BussinessAccountEdits = ({navigation}) => {
   const [value4, setValue4] = React.useState(null);
 
   const [closedFromDayModalVisibility, setClosedFromDayModalVisibility] = React.useState(false)
-  const [closedToDayModalVisibility, setClosedToDayModalVisibility] = React.useState(false)
-  const [closedFromDayModalValue, setClosedFromDayModalValue] = React.useState(null)
+  const [closedOnDayModalValue, setClosedOnDayModalValue] = React.useState(null)
   const [closedToDayModalValue, setClosedToDayModalValue] = React.useState(null)
 
   const [Business, setBusiness] = React.useState('');
@@ -160,8 +159,7 @@ const BussinessAccountEdits = ({navigation}) => {
           Phone: Phone,
           bussinessdaysFrom: value3,
           bussinessdaysto: value4,
-          closedDaysFrom: closedFromDayModalValue,
-          closedDaysto: closedToDayModalValue,
+          closedDays: closedOnDayModalValue,
           bussinessHoursFrom: value,
           bussinessHoursto: value2,
           AccountType: 'Bussiness',
@@ -243,8 +241,8 @@ const BussinessAccountEdits = ({navigation}) => {
 
 
           <TouchableOpacity style={styles.ProfileContainer} onPress={() => {
-                setShowUploadBox(true);
-              }}>
+              setShowUploadBox(true);
+            }}>
             <View style={styles.ProfileCC}>
               {/* <View style={styles.CamerColar}>
               <Icon name="camera" size={35} color="#ffff" />
@@ -496,15 +494,15 @@ const BussinessAccountEdits = ({navigation}) => {
                       
                     ]}>
 
-                    <View style={styles.leftCC3}>
+                    <View style={{...styles.leftCC3, width: "100%"}}>
                       <View style={{zIndex: 2001}}>
                         <DropDownPicker
                           open={closedFromDayModalVisibility}
                           placeholder="from"
-                          value={closedFromDayModalValue}
+                          value={closedOnDayModalValue}
                           items={items3}
                           setOpen={setClosedFromDayModalVisibility}
-                          setValue={setClosedFromDayModalValue}
+                          setValue={setClosedOnDayModalValue}
                           setItems={setItems3}
                           maxHeight={120}
                           // style={{backgroundColor: "pink"}}
@@ -517,7 +515,7 @@ const BussinessAccountEdits = ({navigation}) => {
                         />
                       </View>
                     </View>
-                    <View style={styles.leftCC3}>
+                    {/* <View style={styles.leftCC3}>
                       <View style={{zIndex: 2000}}>
                         <DropDownPicker
                           open={closedToDayModalVisibility}
@@ -537,7 +535,7 @@ const BussinessAccountEdits = ({navigation}) => {
                           }}
                         />
                       </View>
-                    </View>
+                    </View> */}
                   </View>
                 </View>
               </>
@@ -731,9 +729,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0003',
     bottom: 50,
-    height: '100%',
+    height: '36%',
     // alignItems: 'flex-end',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   captureOptionItem: {
     textAlign: 'center',

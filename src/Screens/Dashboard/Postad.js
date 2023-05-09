@@ -52,7 +52,11 @@ const getAdsPrices = (callback) => {
         let tariffs = addTariffData.value
         tariffs.map((tariffData) => {
           let { charges, duration, numberOfAds } = tariffData
-          adsPrices.push({label: `$${charges} (${numberOfAds} ads for ${duration} days)`, value: charges})
+          if (numberOfAds > 1){
+            adsPrices.push({label: `$${charges} (${numberOfAds} ads for ${duration} days)`, value: charges})
+          } else {
+            adsPrices.push({label: `$${charges} (${numberOfAds} ad for ${duration} days)`, value: charges})
+          }
         })
         adsPrices = adsPrices.filter((item) => item != "")
         callback(adsPrices)

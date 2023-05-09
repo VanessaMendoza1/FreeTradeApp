@@ -22,6 +22,13 @@ import MsgComponent from '../../Components/MsgComponent';
 
 const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
 
+const indicateOtherUserAsHavingUnreadMessages = (otherUserId) => {
+  firestore()
+    .collection('Users')
+    .doc(otherUserId)
+    .update({hasUnseenMessages: true})
+}
+
 const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
   console.log({msg, setMsg, setdisabled, userData, receiverData})
   try {
@@ -45,6 +52,7 @@ const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
       .push();
     msgData.id = newReference.key;
     newReference.set(msgData).then(() => {
+      indicateOtherUserAsHavingUnreadMessages(receiverData.id)
       console.log("MESSAGE SENT")
       console.log({msgData})
       let chatListupdate = {
