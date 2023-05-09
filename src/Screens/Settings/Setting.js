@@ -63,6 +63,8 @@ const Setting = ({navigation}) => {
       });
   }
 
+  console.log({IMAGE: MyData.image})
+
   return (
     <ScrollView>
 

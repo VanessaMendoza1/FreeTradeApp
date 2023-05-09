@@ -95,7 +95,7 @@ const BussinessAccountEdits = ({navigation}) => {
 
   const [closedFromDayModalVisibility, setClosedFromDayModalVisibility] = React.useState(false)
   const [closedOnDayModalValue, setClosedOnDayModalValue] = React.useState(null)
-  const [closedToDayModalValue, setClosedToDayModalValue] = React.useState(null)
+  // const [closedToDayModalValue, setClosedToDayModalValue] = React.useState(null)
 
   const [Business, setBusiness] = React.useState('');
   const [Address, setAddress] = React.useState('');

@@ -133,7 +133,7 @@ const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, 
     .get()
     .then(async querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        let postData = documentSnapshot.data()
+        let postData = {...documentSnapshot.data(), id: documentSnapshot.id}
         // console.log({postData})
         let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType, Title } = postData
         // if (user){

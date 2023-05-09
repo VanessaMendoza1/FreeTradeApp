@@ -17,7 +17,6 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
-
 import {useSelector, useDispatch} from 'react-redux';
 import {DataInsert} from '../../redux/counterSlice';
 
@@ -57,7 +56,7 @@ const openPhoto = (setloading, setShowUploadBox, setImgeUrl, updateDetails) => {
           uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
             setloading(false);
             setImgeUrl(downloadURL);
-            updateDetails(downloadURL);
+            updateDetails(downloadURL, setloading);
           });
         },
       );
@@ -80,7 +79,7 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
     cropping: true,
   })
     .then(image => {
-      console.log(image.path);
+      console.log({IMAGE: image.path, PATH: `/items/${Date.now()}` + image.path});
       setShowUploadBox(false);
       // end
       const uploadTask = storage()
@@ -98,14 +97,15 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
         },
         error => {
           console.log(error);
-          setloading(false);
+          // setloading(false);
           alert('Something went wrong');
         },
         () => {
           uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-            setloading(false);
+            // setloading(false);
+            console.log({downloadURL})
             setImgeUrl(downloadURL);
-            updateDetails(downloadURL);
+            updateDetails(downloadURL, setloading);
           });
         },
       );
@@ -120,39 +120,45 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
     });
 };
 
-const updateDetails = downloadURL => {
-  setloading(true);
-  firestore()
-    .collection('Users')
-    .doc(MyData.UserID)
-    .update({
-      image: downloadURL ? downloadURL : MyData.image,
-    })
-    .then(async () => {
-      let userData = [];
-      await firestore()
-        .collection('Users')
-        .doc(MyData.UserID)
-        .get()
-        .then(documentSnapshot => {
-          if (documentSnapshot.exists) {
-            userData.push(documentSnapshot.data());
-          }
-        })
-        .catch(err => {
-          setloading(false);
-          console.warn(err);
-        });
-
-      await dispatch(DataInsert(userData[0]));
-      alert('Profile Picture Updated');
-      setloading(false);
-      navigation.goBack();
-    })
-    .catch(err => {
-      setloading(false);
-      console.log(err);
-    });
+const updateDetails = (downloadURL, setloading) => {
+  console.log({NEW_IMAGE: downloadURL})
+  const currentUserId = auth().currentUser.uid
+  
+  if (downloadURL){
+    setloading(true);
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .update({
+        image: downloadURL,
+      })
+      .then(async () => {
+        let userData = [];
+        await firestore()
+          .collection('Users')
+          .doc(currentUserId)
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot.exists) {
+              console.log({NEW_IMAGE: documentSnapshot.data().image})
+              userData.push();
+            }
+          })
+          .catch(err => {
+            setloading(false);
+            console.warn(err);
+          });
+  
+        await dispatch(DataInsert(userData[0]));
+        alert('Profile Picture Updated');
+        setloading(false);
+        navigation.goBack();
+      })
+      .catch(err => {
+        setloading(false);
+        console.log(err);
+      });
+  }
 };
 
 const EditAccount = ({navigation}) => {
