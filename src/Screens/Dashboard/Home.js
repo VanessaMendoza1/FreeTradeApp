@@ -26,6 +26,7 @@ import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Icons from '../../utils/icons';
 import Collapsible from 'react-native-collapsible';
+import {FlatListSlider} from 'react-native-flatlist-slider';
 
 
 import {getPreciseDistance} from 'geolib';
@@ -208,7 +209,7 @@ const Home = ({navigation}) => {
   const [longitude, setLongitude] = React.useState(0);
   const [latitude, setlatitude] = React.useState(0);
   const [loading, setloading] = useState(false);
-  const imageRef = useRef();
+  const animatedFlatlist = useRef();
   const [active, setActive] = useState(0);
   const indexRef = useRef(active);
   indexRef.current = active;
@@ -231,6 +232,8 @@ const Home = ({navigation}) => {
   const [ selectedSubCategory, setSelectedSubCategory ] = React.useState(null)
   const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
   
+  const _timerId = useRef(null);
+
   React.useEffect(() => {
     console.log({activeField})
     showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
@@ -248,6 +251,13 @@ const Home = ({navigation}) => {
   React.useEffect(() => {
     getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
     showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
+  }, [])
+
+  React.useEffect(() => {
+    _stopAutoPlay();
+    _startAutoPlay();
+
+    return () => _stopAutoPlay()
   }, [])
   
   
@@ -513,6 +523,42 @@ const Home = ({navigation}) => {
     }
   };
 
+  // moving slider content starts here
+  let CurrentSlide = 0;
+  let IntervalTime = 2000;
+  
+  const _goToNextPage = () => {
+    if ( CurrentSlide >= ImageAds.length-1 ) CurrentSlide = 0;
+
+    animatedFlatlist.current.scrollToIndex({
+      index: ++CurrentSlide,
+      animated: true,
+    });
+  };
+
+  const _startAutoPlay = () => {
+    _timerId.current = setInterval(_goToNextPage, IntervalTime)
+    // this._timerId = setInterval(this._goToNextPage, IntervalTime);
+  };
+
+  const _stopAutoPlay = () => {
+    if (_timerId.current) {
+      clearInterval(_timerId.current);
+      _timerId.current = null;
+    }
+  };
+
+  const _renderItem = ({item, index}) => {
+    return <Image source={{uri: item}} style={styles.sliderItems} />;
+  }
+
+  const _keyExtractor = (item, index) => {
+    // console.log(item);
+    return index.toString();
+  }
+  // moving slider content starts here
+
+
   return (
     <>
       {loading && <LoadingScreen />}
@@ -693,17 +739,33 @@ const Home = ({navigation}) => {
             return (
               <>
                 <View style={styles.HeaderBar}>
+                {/* <FlatList
+                  style={{
+                    flex: 1,
+                    // TODO Remove extera global padding
+                    // marginLeft: -size.padding,
+                    // marginRight: -size.padding,
+                  }}
+                  data={this.state.link}
+                  keyExtractor={this._keyExtractor.bind(this)}
+                  renderItem={this._renderItem.bind(this)}
+                  horizontal={true}
+                  flatListRef={React.createRef()}
+                  ref={this.flatList}
+                /> */}
                 <FlatList
                   showsHorizontalScrollIndicator={false}
                   // onViewableItemsChanged={onViewableItemsChangedHandler}
                   viewabilityConfig={{
                     itemVisiblePercentThreshold: 50,
                   }}
-                  ref={imageRef}
+                  ref={animatedFlatlist}
+                  flatListRef={React.createRef()}
                   pagingEnabled
                   data={ImageAds}
                   horizontal
-                  keyExtractor={(item, index) => String(index)}
+                  keyExtractor={_keyExtractor}
+                  // keyExtractor={(item, index) => String(index)}
                   renderItem={({item, index}) => (
                     <Ads
                       onPress={() => {
