@@ -21,15 +21,18 @@ import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
 
 const Setting = ({navigation}) => {
-  const dispatch = useDispatch()
-  const [ isBusinessAccount, setIsBusinessAccount ] = React.useState(false)
+  const dispatch = useDispatch();
+  const [isBusinessAccount, setIsBusinessAccount] = React.useState(false);
   // const [ loading, setloading ] = React.useState(false)
   React.useEffect(() => {
-    isUserHavingBussinessSubscription()
+    isUserHavingBussinessSubscription();
     // setIsBusinessAccount(true)
-  }, [])
+  }, []);
   const MyData = useSelector(state => state.counter.data);
   console.warn(MyData.name);
+
+  const subdata = useSelector(state => state.sub.subdata);
+  console.warn(subdata[0].plan === 'Business');
 
   const clearAll = async () => {
     try {
@@ -44,18 +47,18 @@ const Setting = ({navigation}) => {
   };
 
   const isUserHavingBussinessSubscription = () => {
-    console.log("TRIGGERED")
-    let currentUserId = auth().currentUser.uid
+    console.log('TRIGGERED');
+    let currentUserId = auth().currentUser.uid;
     firestore()
       .collection('Users')
       .doc(currentUserId)
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot.exists) {
-          let userData = documentSnapshot.data()
-          console.log({userData})
-          if (userData.AccountType == "Bussiness"){
-            setIsBusinessAccount(true)
+          let userData = documentSnapshot.data();
+          console.log({userData});
+          if (userData.AccountType == 'Bussiness') {
+            setIsBusinessAccount(true);
           }
         }
       })
@@ -63,13 +66,12 @@ const Setting = ({navigation}) => {
         // setloading(false);
         console.warn(err);
       });
-  }
+  };
 
-  console.log({IMAGE: MyData.image})
+  // console.log({IMAGE: MyData.image})
 
   return (
     <ScrollView>
-
       <View style={styles.MainContainer}>
         {/* header */}
         <View style={styles.Header}>
@@ -99,7 +101,11 @@ const Setting = ({navigation}) => {
             />
           </View>
           <Text style={styles.nameText}>
-            {MyData.BussinessDetails === true ? MyData.BusinessName : MyData.name}
+            {subdata.length > 0
+              ? subdata[0].plan === 'Business'
+                ? MyData.BusinessName
+                : MyData.name
+              : MyData.name}
           </Text>
         </View>
         {/* profile Containr */}
@@ -114,7 +120,7 @@ const Setting = ({navigation}) => {
             })}
           </SettingItem> */}
 
-          { isBusinessAccount ? (
+          {subdata.length > 0 && subdata[0].plan === 'Business' ? (
             <SettingItem
               onPress={() => {
                 navigation.navigate('BussinessAccountEdits');
@@ -135,7 +141,6 @@ const Setting = ({navigation}) => {
               })}
             </SettingItem>
           )}
-        
 
           <SettingItem
             onPress={() => {
@@ -176,26 +181,32 @@ const Setting = ({navigation}) => {
               tintColor: Colors.Primary,
             })}
           </SettingItem>
-          
-          <SettingItem text={'About Us'} onPress={() => {
-            navigation.navigate('AboutUs');
-          }}>
+
+          <SettingItem
+            text={'About Us'}
+            onPress={() => {
+              navigation.navigate('AboutUs');
+            }}>
             {Icons.Terms({
               tintColor: Colors.Primary,
             })}
           </SettingItem>
-          
-          <SettingItem text={'Privacy Policy'} onPress={() => {
-            navigation.navigate('PrivacyPolicy');
-          }}>
+
+          <SettingItem
+            text={'Privacy Policy'}
+            onPress={() => {
+              navigation.navigate('PrivacyPolicy');
+            }}>
             {Icons.Terms({
               tintColor: Colors.Primary,
             })}
           </SettingItem>
-          
-          <SettingItem text={'Terms and Conditions'} onPress={() => {
-            navigation.navigate('TermsAndConditions');
-          }}>
+
+          <SettingItem
+            text={'Terms and Conditions'}
+            onPress={() => {
+              navigation.navigate('TermsAndConditions');
+            }}>
             {Icons.Info({
               tintColor: Colors.Primary,
             })}
@@ -231,8 +242,6 @@ const Setting = ({navigation}) => {
             })}
           </SettingItem>
         </View>
-
-        
       </View>
     </ScrollView>
   );
