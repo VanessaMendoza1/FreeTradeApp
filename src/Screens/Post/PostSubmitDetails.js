@@ -61,14 +61,14 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [isUserHavingLocation, setIsUserHavingLocation] = React.useState((MyData.latitude && MyData.longitude) ? true : false)
   const [entireCategoryAndSubCategoryData, setEntireCategoryAndSubCategoryData] = React.useState({})
   
-  React.useEffect(() => {
-    if (value == "Services"){
-      setItems3([
-        {label: 'Good', value: 'Good'},
-        {label: 'excellent', value: 'excellent'},
-      ])
-    }
-  }, [value])
+  // React.useEffect(() => {
+  //   if (value == "Services"){
+  //     setItems3([
+  //       {label: 'Good', value: 'Good'},
+  //       {label: 'excellent', value: 'excellent'},
+  //     ])
+  //   }
+  // }, [value])
 
   React.useEffect(() => {
     setValue2({})
@@ -352,7 +352,7 @@ const PostSubmitDetails = ({navigation, route}) => {
               )}
               {value2 && (
                 <>
-                  <Text style={styles.CategoryItem}>Condition</Text>
+                  <Text style={styles.CategoryItem}>{(value == "Services") ? "Condition / Service" : "Condition"}</Text>
                   <View style={{zIndex: 2000}}>
                     <DropDownPicker
                       open={open3}
