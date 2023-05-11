@@ -105,6 +105,9 @@ const SubscriptionPage = ({navigation}) => {
     );
   }, []);
 
+  const subdata = useSelector(state => state.sub.subdata);
+  console.warn(subdata.length > 0);
+
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -138,7 +141,7 @@ const SubscriptionPage = ({navigation}) => {
         {/* header */}
 
         {isSubscriptionValid ? (
-          // {(false) ? (
+          // {(subdata.length > 0 ) ? (
 
           <View style={styles.LastPageCC}>
             <TouchableOpacity

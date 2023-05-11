@@ -38,7 +38,7 @@ const Profile = ({navigation}) => {
   const TradingAllData = useSelector(state => state.mypost.MyTradingData);
 
   const subdata = useSelector(state => state.sub.subdata);
-  console.warn(subdata[0].plan === 'Business');
+  console.warn(subdata[0].plan === 'Bussiness');
 
   const allmypost = async () => {
     let SellingData = [];
@@ -179,7 +179,7 @@ const Profile = ({navigation}) => {
                 <View style={styles.HeartContainer2}>
                   <Text style={styles.NameC}>
                     {subdata.length > 0
-                      ? subdata[0].plan === 'Business'
+                      ? subdata[0].plan === 'Bussiness'
                         ? MyData.BusinessName
                         : MyData.name
                       : MyData.name}
@@ -245,7 +245,7 @@ const Profile = ({navigation}) => {
 
           <View style={styles.linebar} />
 
-          {subdata.length > 0 && subdata[0].plan === 'Business' && (
+          {subdata.length > 0 && subdata[0].plan === 'Bussiness' && (
             <>
               <View style={styles.adminMode}>
                 {/* call button */}

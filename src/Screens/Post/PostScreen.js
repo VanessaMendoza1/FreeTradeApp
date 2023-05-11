@@ -327,22 +327,22 @@ const PostScreen = ({navigation, route}) => {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
-                  if (!heart){
+                  if (!heart) {
                     await toggleMarkFavourite(
                       route.params.data.id,
-                      route.params.data.Category, 
-                      route.params.data.SubCategory
-                    )
-                    setheart(true)
-                  } else {
-                    let isForRemovingFromFavourites = true
-                    await toggleMarkFavourite(
-                      route.params.data.id,
-                      route.params.data.Category, 
+                      route.params.data.Category,
                       route.params.data.SubCategory,
-                      isForRemovingFromFavourites
-                    )
-                    setheart(false)
+                    );
+                    setheart(true);
+                  } else {
+                    let isForRemovingFromFavourites = true;
+                    await toggleMarkFavourite(
+                      route.params.data.id,
+                      route.params.data.Category,
+                      route.params.data.SubCategory,
+                      isForRemovingFromFavourites,
+                    );
+                    setheart(false);
                   }
                   setheart(!heart);
                 }}
@@ -534,7 +534,7 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer5}>
             <TouchableOpacity
               onPress={() => {
-                console.log({subdata})
+                console.log({subdata});
                 if (subdata.length > 0) {
                   // createChatList(route.params.data.user);
                   navigation.navigate('StartConversation', {
@@ -549,12 +549,12 @@ const PostScreen = ({navigation, route}) => {
                       emailId: route.params.data.email,
                       about: route.params.data.Bio,
                       Token: route.params.data.NotificationToken,
-                      
+
                       itemPrice: route.params.data.Price,
                       itemImage: route.params.data.images[0],
                       sellersName: route.params.data.user.name,
                       sellersImage: route.params.data.user.image,
-                    }
+                    },
                   });
                 } else {
                   // alert('You need to buy Subscription');
@@ -591,7 +591,7 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.space} />
           {subdata.length > 0 && (
             <>
-              {subdata[0].plan !== 'Business' && (
+              {subdata[0].plan !== 'Bussiness' && (
                 <>
                   {VideoAd.length <= 0 ? null : (
                     <>
@@ -619,12 +619,14 @@ const PostScreen = ({navigation, route}) => {
                           {VideoAd[0].TagLine}
                         </Text>
 
-                        
-                          <Text style={styles.MainText2}>{VideoAd[0].user.Address}</Text>
-                          {(VideoAd[0].user?.Phone !== undefined) && (
-                            <Text style={styles.MainText2}>Call: {VideoAd[0].user.Phone}</Text>
-                          )}
-
+                        <Text style={styles.MainText2}>
+                          {VideoAd[0].user.Address}
+                        </Text>
+                        {VideoAd[0].user?.Phone !== undefined && (
+                          <Text style={styles.MainText2}>
+                            Call: {VideoAd[0].user.Phone}
+                          </Text>
+                        )}
                       </View>
                     </>
                   )}
@@ -643,7 +645,7 @@ const PostScreen = ({navigation, route}) => {
                 horizontal={true}
                 renderItem={({item}) => {
                   // console.log({item})
-                  if (item.images){
+                  if (item.images) {
                     return (
                       <TouchableOpacity
                         onPress={() => {
@@ -666,7 +668,6 @@ const PostScreen = ({navigation, route}) => {
                         </ImageBackground>
                       </TouchableOpacity>
                     );
-
                   }
                 }}
               />

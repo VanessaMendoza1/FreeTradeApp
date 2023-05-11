@@ -32,7 +32,7 @@ const Setting = ({navigation}) => {
   console.warn(MyData.name);
 
   const subdata = useSelector(state => state.sub.subdata);
-  console.warn(subdata[0].plan === 'Business');
+  console.warn(subdata[0].plan === 'Bussiness');
 
   const clearAll = async () => {
     try {
@@ -102,7 +102,7 @@ const Setting = ({navigation}) => {
           </View>
           <Text style={styles.nameText}>
             {subdata.length > 0
-              ? subdata[0].plan === 'Business'
+              ? subdata[0].plan === 'Bussiness'
                 ? MyData.BusinessName
                 : MyData.name
               : MyData.name}
@@ -120,7 +120,7 @@ const Setting = ({navigation}) => {
             })}
           </SettingItem> */}
 
-          {subdata.length > 0 && subdata[0].plan === 'Business' ? (
+          {subdata.length > 0 && subdata[0].plan === 'Bussiness' ? (
             <SettingItem
               onPress={() => {
                 navigation.navigate('BussinessAccountEdits');
