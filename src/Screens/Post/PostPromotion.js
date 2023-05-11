@@ -368,8 +368,8 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
 
   return (
     <>
-      <View style={{width: '100%', height: '65%'}}>
-        <CreditCardInput
+      <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
+        <LiteCreditCardInput
           onChange={({values}) => {
             // console.warn(values);
             setCardData(values);

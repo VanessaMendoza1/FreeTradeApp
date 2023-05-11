@@ -316,8 +316,8 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
 
   return (
     <>
-      <View style={{width: '100%', height: '65%'}}>
-        <CreditCardInput
+      <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
+        <LiteCreditCardInput
           onChange={({values}) => {
             // console.warn(values);
             console.warn(values);
