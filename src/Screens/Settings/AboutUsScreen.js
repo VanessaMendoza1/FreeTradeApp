@@ -23,7 +23,7 @@ const AboutUsScreen = ({navigation}) => {
     const [ aboutUsContent, setAboutUsContent ] = React.useState("")
     
     React.useEffect(() => {
-        getPolicy(setAboutUsContent)
+        getAboutUs(setAboutUsContent)
     }, [])
 
     return (
