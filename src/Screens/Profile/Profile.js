@@ -38,7 +38,7 @@ const Profile = ({navigation}) => {
   const TradingAllData = useSelector(state => state.mypost.MyTradingData);
 
   const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(subdata[0].plan === 'Business');
+  console.warn(subdata[0].plan === 'Business');
 
   const allmypost = async () => {
     let SellingData = [];
@@ -115,10 +115,9 @@ const Profile = ({navigation}) => {
     return unsubscribe;
   }, [navigation]);
 
-
-  console.log({ARSALAN_IMAGE: MyData.image})
-  console.log({ARSALAN_IMAGE: MyData.image})
-  console.log({ARSALAN_IMAGE: MyData.image})
+  console.log({ARSALAN_IMAGE: MyData.image});
+  console.log({ARSALAN_IMAGE: MyData.image});
+  console.log({ARSALAN_IMAGE: MyData.image});
   return (
     <>
       <ReportPopup
@@ -179,14 +178,14 @@ const Profile = ({navigation}) => {
 
                 <View style={styles.HeartContainer2}>
                   <Text style={styles.NameC}>
-                    {/* {subdata.length > 0
-                    ? subdata[0].plan === 'Business'
-                      ? MyData.BusinessName
-                      : MyData.name
-                    : MyData.name} */}
-                    {MyData.BussinessDetails === true
-                      ? MyData.BusinessName
+                    {subdata.length > 0
+                      ? subdata[0].plan === 'Business'
+                        ? MyData.BusinessName
+                        : MyData.name
                       : MyData.name}
+                    {/* {MyData.BussinessDetails === true
+                      ? MyData.BusinessName
+                      : MyData.name} */}
                   </Text>
 
                   <View style={styles.IconContainerCC2}>
@@ -209,7 +208,6 @@ const Profile = ({navigation}) => {
                 </View>
 
                 <View style={styles.BtoomTobCC}>
-                  
                   {/* <TouchableOpacity
                   onPress={() => {
                     setmode(true);
@@ -229,13 +227,14 @@ const Profile = ({navigation}) => {
                 </View>
               </View>
             </View>
-            <View style={{
-              alignItems: "center",
-              justifyContent: "center",
-              height: 70
-            }}>
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 70,
+              }}>
               <View>
-                <Icon name="mail" size={30} color={Colors.Primary}/>
+                <Icon name="mail" size={30} color={Colors.Primary} />
               </View>
               <View style={styles.bottomPrflHeader}>
                 <Text>Email Verified</Text>
@@ -246,7 +245,7 @@ const Profile = ({navigation}) => {
 
           <View style={styles.linebar} />
 
-          {MyData.AccountType === 'Bussiness' && (
+          {subdata.length > 0 && subdata[0].plan === 'Business' && (
             <>
               <View style={styles.adminMode}>
                 {/* call button */}
@@ -323,10 +322,9 @@ const Profile = ({navigation}) => {
                         {MyData.bussinessdaysto
                           ? MyData.bussinessdaysto
                           : 'Add from Seeting'}{' '}
-                        {' '}
                         {'\n'}
                         {MyData.closedDays
-                          ? "Closed: " + MyData.closedDays
+                          ? 'Closed: ' + MyData.closedDays
                           : 'Add from Seeting'}{' '}
                       </Text>
                     </View>

@@ -92,14 +92,18 @@ const SubscriptionPage = ({navigation}) => {
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
 
-  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
-  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
-  const [isSubscriptionValid, setIsSubscriptionValid] = React.useState(false)
+  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] =
+    React.useState(9.99);
+  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] =
+    React.useState(1.99);
+  const [isSubscriptionValid, setIsSubscriptionValid] = React.useState(false);
   React.useEffect(() => {
-    getSubscriptionDetails(setIsSubscriptionValid)
-    getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
-  }, [])
-
+    getSubscriptionDetails(setIsSubscriptionValid);
+    getSubscriptionTarriff(
+      setIndividualSubscriptionPricing,
+      setBusinessSubscriptionPricing,
+    );
+  }, []);
 
   return (
     <>
@@ -134,7 +138,7 @@ const SubscriptionPage = ({navigation}) => {
         {/* header */}
 
         {isSubscriptionValid ? (
-        // {(false) ? (
+          // {(false) ? (
 
           <View style={styles.LastPageCC}>
             <TouchableOpacity
@@ -157,7 +161,7 @@ const SubscriptionPage = ({navigation}) => {
                 style={styles.mainViewCC}
                 onPress={() => {
                   // setModalVisible(true)
-                  setplan('Personal');
+                  setplan('price_1N64c3KAtBxeYOh2sxd0LP36');
                   setsub(!sub);
                 }}>
                 <Text style={styles.mainText123}>
@@ -167,7 +171,7 @@ const SubscriptionPage = ({navigation}) => {
               <TouchableOpacity
                 onPress={() => {
                   // setModalVisible(true)
-                  setplan('Business');
+                  setplan('price_1N64dIKAtBxeYOh2knKZAbOk');
                   setsub(!sub);
                 }}
                 style={styles.mainViewCC}>
@@ -196,17 +200,21 @@ const SubscriptionPage = ({navigation}) => {
             <Text style={styles.modalText}>Stripe</Text>
             <PaymentScreen
               amount={
-                plan === 'Personal'
+                plan === '1.99$'
                   ? individualSubscriptionPricing
                   : businessSubscriptionPricing
               }
               plan={plan}
               email={MyData.email}
+              onLoading={() => {
+                setloading(true);
+                setModalVisible(!modalVisible);
+              }}
               onDone={() => {
                 setModalVisible(!modalVisible);
                 setloading(false);
                 // navigation.goBack();
-                if (plan === 'Personal') {
+                if (plan === 'price_1N64c3KAtBxeYOh2sxd0LP36') {
                   navigation.goBack();
                 } else {
                   navigation.navigate('BussinessAccountEdits');
@@ -237,32 +245,28 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
   const [loading, setloading] = React.useState(false);
   const [cardData, setCardData] = React.useState('');
 
-  const _createToken = async Token => {
-    console.warn(cardData.number);
-    console.warn(email);
-    console.warn(amount);
-    console.warn(cardData.expiry);
-    console.warn(cardData.cvc);
+  const _createToken = async () => {
+    // console.warn(cardData.number);
+    // console.warn(email);
+    // console.warn(plan);
+    // console.warn(cardData.expiry);
+    // console.warn(cardData.cvc);
 
-    // setloading(false);
+    setloading(false);
     axios
       .get(
-        `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
-          cardData.number
-        }&email=${email}&amount=${
-          amount * 100
-        }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
-          cardData.cvc
-        }`,
+        `https://umeraftabdev.com/FreeTradeApi/public/api/subscribe?card_number=${cardData.number}&email=${email}&sub_plan=${plan}&expiry=${cardData.expiry}&cvc=${cardData.cvc}`,
       )
       .then(res => {
-        if (res.data.message === 'Payment successfull.') {
+        console.warn(res);
+        if (res.data.message === 'Subscription created successfully') {
           // alert('ALL CLEAR');
-          onDone();
+          uploadSubscription();
+          // onDone();
         }
       })
       .catch(err => {
-        alert('something went wrong');
+        alert('something went wrong Please Try Again');
       });
   };
 
@@ -295,9 +299,9 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
         userid: MyData.UserID,
         startDate: JSON.stringify(now),
         endDate: JSON.stringify(end),
-        plan: plan,
+        plan:
+          plan === 'price_1N64c3KAtBxeYOh2sxd0LP36' ? 'Personal' : 'Bussiness',
         price: amount === 999 ? '9.99$' : '1.99',
-        Cancel: false,
       })
       .then(() => {
         MySubscriptionPackage();
@@ -313,6 +317,7 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
         <CreditCardInput
           onChange={({values}) => {
             // console.warn(values);
+            console.warn(values);
             setCardData(values);
           }}
         />

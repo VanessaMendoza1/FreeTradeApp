@@ -27,16 +27,25 @@ const SubModal = ({visible, onPress, Plan}) => {
           <View
             style={[
               styles.BottomModal,
-              {height: Plan === 'Personal' ? h('35%') : h('55%')},
+              {
+                height:
+                  Plan === 'price_1N64c3KAtBxeYOh2sxd0LP36'
+                    ? h('35%')
+                    : h('55%'),
+              },
             ]}>
             <Text style={styles.Contran}>
-              {Plan === 'Personal' ? 'Personal Plan' : 'Business Plan'}
+              {Plan === 'price_1N64c3KAtBxeYOh2sxd0LP36'
+                ? 'Personal Plan'
+                : 'Business Plan'}
             </Text>
             <Text style={styles.Contran2}>
-              {Plan === 'Personal' ? `${individualSubscriptionPricing}/Month` : `${businessSubscriptionPricing}/Month`}
+              {Plan === 'price_1N64c3KAtBxeYOh2sxd0LP36'
+                ? `${individualSubscriptionPricing}/Month`
+                : `${businessSubscriptionPricing}/Month`}
             </Text>
             {/* abc */}
-            {Plan === 'Personal' && (
+            {Plan === 'price_1N64c3KAtBxeYOh2sxd0LP36' && (
               <View style={[styles.SqBook, {marginBottom: h('5%')}]}>
                 <View style={styles.leftSQ}>
                   <Image
@@ -52,7 +61,7 @@ const SubModal = ({visible, onPress, Plan}) => {
                 </View>
               </View>
             )}
-            {Plan != 'Personal' && (
+            {Plan != 'price_1N64c3KAtBxeYOh2sxd0LP36' && (
               <>
                 <View style={[styles.SqBook, {marginBottom: h('3.5%')}]}>
                   <View style={styles.leftSQ}>
