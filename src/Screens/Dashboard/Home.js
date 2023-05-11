@@ -663,7 +663,7 @@ const Home = ({navigation}) => {
                                   </TouchableOpacity>
                                 )
                               })}
-                              {/* <TouchableOpacity onPress={() => {
+                              <TouchableOpacity onPress={() => {
                                 setSelectedSubCategory(null)
                                 setSelectedCategory(categoryName)
                                 setShowCategoryAndSubCategory(false)
@@ -676,9 +676,9 @@ const Home = ({navigation}) => {
                                   marginVertical: 12,
                                   paddingLeft: w("15%")
                                 }}>
-                                  Select all in {categoryName} !
+                                  Select all in {categoryName}
                                 </Text>
-                              </TouchableOpacity> */}
+                              </TouchableOpacity>
                             </>
                           )
                         }

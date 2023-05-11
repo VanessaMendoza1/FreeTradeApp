@@ -41,7 +41,7 @@ const ToggleNotificationsScreen = ({navigation}) => {
                             <Icon name="arrow-back-outline" size={30} color="#eee" />
                         </TouchableOpacity>
                         <View style={styles.MiddleContainer}>
-                            <Text style={styles.FontWork}>Show Subscriptions</Text>
+                            <Text style={styles.FontWork}>Read Notifications</Text>
                         </View>
                     </View>
                 </View>

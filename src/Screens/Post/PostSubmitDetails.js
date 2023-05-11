@@ -62,6 +62,15 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [entireCategoryAndSubCategoryData, setEntireCategoryAndSubCategoryData] = React.useState({})
   
   React.useEffect(() => {
+    if (value == "Services"){
+      setItems3([
+        {label: 'Good', value: 'Good'},
+        {label: 'excellent', value: 'excellent'},
+      ])
+    }
+  }, [value])
+
+  React.useEffect(() => {
     setValue2({})
     setValue3({})
     if (Object.keys(entireCategoryAndSubCategoryData).length > 0 && value != null){

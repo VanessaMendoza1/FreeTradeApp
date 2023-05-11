@@ -26,6 +26,7 @@ const SendOffer = ({navigation, route}) => {
   // console.warn(UserData.name);
 
   const NotificationSystem = async (id, name, token) => {
+    console.log({PARAMS: route.params})
     firestore()
       .collection('Notification')
       .doc()
@@ -34,36 +35,36 @@ const SendOffer = ({navigation, route}) => {
         text: UserData.name + ' send you' + offer + '$ offer',
       })
       .then(async () => {
+        
         var data = JSON.stringify({
           data: {},
           notification: {
             body: 'Someone send you a Request',
             title: UserData.name + 'send you' + offer + '$ offer',
           },
-          to: JSON.parse(Notii),
+          // to: JSON.parse(Notii),
+          to: Notii,
         });
         var config = {
           method: 'post',
           url: 'https://fcm.googleapis.com/fcm/send',
           headers: {
-            Authorization:
-              'key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls',
-            'Content-Type': 'application/json',
+            "Authorization":
+              "key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls",
+            "Content-Type": "application/json",
           },
           data: data,
         };
         
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
-            console.log(JSON.stringify(response.data));
+            areNotificationsHidden((dummyArg) => callBackIfNotificationsNotHidden, route.params.data.user.UserID)
             navigation.goBack();
             alert('Offer Sent');
           })
           .catch(function (error) {
             console.warn(error);
           });
-
-        areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
       })
       .catch(err => console.warn(err));
   };

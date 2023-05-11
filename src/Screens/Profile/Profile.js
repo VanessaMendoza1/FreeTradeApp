@@ -647,6 +647,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderWidth: h('0.1%'),
     borderColor: '#0002',
+    paddingBottom: 10
   },
   BtnContainer: {
     // backgroundColor: 'red',

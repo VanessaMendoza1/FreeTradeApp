@@ -9,6 +9,7 @@ import {
     Linking
 } from 'react-native';
 import { openComposer } from "react-native-email-link";
+
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../../utils/Colors';
@@ -61,7 +62,6 @@ const ContactUsScreen = ({navigation}) => {
                         openComposer({
                             to: contactUsEmail,
                             subject: "I have a question",
-                            body: "Hi, can you help me with...",
                         });
                         // Linking.openURL(`mailto:${contactUsEmail}`)
                     }}

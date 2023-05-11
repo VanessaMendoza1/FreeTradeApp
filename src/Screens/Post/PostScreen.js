@@ -568,10 +568,15 @@ const PostScreen = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                if (route.params.data.PostType === 'Trading') {
-                  NotificationSystem();
+                if (subdata.length > 0) {
+                  if (route.params.data.PostType === 'Trading') {
+                    NotificationSystem();
+                  } else {
+                    navigation.navigate('SendOffer', {data: route.params.data});
+                  }
                 } else {
-                  navigation.navigate('SendOffer', {data: route.params.data});
+                  // alert('You need to buy Subscription');
+                  navigation.navigate('SubscriptionPage');
                 }
               }}
               style={styles.AskButton2}>
