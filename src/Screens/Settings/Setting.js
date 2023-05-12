@@ -32,7 +32,7 @@ const Setting = ({navigation}) => {
   console.warn(MyData.name);
 
   const subdata = useSelector(state => state.sub.subdata);
-  console.warn(subdata[0].plan === 'Bussiness');
+  // console.warn(subdata[0].plan === 'Bussiness');
 
   const clearAll = async () => {
     try {

@@ -687,33 +687,26 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
     // console.warn(cardData.expiry);
     // console.warn(cardData.cvc);
     // console.warn(cardData.number)
-    const {error, token} = await createToken(buildTestTokenParams());
 
-    if (error) {
-      alert(`Error code: ${error.code}`, error.message);
-      console.warn(`Error: ${JSON.stringify(error)}`);
-    } else if (token) {
-      // console.warn(token);
-      axios
-        .get(
-          `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
-            cardData.number
-          }&email=${email}&amount=${
-            amount * 100
-          }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
-            cardData.cvc
-          }`,
-        )
-        .then(res => {
-          if (res.data.message === 'Payment successfull.') {
-            // alert('ALL CLEAR');
-            onDone();
-          }
-        })
-        .catch(err => {
-          alert('something went wrong');
-        });
-    }
+    axios
+      .get(
+        `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
+          cardData.number
+        }&email=${email}&amount=${
+          amount * 100
+        }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
+          cardData.cvc
+        }`,
+      )
+      .then(res => {
+        if (res.data.message === 'Payment successfull.') {
+          // alert('ALL CLEAR');
+          onDone();
+        }
+      })
+      .catch(err => {
+        alert('something went wrong');
+      });
   };
 
   function buildTestTokenParams() {
@@ -744,8 +737,8 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
 
   return (
     <>
-      <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
-        <LiteCreditCardInput
+      <View style={{width: '100%', height: '55%', justifyContent: 'center'}}>
+        <CreditCardInput
           onChange={({values}) => {
             // console.warn(values);
             setCardData(values);
@@ -1049,7 +1042,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: w('100%'),
-    height: h('40%'),
+    height: h('70%'),
     backgroundColor: 'white',
     borderRadius: h('0.7%'),
     alignItems: 'center',

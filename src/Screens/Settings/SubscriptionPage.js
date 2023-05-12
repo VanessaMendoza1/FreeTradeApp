@@ -108,6 +108,24 @@ const SubscriptionPage = ({navigation}) => {
   const subdata = useSelector(state => state.sub.subdata);
   console.warn(subdata.length > 0);
 
+  let uploadSubscription = () => {
+    firestore()
+      .collection('sub')
+      .doc(MyData.UserID)
+      .delete()
+      .then(async () => {
+        console.log('Document successfully deleted!');
+        await dispatch(SubDataAdd([]));
+        navigation.goBack();
+        setloading(false);
+      })
+      .catch(error => {
+        setloading(false);
+        console.error('Error removing document: ', error);
+        console.warn(error);
+      });
+  };
+
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -140,13 +158,26 @@ const SubscriptionPage = ({navigation}) => {
         </View>
         {/* header */}
 
-        {isSubscriptionValid ? (
+        {subdata.length > 0 ? (
           // {(subdata.length > 0 ) ? (
 
           <View style={styles.LastPageCC}>
             <TouchableOpacity
               onPress={() => {
-                alert('To be done');
+                setloading(true);
+                axios
+                  .get(
+                    `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData.email}`,
+                  )
+                  .then(res => {
+                    console.warn(res);
+                    uploadSubscription();
+                  })
+                  .catch(err => {
+                    setloading(false);
+                    console.warn(err);
+                    uploadSubscription();
+                  });
               }}
               style={styles.mainViewCC2}>
               <Text style={styles.mainText12}>Cancel Subscription</Text>
