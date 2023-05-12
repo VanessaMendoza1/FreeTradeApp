@@ -103,39 +103,35 @@ const BussinessAccountEdits = ({navigation}) => {
   const [Phone, sePhone] = React.useState('');
 
   const [loading, setloading] = React.useState(false);
+  const subdata = useSelector(state => state.sub.subdata);
+  console.warn(subdata[0].plan === 'Bussiness');
 
   const PostChangeName = async () => {
-    let  newarr = []
+    let newarr = [];
     await firestore()
       .collection('Post')
       .get()
-  .then(querySnapshot => {
-   
-      querySnapshot.forEach(documentSnapshot => {
-     
-       
-         
-        if (documentSnapshot.data().UserID === MyData.UserID){
-         
-          newarr.push(documentSnapshot.data().DocId)
-        }
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          if (documentSnapshot.data().UserID === MyData.UserID) {
+            newarr.push(documentSnapshot.data().DocId);
+          }
+        });
       });
-  });
-  if (newarr){
-    newarr.map( async(item, index)=>{
-      await firestore()
-      .collection('Post')
-      .doc(`${item}`)
-      .update({
-        'user.name': Business,
-      })
-      .then(() => {
-        console.log('User updated!');
+    if (newarr) {
+      newarr.map(async (item, index) => {
+        await firestore()
+          .collection('Post')
+          .doc(`${item}`)
+          .update({
+            'user.name': Business,
+          })
+          .then(() => {
+            console.log('User updated!');
+          });
       });
-    })
-  }
+    }
   };
- 
 
   const UpdateData = () => {
     setloading(true);
@@ -183,7 +179,7 @@ const BussinessAccountEdits = ({navigation}) => {
 
           await dispatch(DataInsert(userData[0]));
           alert('Done');
-          PostChangeName()
+          PostChangeName();
 
           setloading(false);
         })
@@ -218,7 +214,6 @@ const BussinessAccountEdits = ({navigation}) => {
           </View>
           {/* header */}
           {/* profile Container */}
-          
 
           {/* <TouchableOpacity
               onPress={() => {
@@ -238,9 +233,9 @@ const BussinessAccountEdits = ({navigation}) => {
               />
             </TouchableOpacity> */}
 
-
-
-          <TouchableOpacity style={styles.ProfileContainer} onPress={() => {
+          <TouchableOpacity
+            style={styles.ProfileContainer}
+            onPress={() => {
               setShowUploadBox(true);
             }}>
             <View style={styles.ProfileCC}>
@@ -256,7 +251,13 @@ const BussinessAccountEdits = ({navigation}) => {
                 }}
               />
             </View>
-            <Text style={styles.nameText}>{MyData.name}</Text>
+            <Text style={styles.nameText}>
+              {subdata.length > 0
+                ? subdata[0].plan === 'Bussiness'
+                  ? MyData.BusinessName
+                  : MyData.name
+                : MyData.name}
+            </Text>
           </TouchableOpacity>
           {/* profile Containr */}
 
@@ -328,13 +329,22 @@ const BussinessAccountEdits = ({navigation}) => {
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={() => openCamera(setShowUploadBox, setloading, setImgeUrl, updateDetails)}>
+            onPress={() =>
+              openCamera(
+                setShowUploadBox,
+                setloading,
+                setImgeUrl,
+                updateDetails,
+              )
+            }>
             <Text>From Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={() => openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)}>
+            onPress={() =>
+              openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)
+            }>
             <Text>From Gallery</Text>
           </TouchableOpacity>
         </View>
@@ -419,7 +429,6 @@ const BussinessAccountEdits = ({navigation}) => {
 
             {modalType !== 'Hours' && (
               <>
-              
                 <View style={styles.workingHours}>
                   <Text style={styles.markText}>Business Days</Text>
 
@@ -475,11 +484,11 @@ const BussinessAccountEdits = ({navigation}) => {
                   </View>
                 </View>
 
-
-                          {/* HERE !!! */}
-                <View style={{
+                {/* HERE !!! */}
+                <View
+                  style={{
                     ...styles.workingHours,
-                    marginTop: 100
+                    marginTop: 100,
                   }}>
                   <Text style={styles.markText}>Closed Days</Text>
 
@@ -491,10 +500,8 @@ const BussinessAccountEdits = ({navigation}) => {
                           ? (items.length + 1) * heightDropItem
                           : heightDropItem,
                       },
-                      
                     ]}>
-
-                    <View style={{...styles.leftCC3, width: "100%"}}>
+                    <View style={{...styles.leftCC3, width: '100%'}}>
                       <View style={{zIndex: 2001}}>
                         <DropDownPicker
                           open={closedFromDayModalVisibility}

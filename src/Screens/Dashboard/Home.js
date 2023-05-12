@@ -32,6 +32,7 @@ import {FlatListSlider} from 'react-native-flatlist-slider';
 import {getPreciseDistance} from 'geolib';
 
 import moment from 'moment';
+import axios from 'axios';
 
 const useInterval = (callback, delay) => {
   const savedCallback = useRef();
@@ -233,6 +234,45 @@ const Home = ({navigation}) => {
   const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
   
   const _timerId = useRef(null);
+
+
+
+  const CheckValidSubscription = () => {
+    axios
+      .get(
+        `https://umeraftabdev.com/FreeTradeApi/public/api/valid_subscription?email=${UserData.email}`,
+      )
+      .then(res => {
+        console.warn(res.data.hasActiveSubscription);
+      })
+      .catch(err => {
+        uploadSubscription();
+      });
+  };
+
+  let uploadSubscription = () => {
+    // console.warn(days >= 0);
+
+    firestore()
+      .collection('sub')
+      .doc(UserData.UserID)
+      .delete()
+      .then(async () => {
+        console.log('Document successfully deleted!');
+        await dispatch(SubDataAdd([]));
+      })
+      .catch(error => {
+        console.error('Error removing document: ', error);
+      });
+  };
+
+  React.useEffect(() => {
+    CheckValidSubscription();
+  }, []);
+
+
+
+
 
   React.useEffect(() => {
     console.log({activeField})
