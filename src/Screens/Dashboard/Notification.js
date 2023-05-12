@@ -39,10 +39,12 @@ const Notification = ({navigation}) => {
         querySnapshot.forEach(documentSnapshot => {
           // console.warn(data.UserID);
           if (documentSnapshot.data().userID == userData.UserID) {
+            // if (documentSnapshot.data().seen == false) {
             NotificationData.push({
               ...documentSnapshot.data(), 
               id: documentSnapshot.id
             });
+            // }
           }
         });
         setNotii(NotificationData);
@@ -96,7 +98,7 @@ const Notification = ({navigation}) => {
               <NotificationHead
                 onPress={async () => {
                   console.warn(item);
-                  if (item.text.endsWith("added an Item you might be interested in")){
+                  if (item.text.endsWith("an item from your favorites just posted. Click to view.")){
                     await firestore()
                       .collection('Post')
                       .doc(item.newlyAddedItemId)
@@ -107,9 +109,18 @@ const Notification = ({navigation}) => {
                           navigation.navigate('PostScreen', {data: newlyAddedItemData});
                         }
                       });
+                  } else if (item.text.endsWith("would like to trade with you, click to see profile!")){
+                    navigation.navigate('OtherUserProfile', {
+                      data: item.userID,
+                    });
+                  } else if (item.text.endsWith("just rated her experience, click to rate yours.")){
+                    navigation.navigate('Review', {
+                      data: item.userID,
+                    });
                   } else if (item.sellerData.UserID){
                     navigation.navigate('Review', {data: item.sellerData});
                   }
+                  // trade , links to profile
                 }}
                 data={item}
                 notifications={Notii}

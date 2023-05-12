@@ -225,15 +225,16 @@ const PostScreen = ({navigation, route}) => {
       .collection('Notification')
       .doc()
       .set({
+        seen: false,
         userID: route.params.data.user.UserID,
-        text: userData.name + '  would like to trade!',
+        text: userData.name + '  would like to trade with you, click to see profile!',
       })
       .then(async () => {
         var data = JSON.stringify({
           data: {},
           notification: {
-            body: 'Someone send you a Request',
-            title: userData.name + '  would like to trade!',
+            body: 'Someone sent you a Request',
+            title: userData.name + '  would like to trade with you, click to see profile!',
           },
           to: JSON.parse(Notii),
         });
@@ -250,15 +251,16 @@ const PostScreen = ({navigation, route}) => {
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
+            areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
             navigation.goBack();
-            alert('Offer Sent');
+            alert('Trade Offer Sent');
           })
           .catch(function (error) {
             // console.warn(error);
-            alert('Offer Sent');
+            alert('Trade Offer Sent');
           });
 
-        areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
+        
       })
       .catch(err => console.warn(err));
   };
