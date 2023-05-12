@@ -282,6 +282,7 @@ import {
         .collection('Notification')
         .doc()
         .set({
+          seen: false,
           userID: route.params.data.user.UserID,
           text: userData.name + '  would like to trade!',
         })
@@ -289,7 +290,7 @@ import {
           var data = JSON.stringify({
             data: {},
             notification: {
-              body: 'Someone send you a Request',
+              body: 'Someone sent you a Request',
               title: userData.name + '  would like to trade!',
             },
             to: JSON.parse(Notii),

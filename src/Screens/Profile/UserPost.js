@@ -236,8 +236,8 @@ const UserPost = ({navigation, route}) => {
       .doc()
       .set({
         userID: id,
-        text:
-          Userdata.name + ' has marked an ' + {dealType} + ' you ! Review it now ',
+        text: "Hi " + Userdata.name + ' just rated her experience, click to rate yours.',
+        // text: Userdata.name + ' has marked an ' + {dealType} + ' you ! Review it now ',
         sellerData: Userdata,
         seen: false,
       })
@@ -245,9 +245,9 @@ const UserPost = ({navigation, route}) => {
         var data = JSON.stringify({
           data: {},
           notification: {
-            body: 'Someone send you a Request',
-            title:
-              Userdata.name + 'has marked an ' + {dealType} + ' you ! Review it now ',
+            body: 'Someone sent you a Request',
+            title: "Hi " + Userdata.name + ' just rated her experience, click to rate yours.',
+            // title: Userdata.name + 'has marked an ' + {dealType} + ' you ! Review it now ',
           },
           to: token,
         });
@@ -264,13 +264,12 @@ const UserPost = ({navigation, route}) => {
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
+            areNotificationsHidden(callBackIfNotificationsNotHidden, id)
             navigation.navigate('Review');
           })
           .catch(function (error) {
             console.warn(error);
           });
-
-        areNotificationsHidden(callBackIfNotificationsNotHidden, id)
       })
       .catch(err => console.warn(err));
   };

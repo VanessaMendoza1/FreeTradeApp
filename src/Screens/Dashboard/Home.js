@@ -209,7 +209,7 @@ const Home = ({navigation}) => {
   const [longitude, setLongitude] = React.useState(0);
   const [latitude, setlatitude] = React.useState(0);
   const [loading, setloading] = useState(false);
-  const animatedFlatlist = useRef();
+  const animatedFlatlist = useRef(null);
   const [active, setActive] = useState(0);
   const indexRef = useRef(active);
   indexRef.current = active;
@@ -276,24 +276,26 @@ const Home = ({navigation}) => {
     let NotificationData = [];
     await firestore()
       .collection('Notification')
-      .get()
+      .get()       
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           // console.warn(data.UserID);
           if (documentSnapshot.data().userID == UserData.UserID) {
+            console.log({SEEN: documentSnapshot.data().seen})
             if (documentSnapshot.data().seen == false) {
-              NotificationData.push(documentSnapshot.data());
+              NotificationData.push({
+                ...documentSnapshot.data(), 
+                id: documentSnapshot.id
+              });
             }
           }
         });
+        console.log({NotificationData1321: NotificationData})
         setNotii(NotificationData);
-        setloading(false);
-
-        // console.warn(NotificationData);
+        console.warn(NotificationData);
       })
       .catch(err => {
         console.warn(err);
-        setloading(false);
       });
   };
 
@@ -459,6 +461,7 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     allpost();
+    NotificationData()
   }, []);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
@@ -530,10 +533,12 @@ const Home = ({navigation}) => {
   const _goToNextPage = () => {
     if ( CurrentSlide >= ImageAds.length-1 ) CurrentSlide = 0;
 
-    animatedFlatlist.current.scrollToIndex({
-      index: ++CurrentSlide,
-      animated: true,
-    });
+    if (animatedFlatlist.current != null){
+      animatedFlatlist.current.scrollToIndex({
+        index: ++CurrentSlide,
+        animated: true,
+      });
+    }
   };
 
   const _startAutoPlay = () => {
@@ -557,7 +562,7 @@ const Home = ({navigation}) => {
     return index.toString();
   }
   // moving slider content starts here
-
+  console.log({NOTI: Notii.length})
 
   return (
     <>
