@@ -93,8 +93,10 @@ const BussinessAccountEdits = ({navigation}) => {
   const [open4, setOpen4] = React.useState(false);
   const [value4, setValue4] = React.useState(null);
 
-  const [closedFromDayModalVisibility, setClosedFromDayModalVisibility] = React.useState(false)
-  const [closedOnDayModalValue, setClosedOnDayModalValue] = React.useState(null)
+  const [closedFromDayModalVisibility, setClosedFromDayModalVisibility] =
+    React.useState(false);
+  const [closedOnDayModalValue, setClosedOnDayModalValue] =
+    React.useState(null);
   // const [closedToDayModalValue, setClosedToDayModalValue] = React.useState(null)
 
   const [Business, setBusiness] = React.useState('');
@@ -104,7 +106,7 @@ const BussinessAccountEdits = ({navigation}) => {
 
   const [loading, setloading] = React.useState(false);
   const subdata = useSelector(state => state.sub.subdata);
-  console.warn(subdata[0].plan === 'Bussiness');
+  // console.warn(subdata[0].plan === 'Bussiness');
 
   const PostChangeName = async () => {
     let newarr = [];
