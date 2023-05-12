@@ -176,7 +176,7 @@ const SubscriptionPage = ({navigation}) => {
                   .catch(err => {
                     setloading(false);
                     console.warn(err);
-                    alert('something went wrong Please Try Again');
+                    uploadSubscription();
                   });
               }}
               style={styles.mainViewCC2}>
