@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0003',
     bottom: 50,
-    height: '36%',
+    height: '46%',
     // alignItems: 'flex-end',
     justifyContent: 'flex-start',
   },
