@@ -101,7 +101,7 @@ const FavouriteItemsScreen = ({navigation}) => {
 							<Icon name="arrow-back-outline" size={30} color="#ffff" />
 						</TouchableOpacity>
 						<View style={styles.MiddleContainer}>
-							<Text style={styles.FontWork}>Favourites</Text>
+							<Text style={styles.FontWork}>Favorites</Text>
 						</View>
 					</View>
 					

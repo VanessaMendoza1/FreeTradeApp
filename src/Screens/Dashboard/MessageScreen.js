@@ -47,6 +47,7 @@ const MessageScreen = ({navigation}) => {
       .once('value')
       .then(snapshot => {
         // console.warn('all User data: ', Object.values(snapshot.val()));
+        console.log({VAL: snapshot.val()})
         setusers(
           Object.values(snapshot.val()).filter(it => it.id != Userdata.UserID),
         );
@@ -89,6 +90,9 @@ const MessageScreen = ({navigation}) => {
               }}
               username={item.sellersName}
               img={item.sellersImage}
+              itemImage={item.itemImage}
+              itemPrice={item.itemPrice}
+              lastMessage={item.lastMsg}
             />
           );
         })}

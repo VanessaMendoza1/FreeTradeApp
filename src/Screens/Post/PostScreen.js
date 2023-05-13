@@ -63,10 +63,23 @@ const PostScreen = ({navigation, route}) => {
   );
   // console.warn(imgeUrl2);
 
+  const data = route.params.data
+
   React.useEffect(() => {
-    isItemLiked(route.params.data.id, () => setheart(true))
-    getSimilarItems()
-  }, [])
+    const unsubscribe = navigation.addListener('focus', () => {
+      allImage()
+      isItemLiked(route.params.data.id, () => setheart(true))
+      getSimilarItems()
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  // React.useEffect(() => {
+  //   allImage()
+  //   isItemLiked(route.params.data.id, () => setheart(true))
+  //   getSimilarItems()
+  // }, [])
 
   const allImage = () => {
     let data = [];
@@ -75,6 +88,7 @@ const PostScreen = ({navigation, route}) => {
         data.push(item);
       }
     });
+    console.log({SETTING: data})
     setimgeUrl2(data);
   };
 
@@ -360,21 +374,23 @@ const PostScreen = ({navigation, route}) => {
 
           <View>
             <FlatList
-              data={imgeUrl2}
+              data={route.params.data.images}
               renderItem={item => {
-                return (
-                  <TouchableOpacity
-                    style={styles.imgCrousal}
-                    onPress={() => {
-                      navigation.navigate('ImageScreen', {
-                        data: item.item,
-                        video: false,
-                      });
-                    }}
-                    activeOpacity={1}>
-                    <Image source={{uri: item.item}} style={styles.image} />
-                  </TouchableOpacity>
-                );
+                if (item.item != ""){
+                  return (
+                    <TouchableOpacity
+                      style={styles.imgCrousal}
+                      onPress={() => {
+                        navigation.navigate('ImageScreen', {
+                          data: item.item,
+                          video: false,
+                        });
+                      }}
+                      activeOpacity={1}>
+                      <Image source={{uri: item.item}} style={styles.image} />
+                    </TouchableOpacity>
+                  );
+                }
               }}
               keyExtractor={(item, index) => index.toString()}
               horizontal

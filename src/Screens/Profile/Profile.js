@@ -115,9 +115,6 @@ const Profile = ({navigation}) => {
     return unsubscribe;
   }, [navigation]);
 
-  console.log({ARSALAN_IMAGE: MyData.image});
-  console.log({ARSALAN_IMAGE: MyData.image});
-  console.log({ARSALAN_IMAGE: MyData.image});
   return (
     <>
       <ReportPopup
@@ -643,7 +640,7 @@ const styles = StyleSheet.create({
   },
   linebar: {
     width: '100%',
-    borderWidth: h('0.1%'),
+    borderBottomWidth: h('0.1%'),
     borderColor: '#0002',
     paddingBottom: 10
   },

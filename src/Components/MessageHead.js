@@ -1,27 +1,66 @@
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground} from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 
-const MessageHead = ({onPress, username, img}) => {
+const MessageHead = ({onPress, username, img, itemImage, itemPrice, lastMessage}) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.MessageContainer}>
       <View style={styles.leftContainer}>
-        <View style={styles.ProfileContainer}>
-          <View style={styles.ProfileCC}>
-            <Image
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-              source={{
-                uri: img
-                  ? img
-                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
-              }}
-            />
+        <View style={{
+          // backgroundColor: "pink",
+          flex: 1,
+          display: "flex",
+          flexDirection: "row",
+          // justifyContent: "space-between"
+        }}>
+          <View style={styles.ProfileContainer}>
+            <View style={styles.ProfileCC}>
+              <Image
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                source={{
+                  uri: img
+                    ? img
+                    : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+                }}
+              />
+            </View>
           </View>
+          {/* {lastMessage} */}
+          <View style={styles.RightContainer}>
+            <Text style={styles.nameText}>{username}</Text>
+            <Text>{lastMessage.length > 40 ? lastMessage.substring(0, 40) + "..." : lastMessage}</Text>
+            
+          </View>
+          
         </View>
       </View>
-      <View style={styles.RightContainer}>
-        <Text style={styles.nameText}>{username}</Text>
+      <View style={{
+        // flex: 1,
+        alignSelf: "center",
+        // flexDirection: "row",
+        alignItems: "flex-end",
+        backgroundColor: "pink",
+
+      }}>
+        <ImageBackground
+          style={{width: h('8%'), height: h('8%'), resizeMode: 'cover'}}
+          source={{
+            uri: itemImage
+              ? itemImage
+              : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+          }}
+        >
+          <Text style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            color:  "white",
+            textAlign: "center",
+            marginTop:  h('5.5%')
+          }}>
+            ${itemPrice}
+          </Text>
+        </ImageBackground>
       </View>
+      
     </TouchableOpacity>
   );
 };
@@ -35,22 +74,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: h('0.2%'),
     borderBottomColor: '#0002',
     flexDirection: 'row',
+    justifyContent: "space-between",
+    paddingRight: 10
     // backgroundColor: 'red',
   },
   leftContainer: {
-    width: '20%',
+    width: '50%',
     height: '100%',
     // backgroundColor: 'gold',
     marginLeft: h('1%'),
   },
   RightContainer: {
-    width: '70%',
+    width: '100%',
     height: '100%',
     justifyContent: 'center',
     // backgroundColor: 'gold',
   },
   ProfileContainer: {
-    width: '100%',
+    width: '40%',
     height: '100%',
     // backgroundColor: 'green',
 

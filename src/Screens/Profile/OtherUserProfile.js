@@ -21,7 +21,7 @@ import firestore from '@react-native-firebase/firestore';
 import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {useSelector, useDispatch} from 'react-redux';
 import LoadingScreen from '../../Components/LoadingScreen';
-
+import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
 const OtherUserProfile = ({navigation, route}) => {
   console.warn(route.params.data);
   const [activeField, setActiveField] = React.useState('Services');
@@ -90,9 +90,19 @@ const OtherUserProfile = ({navigation, route}) => {
   };
 
   useEffect(() => {
-    MyData();
-    allmypost();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      MyData();
+      allmypost();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+
+  // useEffect(() => {
+  //   MyData();
+  //   allmypost();
+  // }, []);
 
   return (
     <>
@@ -209,7 +219,7 @@ const OtherUserProfile = ({navigation, route}) => {
                   }}
                   style={styles.adminButton}>
                   <Icon name="call" size={25} color="#ffff" />
-                  <Text style={styles.numberadmin}>+{User[0].Phone}</Text>
+                  <Text style={styles.numberadmin}>+{formatPhoneNumber(User[0].Phone)}</Text>
                 </TouchableOpacity>
                 {/* call button */}
 
@@ -313,22 +323,24 @@ const OtherUserProfile = ({navigation, route}) => {
                     data={TradingD}
                     contentContainerStyle={{paddingBottom: h('3%')}}
                     numColumns={3}
-                    renderItem={({item}) => (
-                      <View
-                        style={{
-                          flex: 1,
-                          margin: 5,
-                          backgroundColor: '#fff',
-                          height: h('25%'),
-                        }}>
-                        <ServiceItem
-                          item={item}
-                          onPress={() => {
-                            navigation.navigate('PostScreen', {data: item});
-                          }}
-                        />
-                      </View>
-                    )}
+                    renderItem={({item}) => {
+                      return (
+                        <View
+                          style={{
+                            flex: 1,
+                            margin: 5,
+                            backgroundColor: '#fff',
+                            height: h('25%'),
+                          }}>
+                          <ServiceItem
+                            item={item}
+                            onPress={() => {
+                              navigation.navigate('PostScreen', {data: item});
+                            }}
+                          />
+                        </View>
+                      )
+                    }}
                     keyExtractor={item => item.id}
                   />
                 ) : (
@@ -345,22 +357,25 @@ const OtherUserProfile = ({navigation, route}) => {
                     data={SellingD}
                     contentContainerStyle={{paddingBottom: h('3%')}}
                     numColumns={3}
-                    renderItem={({item}) => (
-                      <View
-                        style={{
-                          flex: 1,
-                          margin: 5,
-                          backgroundColor: '#fff',
-                          height: h('25%'),
-                        }}>
-                        <ServiceItem
-                          item={item}
-                          onPress={() => {
-                            navigation.navigate('PostScreen', {data: item});
-                          }}
-                        />
-                      </View>
-                    )}
+                    renderItem={({item}) => {
+                      console.log({ITEM: item})
+                      return (
+                        <View
+                          style={{
+                            flex: 1,
+                            margin: 5,
+                            backgroundColor: '#fff',
+                            height: h('25%'),
+                          }}>
+                          <ServiceItem
+                            item={item}
+                            onPress={() => {
+                              navigation.navigate('PostScreen', {data: item});
+                            }}
+                          />
+                        </View>
+                      )
+                    }}
                     keyExtractor={item => item.id}
                   />
                 ) : (

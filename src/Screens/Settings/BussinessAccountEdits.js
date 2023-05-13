@@ -38,15 +38,15 @@ const allowedTimings = [
   {label: '10:00 Am', value: '10:00 Am'},
   {label: '11:00 Am', value: '11:00 Am'},
   {label: '12:00 Pm', value: '12:00 Pm'},
-  {label: '01:00 Pm', value: '01:00 Pm'},
-  {label: '02:00 Pm', value: '02:00 Pm'},
-  {label: '03:00 Pm', value: '03:00 Pm'},
-  {label: '04:00 Pm', value: '04:00 Pm'},
-  {label: '05:00 Pm', value: '05:00 Pm'},
-  {label: '06:00 Pm', value: '06:00 Pm'},
-  {label: '07:00 Pm', value: '07:00 Pm'},
-  {label: '08:00 Pm', value: '08:00 Pm'},
-  {label: '09:00 Pm', value: '09:00 Pm'},
+  {label: '1:00 Pm', value: '1:00 Pm'},
+  {label: '2:00 Pm', value: '2:00 Pm'},
+  {label: '3:00 Pm', value: '3:00 Pm'},
+  {label: '4:00 Pm', value: '4:00 Pm'},
+  {label: '5:00 Pm', value: '5:00 Pm'},
+  {label: '6:00 Pm', value: '6:00 Pm'},
+  {label: '7:00 Pm', value: '7:00 Pm'},
+  {label: '8:00 Pm', value: '8:00 Pm'},
+  {label: '9:00 Pm', value: '9:00 Pm'},
   {label: '10:00 Pm', value: '10:00 Pm'},
   {label: '11:00 Pm', value: '11:00 Pm'},
   {label: '12:00 Pm', value: '12:00 Pm'},
@@ -99,6 +99,14 @@ const BussinessAccountEdits = ({navigation}) => {
     React.useState(null);
   // const [closedToDayModalValue, setClosedToDayModalValue] = React.useState(null)
 
+  const [OPassword, setOpassword] = React.useState(true);
+  const [Password, setpassword] = React.useState(true);
+  const [CPassword, setCpassword] = React.useState(true);
+
+  const [oldPassword, setOldPassword] = React.useState('');
+  const [newPassword, setNewPassword] = React.useState('');
+  const [newCPassword, setNewCPassword] = React.useState('');
+
   const [Business, setBusiness] = React.useState('');
   const [Address, setAddress] = React.useState('');
   const [Website, setWebsite] = React.useState('');
@@ -140,7 +148,7 @@ const BussinessAccountEdits = ({navigation}) => {
     if (
       Business !== '' &&
       Address !== '' &&
-      Website !== '' &&
+      // Website !== '' &&
       Phone !== '' &&
       value4 !== null &&
       value3 !== null &&
@@ -195,6 +203,39 @@ const BussinessAccountEdits = ({navigation}) => {
     }
   };
 
+
+  const updatePassword = () => {
+    setloading(true);
+    if (newCPassword === newPassword) {
+      auth()
+        .signInWithEmailAndPassword(MyData.email, oldPassword)
+        .then(async userCredential => {
+          const user = userCredential.user;
+          user.updatePassword(newPassword);
+
+          alert('Password Changed');
+          navigation.goBack();
+          setloading(false);
+        })
+        .catch(error => {
+          setloading(true);
+          const errorMessage = error.code;
+          setloading(false);
+          console.log(errorMessage);
+          if (errorMessage === 'auth/wrong-password') {
+            alert('Wrong Password');
+            setloading(false);
+          }
+          if (errorMessage === 'auth/user-not-found') {
+            setloading(false);
+          }
+        });
+    } else {
+      alert('New Password and Confirm Password are not same !');
+      setloading(false);
+    }
+  };
+
   return (
     <ScrollView>
       {loading ? (
@@ -241,6 +282,9 @@ const BussinessAccountEdits = ({navigation}) => {
               setShowUploadBox(true);
             }}>
             <View style={styles.ProfileCC}>
+              <View style={styles.CamerColar}>
+                <Icon name="camera" size={35} color="#ffff" />
+              </View>
               {/* <View style={styles.CamerColar}>
               <Icon name="camera" size={35} color="#ffff" />
             </View> */}
@@ -292,6 +336,80 @@ const BussinessAccountEdits = ({navigation}) => {
               onChangeText={e => sePhone(e)}
               value={Phone}
             />
+
+            <Text style={styles.NamePlate}>Change Password</Text>
+            <View style={styles.PasswordContainer}>
+              <TextInput
+                style={styles.inputContainercc2}
+                placeholder={'Old Password'}
+                placeholderTextColor={Colors.Primary}
+                secureTextEntry={OPassword}
+                onChangeText={e => setOldPassword(e)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setOpassword(!OPassword);
+                }}
+                style={styles.iconContainercc2}>
+                {OPassword ? (
+                  <Icon name="eye-off" size={30} color={Colors.Primary} />
+                ) : (
+                  <Icon name="eye" size={30} color={Colors.Primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            <View style={styles.PasswordContainer}>
+              <TextInput
+                style={styles.inputContainercc2}
+                placeholder={'New Password'}
+                placeholderTextColor={Colors.Primary}
+                secureTextEntry={Password}
+                onChangeText={e => setNewPassword(e)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setpassword(!Password);
+                }}
+                style={styles.iconContainercc2}>
+                {Password ? (
+                  <Icon name="eye-off" size={30} color={Colors.Primary} />
+                ) : (
+                  <Icon name="eye" size={30} color={Colors.Primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            {/* passwordCC */}
+            {/* passwordCC */}
+            <View style={styles.PasswordContainer}>
+              <TextInput
+                style={styles.inputContainercc2}
+                placeholder={'Confirm New Password'}
+                placeholderTextColor={Colors.Primary}
+                secureTextEntry={CPassword}
+                onChangeText={e => setNewCPassword(e)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setCpassword(!CPassword);
+                }}
+                style={styles.iconContainercc2}>
+                {CPassword ? (
+                  <Icon name="eye-off" size={30} color={Colors.Primary} />
+                ) : (
+                  <Icon name="eye" size={30} color={Colors.Primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            <View style={styles.AppBtn1}>
+              <Appbutton
+                onPress={() => {
+                  updatePassword();
+                }}
+                CustomWidth={'100%'}
+                text={'Change Password'}
+              />
+            </View>
+
             <View style={{height: h('2%')}} />
 
             <Appbutton
@@ -507,7 +625,7 @@ const BussinessAccountEdits = ({navigation}) => {
                       <View style={{zIndex: 2001}}>
                         <DropDownPicker
                           open={closedFromDayModalVisibility}
-                          placeholder="from"
+                          placeholder="Closed Day"
                           value={closedOnDayModalValue}
                           items={items3}
                           setOpen={setClosedFromDayModalVisibility}
@@ -565,6 +683,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     width: '100%',
     height: h('130%'),
+    marginBottom: 20,
+  },
+  NamePlate: {
+    color: Colors.Primary,
+    fontSize: h('2.3%'),
+    fontWeight: 'bold',
+    marginBottom: h('.7%'),
+    marginTop: h('2%'),
+  },
+  PasswordContainer: {
+    width: '100%',
+    height: h('7%'),
+    borderColor: Colors.Primary,
+    borderWidth: h('0.2%'),
+    marginTop: h('1%'),
+    flexDirection: 'row',
   },
   Header: {
     width: '100%',
@@ -616,9 +750,24 @@ const styles = StyleSheet.create({
 
     // backgroundColor: 'blue',
   },
+  iconContainercc2: {
+    width: '15%',
+    height: '100%',
+    // backgroundColor: 'green',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   AppBtn: {
     width: '100%',
-    height: h('7%'),
+    height: h('47%'),
+    // backgroundColor: 'red',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    zIndex: -1,
+  },
+  AppBtn1: {
+    width: '100%',
+    height: h('10%'),
     // backgroundColor: 'red',
     justifyContent: 'flex-end',
     alignItems: 'center',
@@ -676,14 +825,14 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   leftCC: {
-    width: '30%',
+    width: '45%',
     height: '100%',
     // backgroundColor: 'green',
     justifyContent: 'center',
     alignItems: 'center',
   },
   leftCC2: {
-    width: '40%',
+    width: '45%',
     height: '100%',
     // backgroundColor: 'green',
     justifyContent: 'center',

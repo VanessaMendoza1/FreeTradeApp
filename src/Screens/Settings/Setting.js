@@ -166,7 +166,7 @@ const Setting = ({navigation}) => {
             onPress={() => {
               navigation.navigate('FavouriteItems');
             }}
-            text={'Favourites'}>
+            text={'Favorites'}>
             {Icons.HeartIcon({
               tintColor: Colors.Primary,
             })}

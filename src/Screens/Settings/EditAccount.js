@@ -536,6 +536,14 @@ const styles = StyleSheet.create({
     paddingLeft: h('1.5%'),
     // backgroundColor: 'red',
   },
+  inputContainercc2: {
+    height: '100%',
+    width: '85%',
+    fontSize: h('2%'),
+    paddingLeft: h('1.5%'),
+
+    // backgroundColor: 'blue',
+  },
   PasswordContainer: {
     width: '100%',
     height: h('7%'),

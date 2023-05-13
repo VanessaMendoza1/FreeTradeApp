@@ -542,18 +542,18 @@ const Postad = ({navigation}) => {
                 )}
               </TouchableOpacity>
 
-              {subdata.length > 0 ? (
+              {/* {subdata.length > 0 ? (
                 <>
-                  {subdata[0].plan === 'Business' ? (
+                  {subdata[0].plan === 'Business' ? ( */}
                     <TextInput
                       style={styles.inputText}
                       placeholder={'Tag line: 12 characters'}
                       placeholderTextColor={Colors.Primary}
                       onChangeText={e => setTagLine(e)}
                     />
-                  ) : null}
+                  {/* ) : null}
                 </>
-              ) : null}
+              ) : null} */}
 
               <View style={styles.space} />
 

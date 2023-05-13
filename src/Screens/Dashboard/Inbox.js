@@ -7,6 +7,8 @@ import {
   Image,
   FlatList,
   ScrollView,
+  ImageBackground,
+  Keyboard
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
@@ -240,13 +242,21 @@ const Inbox = ({navigation, route}) => {
             alignItems: "center",
             justifyContent: "center"
           }}>
-            <Image
-              style={{width: 50, height: 50, resizeMode: 'stretch', borderRadius: 10, marginBottom: 2}}
+            <ImageBackground
+              style={{width: h('8%'), height: h('8%'), resizeMode: 'cover', borderRadius: 10, marginBottom: 2}}
               source={{uri: itemOfDiscussionImage}}
-            />
-            <Text style={{textAlign: "center", color: "white"}}>
-              ${itemOfDiscussionPrice}
-            </Text>
+            >
+              <Text style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                color:  "white",
+                textAlign: "center",
+                marginTop:  h('5.5%')
+              }}>
+                ${itemOfDiscussionPrice}
+              </Text>
+              {/* <Text style={{textAlign: "center", color: "white"}}>
+              </Text> */}
+            </ImageBackground>
           </View>
         </View>
         {/* header */}
@@ -299,13 +309,18 @@ const Inbox = ({navigation, route}) => {
               // marginTop: h('1%'),
             }}
             placeholder="Type a Message"
+            blurOnSubmit
             placeholderTextColor={Colors.Primary}
             multiline={true}
             value={msg}
+            secureTextEntry
             onChangeText={val => setMsg(val)}
             // onChangeText={val => setMsg(val)}
           />
-          <TouchableOpacity style={styles.BtnCCW} onPress={() => sendMsg(msg, setMsg, setdisabled, userData, receiverData)}>
+          <TouchableOpacity style={styles.BtnCCW} onPress={() => {
+            Keyboard.dismiss();
+            sendMsg(msg, setMsg, setdisabled, userData, receiverData)
+          }}>
             <Icon name="chatbubbles" size={25} color={'#fff'} />
             <Text style={{color: '#fff', fontSize: 18}}>Send</Text>
           </TouchableOpacity>
@@ -326,6 +341,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   Header: {
+    paddingRight: 15,
     width: '100%',
     height: h('10%'),
     backgroundColor: Colors.Primary,
