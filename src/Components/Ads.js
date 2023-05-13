@@ -50,6 +50,8 @@ const styles = StyleSheet.create({
     borderRadius: h('1%'),
     marginLeft: 5,
     marginRight: 5,
+    alignItems: 'center',
+
     // borderColor: '#0008',
     // borderWidth: h('0.2%'),
   },
@@ -61,8 +63,9 @@ const styles = StyleSheet.create({
   },
   MainText: {
     color: '#000',
-    fontSize: h('1.7%'),
+    fontSize: h('2%'),
     fontWeight: 'bold',
+    paddingTop: 5,
     // paddingLeft: h('0.6%'),
   },
   MainText2: {

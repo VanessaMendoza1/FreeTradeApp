@@ -58,7 +58,7 @@ const ForgetPassword = ({navigation}) => {
           source={require('../../../assets/login.png')}>
           <View style={styles.ImgOverlay}>
             <Text style={styles.FreetradeText}>FreeTrade</Text>
-            <Text style={styles.SigninText}>Forget Password</Text>
+            <Text style={styles.SigninText}>Forgot Password</Text>
             <View style={styles.space} />
             <AppInput
               placeholder={'Enter Email'}
