@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     // paddingLeft: h('0.6%'),
   },
   MainText3: {
-    color: 'red',
+    color: '#000',
     fontSize: h('1.5%'),
 
     // paddingLeft: h('0.6%'),

@@ -112,13 +112,14 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: h('2%'),
     fontWeight: 'bold',
+    paddingLeft: 10,
   },
   boxview: {
-    width: '21%',
+    width: '80%',
     height: '40%',
     // backgroundColor: 'red',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     alignItems: 'center',
   },
 });
