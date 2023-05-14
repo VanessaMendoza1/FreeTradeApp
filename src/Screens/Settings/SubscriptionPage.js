@@ -55,33 +55,32 @@ const getSubscriptionTarriff = (
       });
     })
     .catch(err => {
+      setloading(false);
+      setModalVisible(!modalVisible);
       console.log(err);
     });
 };
 
-const getSubscriptionDetails = async (setIsSubscriptionValid) => {
-  const currentUserId = auth().currentUser.uid
+const getSubscriptionDetails = async setIsSubscriptionValid => {
+  const currentUserId = auth().currentUser.uid;
   let isSubscriptionValid = false;
   await firestore()
     .collection('sub')
     .get()
     .then(async querySnapshot => {
-      
       querySnapshot.forEach(documentSnapshot => {
         if (documentSnapshot.data().userid === currentUserId) {
           const now = moment.utc();
           var end = JSON.parse(documentSnapshot.data().endDate);
           var days = now.diff(end, 'days');
-          console.log({days})
+          console.log({days});
           if (days >= 1) {
-            isSubscriptionValid = true
+            isSubscriptionValid = true;
           }
         }
       });
-      setIsSubscriptionValid(isSubscriptionValid)
+      setIsSubscriptionValid(isSubscriptionValid);
     });
-
-  
 };
 
 const SubscriptionPage = ({navigation}) => {
@@ -121,6 +120,7 @@ const SubscriptionPage = ({navigation}) => {
       })
       .catch(error => {
         setloading(false);
+        setModalVisible(!modalVisible);
         console.error('Error removing document: ', error);
         console.warn(error);
       });
@@ -175,6 +175,7 @@ const SubscriptionPage = ({navigation}) => {
                   })
                   .catch(err => {
                     setloading(false);
+                    setModalVisible(!modalVisible);
                     console.warn(err);
                     uploadSubscription();
                   });
@@ -254,6 +255,10 @@ const SubscriptionPage = ({navigation}) => {
                   navigation.navigate('BussinessAccountEdits');
                 }
               }}
+              onDone2={() => {
+                setModalVisible(!modalVisible);
+                setloading(false);
+              }}
             />
 
             <TouchableOpacity
@@ -272,7 +277,15 @@ const SubscriptionPage = ({navigation}) => {
 
 export default SubscriptionPage;
 
-function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
+function PaymentScreen({
+  navigation,
+  amount,
+  plan,
+  onDone,
+  onLoading,
+  email,
+  onDone2,
+}) {
   const dispatch = useDispatch();
   const {confirmPayment} = useStripe();
   const MyData = useSelector(state => state.counter.data);
@@ -300,7 +313,9 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
         }
       })
       .catch(err => {
-        alert('something went wrong Please Try Again');
+        setloading(false);
+        onDone2();
+        alert('Please re-check your Card & try again');
       });
   };
 
@@ -341,6 +356,7 @@ function PaymentScreen({navigation, amount, plan, onDone, onLoading, email}) {
         MySubscriptionPackage();
       })
       .catch(err => {
+        onDone2();
         console.warn(err);
       });
   };

@@ -737,8 +737,8 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
 
   return (
     <>
-      <View style={{width: '100%', height: '55%', justifyContent: 'center'}}>
-        <CreditCardInput
+      <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
+        <LiteCreditCardInput
           onChange={({values}) => {
             // console.warn(values);
             setCardData(values);
@@ -1042,7 +1042,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: w('100%'),
-    height: h('70%'),
+    height: h('40%'),
     backgroundColor: 'white',
     borderRadius: h('0.7%'),
     alignItems: 'center',
