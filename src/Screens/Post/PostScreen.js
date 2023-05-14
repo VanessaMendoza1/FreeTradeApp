@@ -35,7 +35,7 @@ import { areNotificationsHidden } from '../../utils/appConfigurations'
 import axios from 'axios';
 
 const PostScreen = ({navigation, route}) => {
-  // console.warn(route.params.data.videUrl);
+  // console.warn(route.params.data.Condition);
   const [loading, setloading] = React.useState(false);
   // console.warn(route.params.data.user);
   const [Sitem, setSitem] = React.useState([]);
@@ -63,13 +63,13 @@ const PostScreen = ({navigation, route}) => {
   );
   // console.warn(imgeUrl2);
 
-  const data = route.params.data
+  const data = route.params.data;
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      allImage()
-      isItemLiked(route.params.data.id, () => setheart(true))
-      getSimilarItems()
+      allImage();
+      isItemLiked(route.params.data.id, () => setheart(true));
+      getSimilarItems();
     });
 
     return unsubscribe;
@@ -88,7 +88,7 @@ const PostScreen = ({navigation, route}) => {
         data.push(item);
       }
     });
-    console.log({SETTING: data})
+    console.log({SETTING: data});
     setimgeUrl2(data);
   };
 
@@ -119,11 +119,11 @@ const PostScreen = ({navigation, route}) => {
       .then(snapshot => {
         if (snapshot.val() == null) {
           // let roomId = uuid.v4();
-          let roomId
+          let roomId;
           if (snapshot.val() == null) {
             roomId = uuid.v4();
           } else {
-            roomId = snapshot.val().roomId
+            roomId = snapshot.val().roomId;
           }
           let myData = {
             roomId,
@@ -170,7 +170,7 @@ const PostScreen = ({navigation, route}) => {
   };
 
   const getSimilarItems = async () => {
-    let similarItems = []
+    let similarItems = [];
     await firestore()
       .collection('Post')
       .where('Category', '==', data.Category)
@@ -178,11 +178,14 @@ const PostScreen = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          similarItems.push({...documentSnapshot.data(), id: documentSnapshot.id})
+          similarItems.push({
+            ...documentSnapshot.data(),
+            id: documentSnapshot.id,
+          });
         });
-        setSitem(similarItems)
+        setSitem(similarItems);
       });
-  }
+  };
 
   const randomItem = () => {
     const arr = AllPostData.map(a => ({sort: 3, value: a}))
@@ -241,14 +244,18 @@ const PostScreen = ({navigation, route}) => {
       .set({
         seen: false,
         userID: route.params.data.user.UserID,
-        text: userData.name + '  would like to trade with you, click to see profile!',
+        text:
+          userData.name +
+          '  would like to trade with you, click to see profile!',
       })
       .then(async () => {
         var data = JSON.stringify({
           data: {},
           notification: {
             body: 'Someone sent you a Request',
-            title: userData.name + '  would like to trade with you, click to see profile!',
+            title:
+              userData.name +
+              '  would like to trade with you, click to see profile!',
           },
           to: JSON.parse(Notii),
         });
@@ -265,7 +272,10 @@ const PostScreen = ({navigation, route}) => {
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
-            areNotificationsHidden(callBackIfNotificationsNotHidden, route.params.data.user.UserID)
+            areNotificationsHidden(
+              callBackIfNotificationsNotHidden,
+              route.params.data.user.UserID,
+            );
             navigation.goBack();
             alert('Trade Offer Sent');
           })
@@ -273,8 +283,6 @@ const PostScreen = ({navigation, route}) => {
             // console.warn(error);
             alert('Trade Offer Sent');
           });
-
-        
       })
       .catch(err => console.warn(err));
   };
@@ -292,7 +300,7 @@ const PostScreen = ({navigation, route}) => {
   //     scrollViewRef.current.scrollTo({y: 0, animated: true});
   //   }
   // };
-  console.log({VideoAd: VideoAd[0]})
+  console.log({VideoAd: VideoAd[0]});
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -376,7 +384,7 @@ const PostScreen = ({navigation, route}) => {
             <FlatList
               data={route.params.data.images}
               renderItem={item => {
-                if (item.item != ""){
+                if (item.item != '') {
                   return (
                     <TouchableOpacity
                       style={styles.imgCrousal}
@@ -428,7 +436,10 @@ const PostScreen = ({navigation, route}) => {
           </View>
 
           <View style={styles.HeadingTextContainer2222}>
-            <Text>Images</Text>
+            <Text style={styles.HeadingText3}>Condition : </Text>
+            <Text style={styles.HeadingText2}>
+              {route.params.data.Condition}
+            </Text>
           </View>
 
           {/* imges */}
@@ -780,6 +791,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // justifyContent: 'space-around',
     alignItems: 'center',
+    marginTop: 10,
   },
   HeadingTextContainer2: {
     width: '90%',
@@ -798,7 +810,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
 
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     alignItems: 'center',
   },
   HeadingTextContainer22232: {
@@ -885,6 +897,10 @@ const styles = StyleSheet.create({
   },
   HeadingText2: {
     color: Colors.Primary,
+    fontSize: h('2%'),
+  },
+  HeadingText3: {
+    color: '#000',
     fontSize: h('2%'),
   },
   miniImg: {

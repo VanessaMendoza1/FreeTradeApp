@@ -34,49 +34,50 @@ const Appheader = ({setSearchValue, onSearch, onMessage, onNotification, noti, s
     <View style={styles.HeaderContainer}>
       <TouchableOpacity
         onPress={() => {
-          if (showCategoryAndSubCategory){
-            setShowCategoryAndSubCategory(false)
-            setShowItemsFromCategoryAndSubCategory(false)
+          if (showCategoryAndSubCategory) {
+            setShowCategoryAndSubCategory(false);
+            setShowItemsFromCategoryAndSubCategory(false);
           } else {
-            setShowCategoryAndSubCategory(true)
-            setShowItemsFromCategoryAndSubCategory(false)
+            setShowCategoryAndSubCategory(true);
+            setShowItemsFromCategoryAndSubCategory(false);
           }
         }}
         style={styles.ViewCOntaier}>
-        <Icon name="menu-outline" size={50} color="#ffff" />
+        <Icon name="menu-outline" size={35} color="#ffff" />
       </TouchableOpacity>
       <TouchableOpacity onPress={onMessage} style={styles.ViewCOntaier2}>
-        <Icon name="chatbox" size={30} color="#ffff"/>
+        <Icon name="chatbox" size={30} color="#ffff" />
         {isHavingNewMessages && (
-          <View style={{
-            width: 13,
-            height: 13, 
-            backgroundColor: "red",
-            position: "absolute",
-            bottom: 22,
-            right: 19,
-            borderRadius: 10,
-            borderColor: "black",
-            borderWidth: 1
-          }}></View>
+          <View
+            style={{
+              width: 13,
+              height: 13,
+              backgroundColor: 'red',
+              position: 'absolute',
+              bottom: 22,
+              right: 19,
+              borderRadius: 10,
+              borderColor: 'black',
+              borderWidth: 1,
+            }}></View>
         )}
       </TouchableOpacity>
 
       <View style={styles.ViewCOntaier3}>
         <View style={styles.Searchbox}>
-        <View style={styles.leftContainer}>
-          <Icon name="search" size={30} color={Colors.Primary} />
-        </View>
-        <TextInput
-          placeholder="Service/Sell/Trade"
-          onChangeText={text => {
-            onSearch(text)
-            setSearchValue(text)
-          }}
-          returnKeyType='search'
-          style={styles.Txtinput}
-          placeholderTextColor={Colors.Primary}
-        />
+          <View style={styles.leftContainer}>
+            <Icon name="search" size={30} color={Colors.Primary} />
+          </View>
+          <TextInput
+            placeholder="Service/Sell/Trade"
+            onChangeText={text => {
+              onSearch(text);
+              setSearchValue(text);
+            }}
+            returnKeyType="search"
+            style={styles.Txtinput}
+            placeholderTextColor={Colors.Primary}
+          />
         </View>
       </View>
 
@@ -94,17 +95,18 @@ const Appheader = ({setSearchValue, onSearch, onMessage, onNotification, noti, s
         {noti ? (
           <>
             <Icon name="notifications" size={30} color="#fff" />
-            <View style={{
-              width: 13,
-              height: 13, 
-              backgroundColor: "red",
-              position: "absolute",
-              bottom: 20,
-              right: 18,
-              borderRadius: 10,
-              borderColor: "black",
-              borderWidth: 1
-            }}></View>
+            <View
+              style={{
+                width: 13,
+                height: 13,
+                backgroundColor: 'red',
+                position: 'absolute',
+                bottom: 20,
+                right: 18,
+                borderRadius: 10,
+                borderColor: 'black',
+                borderWidth: 1,
+              }}></View>
           </>
         ) : (
           <Icon name="notifications" size={30} color="#ffff" />
