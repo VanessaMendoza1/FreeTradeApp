@@ -120,7 +120,7 @@ const SubscriptionPage = ({navigation}) => {
       })
       .catch(error => {
         setloading(false);
-        setModalVisible(!modalVisible);
+        setModalVisible(false);
         console.error('Error removing document: ', error);
         console.warn(error);
       });
@@ -175,7 +175,7 @@ const SubscriptionPage = ({navigation}) => {
                   })
                   .catch(err => {
                     setloading(false);
-                    setModalVisible(!modalVisible);
+                    setModalVisible(false);
                     console.warn(err);
                     uploadSubscription();
                   });
@@ -243,10 +243,10 @@ const SubscriptionPage = ({navigation}) => {
               email={MyData.email}
               onLoading={() => {
                 setloading(true);
-                setModalVisible(!modalVisible);
+                setModalVisible(false);
               }}
               onDone={() => {
-                setModalVisible(!modalVisible);
+                setModalVisible(false);
                 setloading(false);
                 // navigation.goBack();
                 if (plan === 'price_1N64c3KAtBxeYOh2sxd0LP36') {
@@ -256,7 +256,7 @@ const SubscriptionPage = ({navigation}) => {
                 }
               }}
               onDone2={() => {
-                setModalVisible(!modalVisible);
+                setModalVisible(false);
                 setloading(false);
               }}
             />
