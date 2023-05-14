@@ -653,17 +653,16 @@ const Postad = ({navigation}) => {
                   email={MyData.email}
                   onLoading={() => {
                     setloading(true);
-                    setModalVisible(false);
                   }}
                   onDone={() => {
-                    setModalVisible(false);
+                    setModalVisible(!modalVisible);
                     PostAd();
                   }}
                 />
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
-                    setModalVisible(false);
+                    setModalVisible(!modalVisible);
                   }}>
                   <Text style={styles.textStyle}>Cancel</Text>
                 </TouchableOpacity>

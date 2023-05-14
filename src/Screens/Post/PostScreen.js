@@ -31,6 +31,7 @@ import {
   isItemLiked
 } from '../Profile/OtherUserPostDetails'
 import { areNotificationsHidden } from '../../utils/appConfigurations'
+import { useFocusEffect } from '@react-navigation/native';
 
 import axios from 'axios';
 
@@ -65,15 +66,25 @@ const PostScreen = ({navigation, route}) => {
 
   const data = route.params.data;
 
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+  // React.useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     allImage();
+  //     isItemLiked(route.params.data.id, () => setheart(true));
+  //     getSimilarItems();
+  //   });
+
+  //   return unsubscribe;
+  // }, [navigation]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Focussed PostScreen.js, running allImage isItemLiked getSimilarItems")
       allImage();
       isItemLiked(route.params.data.id, () => setheart(true));
       getSimilarItems();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
+      return () => null;
+    }, [])
+  );
 
   // React.useEffect(() => {
   //   allImage()

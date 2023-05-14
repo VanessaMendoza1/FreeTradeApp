@@ -28,6 +28,7 @@ import Icons from '../../utils/icons';
 import Collapsible from 'react-native-collapsible';
 import {FlatListSlider} from 'react-native-flatlist-slider';
 import auth from '@react-native-firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 import {getPreciseDistance} from 'geolib';
@@ -213,10 +214,13 @@ const Home = ({navigation}) => {
 
   const [ isHavingNewMessages, setIsHavingNewMessages ] = React.useState(false)
 
-  React.useEffect(() => {
-    checkIfNewMessagesAvailable(setIsHavingNewMessages)
-  }, [])
-
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Focussed Home.js, running checkIfNewMessagesAvailable")
+      checkIfNewMessagesAvailable(setIsHavingNewMessages)
+      return () => null;
+    }, [])
+  );
 
   const CheckValidSubscription = () => {
     axios
@@ -586,6 +590,7 @@ const Home = ({navigation}) => {
           setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
           onSearch={(text) => showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, text)}
           onMessage={() => {
+            setIsHavingNewMessages(false)
             navigation.navigate('MessageScreen');
           }}
           onNotification={() => {

@@ -15,6 +15,7 @@ import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
 import { areNotificationsHidden } from "../../utils/appConfigurations"
 import auth from '@react-native-firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
@@ -26,10 +27,13 @@ const Notification = ({navigation}) => {
     NotificationData2();
   }
 
-  React.useEffect(() => {
-    // areNotificationsHidden(getNotification)
-    getNotification()
-  }, []);
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed Notification.js, running getNotification")
+			getNotification()
+			return () => null;
+		}, [])
+	);
 
   const NotificationData = async () => {
     let NotificationData = [];

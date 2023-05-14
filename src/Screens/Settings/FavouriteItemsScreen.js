@@ -16,6 +16,7 @@ import auth from '@react-native-firebase/auth';
 import ServiceItem from '../../Components/ServiceItem';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
 import LoadingScreen from '../../Components/LoadingScreen';
+import { useFocusEffect } from '@react-navigation/native';
 
 const FavouriteItemsScreen = ({navigation}) => {
 	const [ loading, setloading ] = React.useState(true)
@@ -23,9 +24,14 @@ const FavouriteItemsScreen = ({navigation}) => {
 	const [ favouriteServicesItems, setFavouriteServicesItems ] = React.useState([])
 	const [ favouriteTradingItems, setFavouriteTradingItems ] = React.useState([])
 	
-	React.useEffect(() => {
-		{(async () => (getFavourites()))()}
-	}, [])
+	useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed FavouriteItemsScreen.js, running getFavourites")
+			{(async () => (getFavourites()))()}
+			return () => null;
+		}, [])
+	);
+
 	
 	const getFavourites = async () => {
 		let currentUserId = auth().currentUser.uid

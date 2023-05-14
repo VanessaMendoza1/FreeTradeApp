@@ -16,6 +16,7 @@ import firestore from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import uuid from 'react-native-uuid';
 import auth from '@react-native-firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const removeNewMessagesAvailableDot = () => {
   const currentUserId = auth().currentUser.uid
@@ -58,9 +59,14 @@ const MessageScreen = ({navigation}) => {
       });
   };
 
-  React.useEffect(() => {
-    getAllUser();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Focussed MessageScreen.js, running getAllUser")
+      getAllUser();
+      return () => null;
+    }, [])
+  );
+
 
   return (
     <View style={styles.MainContainer}>

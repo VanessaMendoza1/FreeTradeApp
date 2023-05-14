@@ -38,7 +38,7 @@ const getContactUsEmail = (callback) => getConfigurations(dataTypeForContactUsEm
 
 
 const areNotificationsHidden = (callback, currentUserId = null) => {
-    if (currentUserId == null)currentUserId = auth().currentUser.uid
+    if (currentUserId == null) currentUserId = auth().currentUser.uid
     firestore()
         .collection('Users')
         .doc(currentUserId)
