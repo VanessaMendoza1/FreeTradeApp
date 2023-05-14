@@ -20,7 +20,7 @@ const Ads = ({data, onPress}) => {
         <Text style={styles.MainText}>{data.title}</Text>
       )}
       {data.TagLine && (
-        <Text style={styles.MainText3}>{data.TagLine}</Text>
+        <Text style={{...styles.MainText3, color: "red"}}>{data.TagLine}</Text>
       )}
 
       {(data.Adtype == "Business") && (

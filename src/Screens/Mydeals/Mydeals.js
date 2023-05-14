@@ -13,6 +13,7 @@ import MydealItem from '../../Components/MydealItem';
 import BottomContactAdmin from '../../Components/BottomContactAdmin';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
+import auth from '@react-native-firebase/auth';
 
 const Mydeals = ({navigation}) => {
   const [activeField, setActiveField] = React.useState('Sold');
@@ -25,13 +26,13 @@ const Mydeals = ({navigation}) => {
 
   const SoldPost = async () => {
     let SOLDDATA = [];
-
+    const currentUserId = auth().currentUser.uid
     await firestore()
       .collection('Sold')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().SellerID === MyData.UserID) {
+          if (documentSnapshot.data().SellerID === currentUserId) {
             SOLDDATA.push(documentSnapshot.data());
           }
         });
@@ -42,13 +43,14 @@ const Mydeals = ({navigation}) => {
 
   const BoughtData = async () => {
     let BoughtD = [];
+    const currentUserId = auth().currentUser.uid
 
     await firestore()
       .collection('Bought')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().BuyerID === MyData.UserID) {
+          if (documentSnapshot.data().BuyerID === currentUserId) {
             BoughtD.push(documentSnapshot.data());
           }
         });
@@ -58,13 +60,13 @@ const Mydeals = ({navigation}) => {
   };
   const TradeData = async () => {
     let TradeD = [];
-
+    const currentUserId = auth().currentUser.uid
     await firestore()
       .collection('Trade')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().SellerID === MyData.UserID) {
+          if (documentSnapshot.data().SellerID === currentUserId) {
             TradeD.push(documentSnapshot.data());
           }
         });

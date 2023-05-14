@@ -21,7 +21,7 @@ import firestore from '@react-native-firebase/firestore';
 import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {useSelector, useDispatch} from 'react-redux';
 import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
-
+import auth from '@react-native-firebase/auth';
 import {SubDataAdd} from '../../redux/subSlicer';
 
 import moment from 'moment';
@@ -41,6 +41,7 @@ const Profile = ({navigation}) => {
   // console.warn(subdata[0].plan === 'Bussiness');
 
   const allmypost = async () => {
+    const currentUserId = auth().currentUser.uid
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
@@ -50,7 +51,7 @@ const Profile = ({navigation}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           if (
-            documentSnapshot.data().UserID === MyData.UserID &&
+            documentSnapshot.data().UserID === currentUserId &&
             documentSnapshot.data().status === false
           ) {
             if (documentSnapshot.data().PostType === 'Trading') {
@@ -72,13 +73,14 @@ const Profile = ({navigation}) => {
   };
 
   const MySubscriptionPackage = async () => {
+    const currentUserId = auth().currentUser.uid
     let data = [];
     await firestore()
       .collection('sub')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().userid === MyData.UserID) {
+          if (documentSnapshot.data().userid === currentUserId) {
             const now = moment.utc();
             var end = JSON.parse(documentSnapshot.data().endDate);
             var days = now.diff(end, 'days');
@@ -95,9 +97,10 @@ const Profile = ({navigation}) => {
   };
 
   const DeletePost = () => {
+    const currentUserId = auth().currentUser.uid
     firestore()
       .collection('sub')
-      .doc(MyData.UserID)
+      .doc(currentUserId)
       .delete()
       .then(() => {
         MySubscriptionPackage();

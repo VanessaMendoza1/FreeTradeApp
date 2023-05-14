@@ -14,6 +14,7 @@ import NotificationHead from '../../Components/NotificationHead';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
 import { areNotificationsHidden } from "../../utils/appConfigurations"
+import auth from '@react-native-firebase/auth';
 
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
@@ -32,13 +33,14 @@ const Notification = ({navigation}) => {
 
   const NotificationData = async () => {
     let NotificationData = [];
+    const currentUserId = auth().currentUser.uid
     await firestore()
       .collection('Notification')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           // console.warn(data.UserID);
-          if (documentSnapshot.data().userID == userData.UserID) {
+          if (documentSnapshot.data() && documentSnapshot.data().userID == currentUserId) {
             // if (documentSnapshot.data().seen == false) {
             NotificationData.push({
               ...documentSnapshot.data(), 
@@ -56,9 +58,10 @@ const Notification = ({navigation}) => {
   };
   const NotificationData2 = async () => {
     // console.warn('r');
+    const currentUserId = auth().currentUser.uid
     await firestore()
       .collection('Notification')
-      .where('userID', '==', userData.UserID)
+      .where('userID', '==', currentUserId)
       .get()
       .then(snapshot => {
         let batch = firestore().batch();
@@ -97,7 +100,7 @@ const Notification = ({navigation}) => {
             return (
               <NotificationHead
                 onPress={async () => {
-                  console.warn(item);
+                  console.log({item});
                   if (item.text.endsWith("an item from your favorites just posted. Click to view.")){
                     await firestore()
                       .collection('Post')
@@ -117,8 +120,6 @@ const Notification = ({navigation}) => {
                     navigation.navigate('Review', {
                       data: item.userID,
                     });
-                  } else if (item.sellerData.UserID){
-                    navigation.navigate('Review', {data: item.sellerData});
                   }
                   // trade , links to profile
                 }}

@@ -36,9 +36,14 @@ const Setting = ({navigation}) => {
 
   const clearAll = async () => {
     try {
-      await dispatch(DataInsert({}));
-      await AsyncStorage.clear();
-      navigation.replace('Login');
+      auth().signOut().then(async function() {
+        console.log('Signed Out');
+        await dispatch(DataInsert({}));
+        await AsyncStorage.clear();
+        navigation.replace('Login');
+      }, function(error) {
+        console.error('Sign Out Error', error);
+      });
     } catch (e) {
       // clear error
     }
@@ -47,7 +52,6 @@ const Setting = ({navigation}) => {
   };
 
   const isUserHavingBussinessSubscription = () => {
-    console.log('TRIGGERED');
     let currentUserId = auth().currentUser.uid;
     firestore()
       .collection('Users')

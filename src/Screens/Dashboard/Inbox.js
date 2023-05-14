@@ -19,7 +19,7 @@ import { getCurrentTimeStamp } from '../../utils/time'
 import firestore from '@react-native-firebase/firestore';
 import {useSelector} from 'react-redux';
 import database from '@react-native-firebase/database';
-
+import auth from '@react-native-firebase/auth';
 import MsgComponent from '../../Components/MsgComponent';
 
 const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
@@ -32,7 +32,7 @@ const indicateOtherUserAsHavingUnreadMessages = (otherUserId) => {
 }
 
 const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
-  console.log({msg, setMsg, setdisabled, userData, receiverData})
+  const currentUserId = auth().currentUser.uid
   try {
     if (msg == '' || msgvalid(msg) == 0) {
       alert('Enter something....');
@@ -43,7 +43,7 @@ const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
     let msgData = {
       roomId: receiverData.roomId,
       message: msg,
-      from: userData?.UserID,
+      from: currentUserId,
       to: receiverData.id,
       sendTime: getCurrentTimeStamp(),
       msgType: 'text',
@@ -62,12 +62,12 @@ const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
         sendTime: msgData.sendTime,
       };
       database()
-        .ref('/chatlist/' + receiverData?.id + '/' + userData?.UserID)
+        .ref('/chatlist/' + receiverData?.id + '/' + currentUserId)
         .update(chatListupdate)
         .then(() => console.log('Data updated.'));
   
       database()
-        .ref('/chatlist/' + userData?.UserID + '/' + receiverData?.id)
+        .ref('/chatlist/' + currentUserId + '/' + receiverData?.id)
         .update(chatListupdate)
         .then(() => console.log('Data updated.'));
   
@@ -298,7 +298,7 @@ const Inbox = ({navigation, route}) => {
             style={{
               backgroundColor: '#ffff',
               width: '75%',
-              height: h('7%'),
+              height: 55,
               paddingHorizontal: 15,
               color: '#000',
               fontSize: h('2%'),
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   },
   BtnCCW: {
     width: '20%',
-    height: '80%',
+    height: 55,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.Primary,

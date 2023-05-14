@@ -42,17 +42,18 @@ const MessageScreen = ({navigation}) => {
   }, [])
 
   const getAllUser = () => {
+    const currentUserId = auth().currentUser.uid
     database()
-      .ref('chatlist/' + Userdata.UserID)
+      .ref('chatlist/' + currentUserId)
       .once('value')
       .then(snapshot => {
         // console.warn('all User data: ', Object.values(snapshot.val()));
         console.log({VAL: snapshot.val()})
         setusers(
-          Object.values(snapshot.val()).filter(it => it.id != Userdata.UserID),
+          Object.values(snapshot.val()).filter(it => it.id != currentUserId),
         );
         setallUserBackup(
-          Object.values(snapshot.val()).filter(it => it.id != Userdata.UserID),
+          Object.values(snapshot.val()).filter(it => it.id != currentUserId),
         );
       });
   };

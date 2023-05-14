@@ -3,32 +3,8 @@ import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../utils/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 
-const checkIfNewMessagesAvailable = (callback) => {
-  const currentUserId = auth().currentUser.uid
-    firestore()
-      .collection('Users')
-      .doc(currentUserId)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          let userData = documentSnapshot.data()
-          if (userData.hasUnseenMessages && userData.hasUnseenMessages == true){
-            callback(true)
-          }
-        }
-      })
-}
-
-const Appheader = ({setSearchValue, onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
-  console.warn(noti);
-  const [ isHavingNewMessages, setIsHavingNewMessages ] = React.useState(false)
-
-  React.useEffect(() => {
-    checkIfNewMessagesAvailable(setIsHavingNewMessages)
-  }, [])
+const Appheader = ({isHavingNewMessages, setSearchValue, onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
 
   return (
     <View style={styles.HeaderContainer}>

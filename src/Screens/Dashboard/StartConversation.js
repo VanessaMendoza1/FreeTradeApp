@@ -24,6 +24,7 @@ import firestore from '@react-native-firebase/firestore';
 import Appbutton from '../../Components/Appbutton';
 import { sendMsg } from './Inbox'
 import { all } from 'axios';
+import auth from '@react-native-firebase/auth';
 
 const StartConversation = ({navigation, route}) => {
   //   console.warn(route.params.data.Notification !== '');
@@ -55,9 +56,9 @@ const StartConversation = ({navigation, route}) => {
   }, [])
   const createChatList = data => {
     setloading(true);
-
+    const currentUserId = auth().currentUser.uid
     database()
-      .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
+      .ref('/chatlist/' + currentUserId + '/' + data.UserID)
       .once('value')
       .then(async snapshot => {
         let roomId
@@ -84,13 +85,13 @@ const StartConversation = ({navigation, route}) => {
         };
         sendMsg(txt, settxt, setloading, userData, SendData)
         database()
-          .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
+          .ref('/chatlist/' + currentUserId + '/' + data.UserID)
           .once('value')
           .then(async snapshot => {
             if ((snapshot.val() == null) || (snapshot.val().itemPrice == null && snapshot.val().itemImage == null)) {
               let myData = {
                 roomId,
-                id: userData.UserID,
+                id: currentUserId,
                 name: userData.name,
                 img: userData.image,
                 emailId: userData.emails,
@@ -104,7 +105,7 @@ const StartConversation = ({navigation, route}) => {
                 sellersImage: data.user.image,
               };
               database()
-                .ref('/chatlist/' + data.UserID + '/' + userData.UserID)
+                .ref('/chatlist/' + data.UserID + '/' + currentUserId)
                 .update(myData)
                 .then(() => console.log('Data updated.'));
     
@@ -112,7 +113,7 @@ const StartConversation = ({navigation, route}) => {
               data.roomId = roomId;
     
               database()
-                .ref('/chatlist/' + userData.UserID + '/' + data.UserID)
+                .ref('/chatlist/' + currentUserId + '/' + data.UserID)
                 .update(SendData)
                 .then(() => {
                   console.log('Data updated.')

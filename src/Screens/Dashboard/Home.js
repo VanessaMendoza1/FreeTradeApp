@@ -27,6 +27,7 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import Icons from '../../utils/icons';
 import Collapsible from 'react-native-collapsible';
 import {FlatListSlider} from 'react-native-flatlist-slider';
+import auth from '@react-native-firebase/auth';
 
 
 import {getPreciseDistance} from 'geolib';
@@ -34,34 +35,6 @@ import {getPreciseDistance} from 'geolib';
 import moment from 'moment';
 import axios from 'axios';
 
-const useInterval = (callback, delay) => {
-  const savedCallback = useRef();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    const tick = () => {
-      savedCallback.current();
-    };
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-};
-
-const SECTIONS = [
-  {
-    title: 'First',
-    content: 'Lorem ipsum...',
-  },
-  {
-    title: 'Second',
-    content: 'Lorem ipsum...',
-  },
-];
 
 const getCategoriesAndSubCategories = (callback) => {
   let categoryAlongSubCategories = {}
@@ -103,10 +76,7 @@ const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callb
       return
     }
     let filteredItemsThroughCategoryAndSubCategory = []
-    querySnapshot.forEach((doc) => {
-      // console.log(doc.id, doc.data());
-      let itemData = doc.data()
-      let itemId = doc.id // favouriteItemData.productId
+    querySnapshot.forEach((doc) => {     
       filteredItemsThroughCategoryAndSubCategory.push({...doc.data(), id: doc.id})
     })
 
@@ -144,24 +114,18 @@ const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, 
           const searchLongitude = userData?.LocationFilter?.longitude;
           const searchDistanceLimit = userData?.LocationFilter?.LocalDistance
           const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
-          // console.log({Title})
+
           if (Title && Title != ""){
             Title = Title.toLowerCase()
           }
           if (searchText && searchText != ""){
             searchText = searchText.toLowerCase()
           }
-          // let isSearchQueryMatched = searchText != "" && (Title.includes(searchText) || Title == searchText)
+
           if (searchText != ""){
-            // console.log("TRIGGERED IF")
-            // console.log({searchText, Title})
+
             if (Title && (Title.includes(searchText) || Title == searchText)){
-              console.log("MATCHED")
-              console.log("MATCHED")
-              console.log("MATCHED")
-              console.log("MATCHED")
-              console.log("MATCHED")
-              console.log({searchText, Title, status, distanceInKm, searchDistanceLimit, activeField})
+
               if (status == false){
                 if (distanceInKm <= searchDistanceLimit){
                   
@@ -179,8 +143,7 @@ const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, 
               }
             }
           } else {
-            console.log("TRIGGERED ELSE")
-            console.log({searchText})
+
             if (status == false){
               if (distanceInKm <= searchDistanceLimit){
                   if (PostType === 'Trading' && activeField == "Trading") {
@@ -196,14 +159,27 @@ const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, 
             }
           }  
       });
-
-      console.log({TradingData12: tradingData, sellingData12: sellingData, ServiceData12: serviceData})
-
       setServiceData(serviceData)
       setSellingData(sellingData)
       setTradingData(tradingData)
 
     });
+}
+
+const checkIfNewMessagesAvailable = (callback) => {
+  const currentUserId = auth().currentUser.uid
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          let userData = documentSnapshot.data()
+          if (userData.hasUnseenMessages && userData.hasUnseenMessages == true){
+            callback(true)
+          }
+        }
+      })
 }
 
 const Home = ({navigation}) => {
@@ -235,6 +211,11 @@ const Home = ({navigation}) => {
   
   const _timerId = useRef(null);
 
+  const [ isHavingNewMessages, setIsHavingNewMessages ] = React.useState(false)
+
+  React.useEffect(() => {
+    checkIfNewMessagesAvailable(setIsHavingNewMessages)
+  }, [])
 
 
   const CheckValidSubscription = () => {
@@ -270,10 +251,6 @@ const Home = ({navigation}) => {
     CheckValidSubscription();
   }, []);
 
-
-
-
-
   React.useEffect(() => {
     console.log({activeField})
     showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
@@ -284,9 +261,6 @@ const Home = ({navigation}) => {
     setItemsFromCategoryAndSubCategoryFilteration([])
   }, [selectedCategory])
 
-  // React.useEffect(() => {
-  //   setItemsFromCategoryAndSubCategoryFilteration([])
-  // }, [selectedSubCategory])
   
   React.useEffect(() => {
     getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
@@ -300,19 +274,13 @@ const Home = ({navigation}) => {
     return () => _stopAutoPlay()
   }, [])
   
-  
-
-  // console.warn();
-
-  // console.warn(UserData.AccountType);
-  // console.warn(UserData.longitude);
-
   const ImageAds = useSelector(state => state.ads.ImageData);
   const subdata = useSelector(state => state.sub.subdata);
   // console.warn(subdata[0].plan === 'Business');
   // console.warn(subdata.length > 0);
 
   const NotificationData = async () => {
+    const currentUserId = auth().currentUser.uid
     let NotificationData = [];
     await firestore()
       .collection('Notification')
@@ -320,8 +288,7 @@ const Home = ({navigation}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           // console.warn(data.UserID);
-          if (documentSnapshot.data().userID == UserData.UserID) {
-            console.log({SEEN: documentSnapshot.data().seen})
+          if (documentSnapshot.data().userID == currentUserId) {
             if (documentSnapshot.data().seen == false) {
               NotificationData.push({
                 ...documentSnapshot.data(), 
@@ -330,7 +297,6 @@ const Home = ({navigation}) => {
             }
           }
         });
-        console.log({NotificationData1321: NotificationData})
         setNotii(NotificationData);
         console.warn(NotificationData);
       })
@@ -340,13 +306,14 @@ const Home = ({navigation}) => {
   };
 
   const MySubscriptionPackage = async () => {
+    const currentUserId = auth().currentUser.uid
     let data = [];
     await firestore()
       .collection('sub')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().userid === UserData.UserID) {
+          if (documentSnapshot.data().userid === currentUserId) {
             const now = moment.utc();
             var end = JSON.parse(documentSnapshot.data().endDate);
             var days = now.diff(end, 'days');
@@ -366,9 +333,10 @@ const Home = ({navigation}) => {
   };
 
   const DeletePost = () => {
+    const currentUserId = auth().currentUser.uid
     firestore()
       .collection('sub')
-      .doc(UserData.UserID)
+      .doc(currentUserId)
       .delete()
       .then(() => {
         MySubscriptionPackage();
@@ -610,6 +578,7 @@ const Home = ({navigation}) => {
 
       <View style={styles.mainContainer}>
         <Appheader
+          isHavingNewMessages={isHavingNewMessages}
           setSearchValue={setSearchValue}
           setShowItemsFromCategoryAndSubCategory={setShowItemsFromCategoryAndSubCategory}
           showCategoryAndSubCategory={showCategoryAndSubCategory}
@@ -805,6 +774,13 @@ const Home = ({navigation}) => {
                     itemVisiblePercentThreshold: 50,
                   }}
                   ref={animatedFlatlist}
+                  onScrollToIndexFailed={info => {
+                    const wait = new Promise(resolve => setTimeout(resolve, 500));
+                    wait.then(() => {
+                      animatedFlatlist.current?.scrollToIndex({ index: info.index, animated: true });
+                    });
+                  }}
+                  initialScrollIndex={0}  
                   flatListRef={React.createRef()}
                   pagingEnabled
                   data={ImageAds}

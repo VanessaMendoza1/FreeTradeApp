@@ -22,6 +22,8 @@ import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import LoadingScreen from '../../Components/LoadingScreen';
 import { openPhoto, openCamera, updateDetails } from './EditAccount'
+import auth from '@react-native-firebase/auth';
+
 const heightDropItem = 40;
 
 const allowedTimings = [
@@ -117,13 +119,14 @@ const BussinessAccountEdits = ({navigation}) => {
   // console.warn(subdata[0].plan === 'Bussiness');
 
   const PostChangeName = async () => {
+    const currentUserId = auth().currentUser.uid
     let newarr = [];
     await firestore()
       .collection('Post')
       .get()
       .then(querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().UserID === MyData.UserID) {
+          if (documentSnapshot.data().UserID === currentUserId) {
             newarr.push(documentSnapshot.data().DocId);
           }
         });
@@ -144,6 +147,7 @@ const BussinessAccountEdits = ({navigation}) => {
   };
 
   const UpdateData = () => {
+    const currentUserId = auth().currentUser.uid
     setloading(true);
     if (
       Business !== '' &&
@@ -157,7 +161,7 @@ const BussinessAccountEdits = ({navigation}) => {
     ) {
       firestore()
         .collection('Users')
-        .doc(MyData.UserID)
+        .doc(currentUserId)
         .update({
           BusinessName: Business,
           Address: Address,
@@ -175,7 +179,7 @@ const BussinessAccountEdits = ({navigation}) => {
           let userData = [];
           await firestore()
             .collection('Users')
-            .doc(MyData.UserID)
+            .doc(currentUserId)
             .get()
             .then(documentSnapshot => {
               if (documentSnapshot.exists) {
@@ -275,6 +279,8 @@ const BussinessAccountEdits = ({navigation}) => {
                 }}
               />
             </TouchableOpacity> */}
+            
+
 
           <TouchableOpacity
             style={styles.ProfileContainer}
@@ -307,37 +313,7 @@ const BussinessAccountEdits = ({navigation}) => {
           </TouchableOpacity>
           {/* profile Containr */}
 
-          <View style={styles.bottomContaaainers}>
-            <TextInput
-              style={styles.inputContainercc}
-              placeholder={'Business name'}
-              placeholderTextColor={Colors.Primary}
-              onChangeText={e => setBusiness(e)}
-              value={Business}
-            />
-            <TextInput
-              style={styles.inputContainercc}
-              placeholder={'Address'}
-              placeholderTextColor={Colors.Primary}
-              onChangeText={e => setAddress(e)}
-              value={Address}
-            />
-            <TextInput
-              style={styles.inputContainercc}
-              placeholder={'Website (optional)'}
-              placeholderTextColor={Colors.Primary}
-              onChangeText={e => setWebsite(e)}
-              value={Website}
-            />
-            <TextInput
-              style={styles.inputContainercc}
-              placeholder={'Phone Number'}
-              placeholderTextColor={Colors.Primary}
-              onChangeText={e => sePhone(e)}
-              value={Phone}
-            />
-
-            <Text style={styles.NamePlate}>Change Password</Text>
+          <Text style={styles.NamePlate}>Change Password</Text>
             <View style={styles.PasswordContainer}>
               <TextInput
                 style={styles.inputContainercc2}
@@ -405,10 +381,47 @@ const BussinessAccountEdits = ({navigation}) => {
                 onPress={() => {
                   updatePassword();
                 }}
-                CustomWidth={'100%'}
+                CustomWidth={'83%'}
                 text={'Change Password'}
               />
             </View>
+            
+
+
+
+          <View style={styles.bottomContaaainers}>
+            <TextInput
+              style={styles.inputContainercc}
+              placeholder={'Business name'}
+              placeholderTextColor={Colors.Primary}
+              onChangeText={e => setBusiness(e)}
+              value={Business}
+            />
+            <TextInput
+              style={styles.inputContainercc}
+              placeholder={'Address'}
+              placeholderTextColor={Colors.Primary}
+              onChangeText={e => setAddress(e)}
+              value={Address}
+            />
+            <TextInput
+              style={styles.inputContainercc}
+              placeholder={'Website (optional)'}
+              placeholderTextColor={Colors.Primary}
+              onChangeText={e => setWebsite(e)}
+              value={Website}
+            />
+            <TextInput
+              style={styles.inputContainercc}
+              placeholder={'Phone Number'}
+              placeholderTextColor={Colors.Primary}
+              onChangeText={e => sePhone(e)}
+              value={Phone}
+            />
+
+            
+            
+            
 
             <View style={{height: h('2%')}} />
 
@@ -693,7 +706,8 @@ const styles = StyleSheet.create({
     marginTop: h('2%'),
   },
   PasswordContainer: {
-    width: '100%',
+    alignSelf: "center",
+    width: '90%',
     height: h('7%'),
     borderColor: Colors.Primary,
     borderWidth: h('0.2%'),
@@ -759,7 +773,7 @@ const styles = StyleSheet.create({
   },
   AppBtn: {
     width: '100%',
-    height: h('47%'),
+    height: h('7%'),
     // backgroundColor: 'red',
     justifyContent: 'flex-end',
     alignItems: 'center',
