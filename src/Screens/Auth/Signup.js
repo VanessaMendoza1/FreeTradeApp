@@ -14,7 +14,7 @@ import Colors from '../../utils/Colors';
 import AppInput from '../../Components/AppInput';
 import Appbutton from '../../Components/Appbutton';
 import SocialButton from '../../Components/SocialButton';
-
+import { useFocusEffect } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
@@ -113,10 +113,19 @@ const Signup = ({navigation}) => {
     }
   };
 
-  React.useEffect(() => {
-    // getData();
-    checkPermission();
-  }, []);
+  // React.useEffect(() => {
+  //   // getData();
+  //   checkPermission();
+  // }, []);
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Focussed Signup.js, running checkPermission")
+      checkPermission();
+      return () => null;
+    }, [])
+  );
 
   const onSubmitUser = () => {
     // navigation.navigate('GetPremium');
@@ -141,7 +150,8 @@ const Signup = ({navigation}) => {
             const user = userCredential.user;
             // console.warn(user);
 
-            auth().onAuthStateChanged(function (user) {
+            var unsubscribe = auth().onAuthStateChanged(function (user) {
+              // if (user == null) return
               user.sendEmailVerification();
               firestore()
                 .collection('Users')
@@ -174,6 +184,8 @@ const Signup = ({navigation}) => {
                 })
                 .catch(err => console.log(err));
             });
+
+            unsubscribe()
           })
           .catch(error => {
             if (error.code === 'auth/email-already-in-use') {

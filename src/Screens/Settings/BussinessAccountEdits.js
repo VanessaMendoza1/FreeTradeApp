@@ -338,7 +338,7 @@ const BussinessAccountEdits = ({navigation}) => {
               <Icon name="arrow-back-outline" size={30} color="#ffff" />
             </TouchableOpacity>
             <View style={styles.MiddleContainer}>
-              <Text style={styles.FontWork}>Settings</Text>
+              <Text style={styles.FontWork}>Setting</Text>
             </View>
           </View>
           {/* header */}
@@ -361,6 +361,8 @@ const BussinessAccountEdits = ({navigation}) => {
                 }}
               />
             </TouchableOpacity> */}
+            
+
 
           <TouchableOpacity
             style={styles.ProfileContainer}
@@ -466,7 +468,9 @@ const BussinessAccountEdits = ({navigation}) => {
                 text={'Change Password'}
               />
             </View>
-        
+            
+
+
 
           <View style={styles.bottomContaaainers}>
             <TextInput
@@ -497,6 +501,10 @@ const BussinessAccountEdits = ({navigation}) => {
               onChangeText={e => sePhone(e)}
               value={Phone}
             />
+
+            
+            
+            
 
             <View style={{height: h('2%')}} />
 

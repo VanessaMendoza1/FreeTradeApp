@@ -19,10 +19,10 @@ const Appheader = ({isHavingNewMessages, setSearchValue, onSearch, onMessage, on
           }
         }}
         style={styles.ViewCOntaier}>
-        <Icon name="menu-outline" size={30} color="#ffff" />
+        <Icon name="menu-outline" size={35} color="#ffff" />
       </TouchableOpacity>
       <TouchableOpacity onPress={onMessage} style={styles.ViewCOntaier2}>
-        <Icon name="chatbox" size={25} color="#ffff" />
+        <Icon name="chatbox" size={30} color="#ffff" />
         {isHavingNewMessages && (
           <View
             style={{
@@ -42,7 +42,7 @@ const Appheader = ({isHavingNewMessages, setSearchValue, onSearch, onMessage, on
       <View style={styles.ViewCOntaier3}>
         <View style={styles.Searchbox}>
           <View style={styles.leftContainer}>
-            <Icon name="search" size={25} color={Colors.Primary} />
+            <Icon name="search" size={30} color={Colors.Primary} />
           </View>
           <TextInput
             placeholder="Service/Sell/Trade"
@@ -70,7 +70,7 @@ const Appheader = ({isHavingNewMessages, setSearchValue, onSearch, onMessage, on
       <TouchableOpacity onPress={onNotification} style={styles.ViewCOntaier}>
         {noti ? (
           <>
-            <Icon name="notifications" size={25} color="#fff" />
+            <Icon name="notifications" size={30} color="#fff" />
             <View
               style={{
                 width: 13,
@@ -85,7 +85,7 @@ const Appheader = ({isHavingNewMessages, setSearchValue, onSearch, onMessage, on
               }}></View>
           </>
         ) : (
-          <Icon name="notifications" size={25} color="#ffff" />
+          <Icon name="notifications" size={30} color="#ffff" />
         )}
       </TouchableOpacity>
     </View>

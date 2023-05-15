@@ -64,6 +64,7 @@ const StartConversation = ({navigation, route}) => {
       .ref('/chatlist/' + currentUserId + '/' + data.UserID)
       .once('value')
       .then(async snapshot => {
+        console.log({PREVIOUS_CHAT_NODE: snapshot.val()})
         let roomId
         if (snapshot.val() == null) {
           roomId = uuid.v4();
@@ -126,6 +127,50 @@ const StartConversation = ({navigation, route}) => {
               // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
               setloading(false);
             } else {
+              let myData = {
+                // roomId,
+                // id: currentUserId,
+                name: userData.name,
+                img: userData.image,
+                emailId: userData.emails,
+                // about: userData.Bio,
+                lastMsg: txt,
+                // Token: userData.NotificationToken,
+                itemPrice: data.Price,
+                itemImage: data.images[0],
+                sellersName: data.user.name,
+                sellersImage: data.user.image,
+              };
+              let SendData = {
+                // roomId,
+                // id: data.UserID,
+                name: data.name,
+                img: data.image,
+                emailId: data.email,
+                // about: data.Bio,
+                lastMsg: txt,
+                // Token: data.NotificationToken,
+                itemPrice: data.Price,
+                itemImage: data.images[0],
+                sellersName: data.user.name,
+                sellersImage: data.user.image,
+              };
+              database()
+                .ref('/chatlist/' + data.UserID + '/' + currentUserId)
+                .update(myData)
+                .then(() => console.log('Data updated.'));
+    
+              data.lastMsg = txt;
+              data.roomId = roomId;
+    
+              database()
+                .ref('/chatlist/' + currentUserId + '/' + data.UserID)
+                .update(SendData)
+                .then(() => {
+                  console.log('Data updated.')
+                  alert("Message Sent")
+                  navigation.goBack();
+                });
               alert("Message Sent")
               navigation.goBack();
               // navigation.navigate('Inbox', {

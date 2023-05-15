@@ -77,8 +77,9 @@ const LocationPage = ({navigation}) => {
           {/* header */}
           <View style={styles.Header}>
             <TouchableOpacity
-              onPress={() => {
-                navigation.goBack();
+              onPress={async () => {
+                await dispatch(DataInsert({...MyData, LocationFilter: {location:Location}}))
+                navigation.goBack()
               }}
               style={styles.LeftContainer}>
               <Icon name="arrow-back-outline" size={30} color="#ffff" />

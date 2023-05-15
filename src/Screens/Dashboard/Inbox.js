@@ -33,6 +33,7 @@ const indicateOtherUserAsHavingUnreadMessages = (otherUserId) => {
 }
 
 const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
+  console.log({msg, receiverData})
   const currentUserId = auth().currentUser.uid
   try {
     if (msg == '' || msgvalid(msg) == 0) {
@@ -55,6 +56,7 @@ const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
       .push();
     msgData.id = newReference.key;
     newReference.set(msgData).then(() => {
+      console.log({NEW_MESSAGE_SENT_DATA: msgData})
       indicateOtherUserAsHavingUnreadMessages(receiverData.id)
       console.log("MESSAGE SENT")
       console.log({msgData})
@@ -65,12 +67,12 @@ const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
       database()
         .ref('/chatlist/' + receiverData?.id + '/' + currentUserId)
         .update(chatListupdate)
-        .then(() => console.log('Data updated.'));
+        .then(() => console.log({CHAT_NODE_UPDATED_1: '/chatlist/' + receiverData?.id + '/' + currentUserId}));
   
       database()
         .ref('/chatlist/' + currentUserId + '/' + receiverData?.id)
         .update(chatListupdate)
-        .then(() => console.log('Data updated.'));
+        .then(() => console.log({CHAT_NODE_UPDATED_2: '/chatlist/' + currentUserId + '/' + receiverData?.id}));
   
       setMsg('');
       setdisabled(false);
@@ -217,7 +219,7 @@ const Inbox = ({navigation, route}) => {
           }}>
             <ImageBackground
               style={{width: h('8%'), height: h('8%'), resizeMode: 'cover', borderRadius: 10, marginBottom: 2}}
-              source={{uri: itemOfDiscussionImage}}
+              source={{uri: itemOfDiscussionImage ? itemOfDiscussionImage : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80'}}
             >
               <Text style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -351,7 +353,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ProfileContainer2: {
-    width: '82%',
+    width: '62%',
     height: '100%',
     // backgroundColor: 'green',
 
