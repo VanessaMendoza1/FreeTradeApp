@@ -160,14 +160,14 @@ const Home = ({navigation}) => {
       checkIfNewMessagesAvailable(setIsHavingNewMessages)
       CheckValidSubscription()
       getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
-      showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
+      // showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
       _stopAutoPlay();
       _startAutoPlay();
     
       return () => {
-        setServiceData([])
-        setSellingData([])
-        setTradingData([])
+        // setServiceData([])
+        // setSellingData([])
+        // setTradingData([])
         _stopAutoPlay();
       }
     }, [])
