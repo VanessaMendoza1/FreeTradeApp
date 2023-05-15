@@ -99,7 +99,7 @@ const Setting = ({navigation}) => {
             <Icon name="arrow-back-outline" size={30} color="#ffff" />
           </TouchableOpacity>
           <View style={styles.MiddleContainer}>
-            <Text style={styles.FontWork}>Setting</Text>
+            <Text style={styles.FontWork}>Settings</Text>
           </View>
         </View>
         {/* header */}
