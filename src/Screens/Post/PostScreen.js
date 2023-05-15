@@ -334,7 +334,7 @@ const PostScreen = ({navigation, route}) => {
                   navigation.goBack();
                 }}
                 style={styles.leftContainer}>
-                <Icon name="arrow-back-outline" size={30} color="#ffff" />
+                <Icon name="arrow-back-outline" size={25} color="#ffff" />
               </TouchableOpacity>
               <View style={styles.leftContainer2}></View>
               <TouchableOpacity
@@ -347,7 +347,7 @@ const PostScreen = ({navigation, route}) => {
                 })}
               </TouchableOpacity>
               <TouchableOpacity onPress={onShare} style={styles.leftContainer}>
-                <Icon name="arrow-redo" size={30} color="#ffff" />
+                <Icon name="arrow-redo" size={25} color="#ffff" />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={async () => {
@@ -372,9 +372,9 @@ const PostScreen = ({navigation, route}) => {
                 }}
                 style={styles.leftContainer}>
                 {heart ? (
-                  <Icon name="heart" size={30} color="red" />
+                  <Icon name="heart" size={25} color="red" />
                 ) : (
-                  <Icon name="heart" size={30} color="#ffff" />
+                  <Icon name="heart" size={25} color="#ffff" />
                 )}
               </TouchableOpacity>
             </View>
@@ -436,7 +436,7 @@ const PostScreen = ({navigation, route}) => {
           </View>
 
           <View style={styles.HeadingTextContainer2222}>
-            <Text style={styles.HeadingText3}>Condition : </Text>
+            <Text style={styles.HeadingText3}>Condition: </Text>
             <Text style={styles.HeadingText2}>
               {route.params.data.Condition}
             </Text>
@@ -618,51 +618,34 @@ const PostScreen = ({navigation, route}) => {
           </View>
           <View style={styles.linebar} />
           <View style={styles.space} />
-          {subdata.length > 0 && (
-            <>
-              {subdata[0].plan !== 'Bussiness' && (
-                <>
-                  {VideoAd.length <= 0 ? null : (
-                    <>
-                      <View>
-                        <VideoPlayer
-                          video={{
-                            uri: VideoAd[0].AdGraphicLink
-                              ? VideoAd[0].AdGraphicLink
-                              : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                          }}
-                          autoplay
-                          paused={false}
-                          controls={true}
-                          resizeMode={'contain'}
-                          thumbnail={{
-                            uri: 'https://i.picsum.photos/id/866/1600/900.jpg',
-                          }}
-                        />
-                      </View>
-                      <View style={styles.overlay}>
-                        <Text style={styles.videoShoesTag}>
-                          {VideoAd[0].title}
-                        </Text>
-                        <Text style={styles.videoShoesTag2}>
-                          {VideoAd[0].TagLine}
-                        </Text>
 
-                        <Text style={styles.MainText2}>
-                          {VideoAd[0].user.Address}
-                        </Text>
-                        {VideoAd[0].user?.Phone !== undefined && (
-                          <Text style={styles.MainText2}>
-                            Call: {VideoAd[0].user.Phone}
-                          </Text>
-                        )}
-                      </View>
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          )}
+          <View>
+            <VideoPlayer
+              video={{
+                uri: VideoAd[0].AdGraphicLink
+                  ? VideoAd[0].AdGraphicLink
+                  : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+              }}
+              autoplay
+              paused={false}
+              controls={true}
+              resizeMode={'contain'}
+              thumbnail={{
+                uri: 'https://i.picsum.photos/id/866/1600/900.jpg',
+              }}
+            />
+          </View>
+          <View style={styles.overlay}>
+            <Text style={styles.videoShoesTag}>{VideoAd[0].title}</Text>
+            <Text style={styles.videoShoesTag2}>{VideoAd[0].TagLine}</Text>
+
+            <Text style={styles.MainText2}>{VideoAd[0].user.Address}</Text>
+            {VideoAd[0].user?.Phone !== undefined && (
+              <Text style={styles.MainText2}>
+                Call: {VideoAd[0].user.Phone}
+              </Text>
+            )}
+          </View>
 
           <View style={styles.HeadingTextContainer7}>
             <Text style={styles.SimiliarText}>Similar Items</Text>
