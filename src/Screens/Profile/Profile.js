@@ -23,6 +23,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
 import auth from '@react-native-firebase/auth';
 import {SubDataAdd} from '../../redux/subSlicer';
+import { useFocusEffect } from '@react-navigation/native';
 
 import moment from 'moment';
 
@@ -110,13 +111,13 @@ const Profile = ({navigation}) => {
       });
   };
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Focussed Profile.js, running allmypost")
       allmypost();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
+      return () => null;
+    }, [])
+  );
 
   return (
     <>

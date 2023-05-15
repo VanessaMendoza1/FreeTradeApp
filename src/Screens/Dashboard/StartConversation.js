@@ -25,6 +25,7 @@ import Appbutton from '../../Components/Appbutton';
 import { sendMsg } from './Inbox'
 import { all } from 'axios';
 import auth from '@react-native-firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const StartConversation = ({navigation, route}) => {
   //   console.warn(route.params.data.Notification !== '');
@@ -38,22 +39,24 @@ const StartConversation = ({navigation, route}) => {
 
   const {receiverData, txt: _txt} = route.params;
 
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Focussed StartConversation.js, running setItemOfDiscussionImage setItemOfDiscussionPrice setSellersImage")
+      let {
+        itemPrice,
+        itemImage,
+        sellersName,
+        sellersImage: _sellersImage,
+        roomId,
+        id: otherUserId,
+      } = route.params.receiverData
+      setItemOfDiscussionImage(itemImage)
+      setItemOfDiscussionPrice(itemPrice)
+      setSellersImage(_sellersImage)
+      return () => null;
+    }, [])
+  );
 
-  React.useEffect(() => {
-    let {
-      itemPrice,
-      itemImage,
-      sellersName,
-      sellersImage: _sellersImage,
-      roomId,
-      id: otherUserId,
-    } = route.params.receiverData
-
-    setItemOfDiscussionImage(itemImage)
-    setItemOfDiscussionPrice(itemPrice)
-    setSellersImage(_sellersImage)
-    console.log({itemPrice, itemImage, sellersName, sellersImage, otherUserId, roomId})
-  }, [])
   const createChatList = data => {
     setloading(true);
     const currentUserId = auth().currentUser.uid

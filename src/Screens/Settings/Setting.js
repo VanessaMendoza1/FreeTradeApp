@@ -19,15 +19,24 @@ import Icons from '../../utils/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Setting = ({navigation}) => {
   const dispatch = useDispatch();
   const [isBusinessAccount, setIsBusinessAccount] = React.useState(false);
   // const [ loading, setloading ] = React.useState(false)
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed Setting.js, running isUserHavingBussinessSubscription")
+			isUserHavingBussinessSubscription();
+			return () => null;
+		}, [])
+	);
+
   React.useEffect(() => {
-    isUserHavingBussinessSubscription();
-    // setIsBusinessAccount(true)
-  }, []);
+    console.log({isBusinessAccount})
+  }, [isBusinessAccount])
+  
   const MyData = useSelector(state => state.counter.data);
   console.warn(MyData.name);
 
@@ -52,24 +61,27 @@ const Setting = ({navigation}) => {
   };
 
   const isUserHavingBussinessSubscription = () => {
-    let currentUserId = auth().currentUser.uid;
-    firestore()
-      .collection('Users')
-      .doc(currentUserId)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          let userData = documentSnapshot.data();
-          console.log({userData});
-          if (userData.AccountType == 'Bussiness') {
-            setIsBusinessAccount(true);
-          }
-        }
-      })
-      .catch(err => {
-        // setloading(false);
-        console.warn(err);
-      });
+    if (subdata.length > 0 && subdata[0].plan === 'Bussiness'){
+      setIsBusinessAccount(true);
+    }
+    // let currentUserId = auth().currentUser.uid;
+    // firestore()
+    //   .collection('Users')
+    //   .doc(currentUserId)
+    //   .get()
+    //   .then(documentSnapshot => {
+    //     if (documentSnapshot.exists) {
+    //       let userData = documentSnapshot.data();
+    //       console.log({userData});
+    //       if (userData.AccountType == 'Bussiness') {
+    //         setIsBusinessAccount(true);
+    //       }
+    //     }
+    //   })
+    //   .catch(err => {
+    //     // setloading(false);
+    //     console.warn(err);
+    //   });
   };
 
   // console.log({IMAGE: MyData.image})
@@ -123,8 +135,8 @@ const Setting = ({navigation}) => {
               tintColor: Colors.Primary,
             })}
           </SettingItem> */}
-
-          {subdata.length > 0 && subdata[0].plan === 'Bussiness' ? (
+          {isBusinessAccount ? (
+          // {subdata.length > 0 && subdata[0].plan === 'Bussiness' ? (
             <SettingItem
               onPress={() => {
                 navigation.navigate('BussinessAccountEdits');

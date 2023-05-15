@@ -16,6 +16,11 @@ const Ads = ({data, onPress}) => {
           source={{uri: data.AdGraphicLink ? data.AdGraphicLink : img}}
         />
       </View>
+      {(data.BussinessName) && (
+        <>
+          <Text style={styles.MainText}>{data.BussinessName}</Text>
+        </>
+      )}
       {data.title && (
         <Text style={styles.MainText}>{data.title}</Text>
       )}
@@ -63,9 +68,11 @@ const styles = StyleSheet.create({
   },
   MainText: {
     color: '#000',
-    fontSize: h('2%'),
+    fontSize: 15,
     fontWeight: 'bold',
-    paddingTop: 5,
+    paddingTop: 0,
+    paddingBottom: 0,
+    marginBottom: 0
     // paddingLeft: h('0.6%'),
   },
   MainText2: {

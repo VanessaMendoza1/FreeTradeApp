@@ -23,6 +23,7 @@ import storage from '@react-native-firebase/storage';
 import LoadingScreen from '../../Components/LoadingScreen';
 import { openPhoto, openCamera, updateDetails } from './EditAccount'
 import auth from '@react-native-firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const heightDropItem = 40;
 
@@ -53,6 +54,68 @@ const allowedTimings = [
   {label: '11:00 Pm', value: '11:00 Pm'},
   {label: '12:00 Pm', value: '12:00 Pm'},
 ]
+
+const getCurrentBusinessDetails = (
+  // setOldPassword,
+  setBusiness,
+  setAddress,
+  setWebsite,
+  sePhone,
+  setValue,
+  setValue2,
+  setValue3,
+  setValue4,
+  setClosedOnDayModalValue
+) => {
+  const currentUserId = auth().currentUser.uid
+  firestore()
+    .collection('Users')
+    .doc(currentUserId)
+    .get()
+    // .update({
+    //   BusinessName: Business,
+    //   Address: Address,
+    //   Website: Website,
+    //   Phone: Phone,
+    //   bussinessdaysFrom: value3,
+    //   bussinessdaysto: value4,
+    //   closedDays: closedOnDayModalValue,
+    //   bussinessHoursFrom: value,
+    //   bussinessHoursto: value2,
+    //   AccountType: 'Bussiness',
+    //   BussinessDetails: true,
+    // })
+    .then(documentSnapshot => {
+      if (documentSnapshot.exists) {
+        let {
+          // password,
+          BusinessName,
+          Address,
+          Phone,
+          Website,
+          bussinessdaysFrom,
+          bussinessdaysto,
+          closedDays,
+          bussinessHoursFrom,
+          bussinessHoursto,
+        } = documentSnapshot.data()
+        console.log({DATA:documentSnapshot.data()})
+
+        // setOldPassword(password)
+        setBusiness(BusinessName)
+        setAddress(Address)
+        setWebsite(Website)
+        sePhone(Phone)
+        setValue(bussinessHoursFrom)
+        setValue2(bussinessHoursto)
+        setValue3(bussinessdaysFrom)
+        setValue4(bussinessdaysto)
+        setClosedOnDayModalValue(closedDays)
+      }
+    })
+}
+
+
 
 
 const BussinessAccountEdits = ({navigation}) => {
@@ -118,6 +181,25 @@ const BussinessAccountEdits = ({navigation}) => {
   const subdata = useSelector(state => state.sub.subdata);
   // console.warn(subdata[0].plan === 'Bussiness');
 
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed BussinessAcountEdits.js, running getCurrentBusinessDetails")
+			getCurrentBusinessDetails(
+        // setOldPassword,
+        setBusiness,
+        setAddress,
+        setWebsite,
+        sePhone,
+        setValue,
+        setValue2,
+        setValue3,
+        setValue4,
+        setClosedOnDayModalValue,
+      )
+			return () => null;
+		}, [])
+	);
+
   const PostChangeName = async () => {
     const currentUserId = auth().currentUser.uid
     let newarr = [];
@@ -150,14 +232,14 @@ const BussinessAccountEdits = ({navigation}) => {
     const currentUserId = auth().currentUser.uid
     setloading(true);
     if (
-      Business !== '' &&
-      Address !== '' &&
+      Business !== '' 
+      // && Address !== '' &&
       // Website !== '' &&
-      Phone !== '' &&
-      value4 !== null &&
-      value3 !== null &&
-      value2 !== null &&
-      value !== null
+      // Phone !== '' &&
+      // value4 !== null &&
+      // value3 !== null &&
+      // value2 !== null &&
+      // value !== null
     ) {
       firestore()
         .collection('Users')
@@ -312,77 +394,79 @@ const BussinessAccountEdits = ({navigation}) => {
           {/* profile Containr */}
 
           <Text style={styles.NamePlate}>Change Password</Text>
-          <View style={styles.PasswordContainer}>
-            <TextInput
-              style={styles.inputContainercc2}
-              placeholder={'Old Password'}
-              placeholderTextColor={Colors.Primary}
-              secureTextEntry={OPassword}
-              onChangeText={e => setOldPassword(e)}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                setOpassword(!OPassword);
-              }}
-              style={styles.iconContainercc2}>
-              {OPassword ? (
-                <Icon name="eye-off" size={30} color={Colors.Primary} />
-              ) : (
-                <Icon name="eye" size={30} color={Colors.Primary} />
-              )}
-            </TouchableOpacity>
-          </View>
-          <View style={styles.PasswordContainer}>
-            <TextInput
-              style={styles.inputContainercc2}
-              placeholder={'New Password'}
-              placeholderTextColor={Colors.Primary}
-              secureTextEntry={Password}
-              onChangeText={e => setNewPassword(e)}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                setpassword(!Password);
-              }}
-              style={styles.iconContainercc2}>
-              {Password ? (
-                <Icon name="eye-off" size={30} color={Colors.Primary} />
-              ) : (
-                <Icon name="eye" size={30} color={Colors.Primary} />
-              )}
-            </TouchableOpacity>
-          </View>
-          {/* passwordCC */}
-          {/* passwordCC */}
-          <View style={styles.PasswordContainer}>
-            <TextInput
-              style={styles.inputContainercc2}
-              placeholder={'Confirm New Password'}
-              placeholderTextColor={Colors.Primary}
-              secureTextEntry={CPassword}
-              onChangeText={e => setNewCPassword(e)}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                setCpassword(!CPassword);
-              }}
-              style={styles.iconContainercc2}>
-              {CPassword ? (
-                <Icon name="eye-off" size={30} color={Colors.Primary} />
-              ) : (
-                <Icon name="eye" size={30} color={Colors.Primary} />
-              )}
-            </TouchableOpacity>
-          </View>
-          <View style={styles.AppBtn1}>
-            <Appbutton
-              onPress={() => {
-                updatePassword();
-              }}
-              CustomWidth={'83%'}
-              text={'Change Password'}
-            />
-          </View>
+            <View style={styles.PasswordContainer}>
+              <TextInput
+                style={styles.inputContainercc2}
+                placeholder={'Old Password'}
+                value={oldPassword}
+                placeholderTextColor={Colors.Primary}
+                secureTextEntry={OPassword}
+                onChangeText={e => setOldPassword(e)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setOpassword(!OPassword);
+                }}
+                style={styles.iconContainercc2}>
+                {OPassword ? (
+                  <Icon name="eye-off" size={30} color={Colors.Primary} />
+                ) : (
+                  <Icon name="eye" size={30} color={Colors.Primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            <View style={styles.PasswordContainer}>
+              <TextInput
+                style={styles.inputContainercc2}
+                placeholder={'New Password'}
+                placeholderTextColor={Colors.Primary}
+                secureTextEntry={Password}
+                onChangeText={e => setNewPassword(e)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setpassword(!Password);
+                }}
+                style={styles.iconContainercc2}>
+                {Password ? (
+                  <Icon name="eye-off" size={30} color={Colors.Primary} />
+                ) : (
+                  <Icon name="eye" size={30} color={Colors.Primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            {/* passwordCC */}
+            {/* passwordCC */}
+            <View style={styles.PasswordContainer}>
+              <TextInput
+                style={styles.inputContainercc2}
+                placeholder={'Confirm New Password'}
+                placeholderTextColor={Colors.Primary}
+                secureTextEntry={CPassword}
+                onChangeText={e => setNewCPassword(e)}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setCpassword(!CPassword);
+                }}
+                style={styles.iconContainercc2}>
+                {CPassword ? (
+                  <Icon name="eye-off" size={30} color={Colors.Primary} />
+                ) : (
+                  <Icon name="eye" size={30} color={Colors.Primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+            <View style={styles.AppBtn1}>
+              <Appbutton
+                onPress={() => {
+                  updatePassword();
+                }}
+                CustomWidth={'83%'}
+                text={'Change Password'}
+              />
+            </View>
+        
 
           <View style={styles.bottomContaaainers}>
             <TextInput

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Modal,
+  ScrollView
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -31,6 +32,8 @@ import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import LoadingScreen from '../../Components/LoadingScreen';
 import {getAdsPrices} from '../Dashboard/Postad';
 import axios from 'axios';
+import { useFocusEffect } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 const PostPromotion = ({navigation, route}) => {
   console.warn(route.params.data.title);
@@ -48,10 +51,15 @@ const PostPromotion = ({navigation, route}) => {
 
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
+  const [businessName, setBusinessName] = React.useState(MyData?.BusinessName)
 
-  React.useEffect(() => {
-    getAdsPrices(setItems);
-  }, []);
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed PostPromotion.js, running getAdsPrices")
+			getAdsPrices(setItems);
+			return () => null;
+		}, [])
+	);
 
   const adposted = () => {
     setloading(true);
@@ -82,6 +90,7 @@ const PostPromotion = ({navigation, route}) => {
   };
 
   const PostAd = async () => {
+    let currentUserId = auth().currentUser.uid;
     // console.warn('HEHHE');
     const now = moment.utc();
     var end = moment().add(value === 100 ? 15 : 30, 'days');
@@ -97,18 +106,18 @@ const PostPromotion = ({navigation, route}) => {
           .collection('Ads')
           .doc()
           .set({
-            UserID: MyData.UserID,
+            UserID: currentUserId,
             ads: value,
             Adtype: 'Personal',
             AdGraphicLink: route.params.data.images[0],
             TagLine: '',
             MediaType: 'Image',
-            title: route.params.data.title,
+            title: route.params.data.Title,
             user: MyData,
             startDate: JSON.stringify(now),
             endDate: JSON.stringify(end),
             BussinessName:
-              MyData.AccountType === 'Bussiness' ? MyData.BusinessName : '',
+              MyData.AccountType === 'Bussiness' ? MyData.BusinessName : businessName,
           })
           .then(() => {
             Allads();
@@ -150,184 +159,194 @@ const PostPromotion = ({navigation, route}) => {
   };
 
   return (
-    <>
-      {loading && <LoadingScreen />}
-      <PopupModal
-        visible={modalVisble}
-        onPress={() => {
-          navigation.navigate('MakePost');
-          setmodalVisble(false);
-        }}
-        onPress2={() => {
-          setmodalVisble(false);
-        }}
-      />
+    <ScrollView  style={styles.MainContainer}>
+      <>
 
-      <View style={styles.MainContainer}>
-        {/* header */}
-        <View style={styles.Header}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('MakePost');
-            }}
-            style={styles.LeftContainer}>
-            <Icon name="arrow-back-outline" size={30} color="#ffff" />
-          </TouchableOpacity>
-          <View style={styles.MiddleContainer}>
-            <Text style={styles.FontWork}>Promotion</Text>
+        {loading && <LoadingScreen />}
+        <PopupModal
+          visible={modalVisble}
+          onPress={() => {
+            navigation.navigate('MakePost');
+            setmodalVisble(false);
+          }}
+          onPress2={() => {
+            setmodalVisble(false);
+          }}
+        />
+
+        <View>
+          {/* header */}
+          <View style={styles.Header}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('MakePost');
+              }}
+              style={styles.LeftContainer}>
+              <Icon name="arrow-back-outline" size={30} color="#ffff" />
+            </TouchableOpacity>
+            <View style={styles.MiddleContainer}>
+              <Text style={styles.FontWork}>Promotion</Text>
+            </View>
           </View>
-        </View>
-        {/* header */}
+          {/* header */}
 
-        <View style={styles.MainPromtionContainer}>
-          <Text style={styles.PromtionText}>
-            Sell or Trade Faster Promoting!
-          </Text>
-          {/* img */}
-          <View style={styles.ProfileContainer}>
-            <View style={styles.ProfileCC}>
-              <Image
-                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                source={{
-                  uri: route.params.data.images[0]
-                    ? route.params.data.images[0]
-                    : 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=465&q=80',
+          <View style={styles.MainPromtionContainer}>
+            <Text style={styles.PromtionText}>
+              Sell or Trade Faster Promoting!
+            </Text>
+            {/* img */}
+            <View style={styles.ProfileContainer}>
+              <View style={styles.ProfileCC}>
+                <Image
+                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                  source={{
+                    uri: route.params.data.images[0]
+                      ? route.params.data.images[0]
+                      : 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=465&q=80',
+                  }}
+                />
+              </View>
+            </View>
+            {/* img */}
+            <Text style={styles.NameC}>{route.params.data.title}</Text>
+
+            {/* dropdown */}
+            <TextInput
+              style={styles.inputContainercc}
+              placeholder={'Set Business name For Promotion'}
+              placeholderTextColor={Colors.Primary}
+              onChangeText={e => setBusinessName(e)}
+              value={businessName}
+            />
+
+            <View style={{zIndex: 2000, marginTop: h('1%')}}>
+              <Text style={styles.NameC2}>Packages</Text>
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                zIndex={3000}
+                setValue={setValue}
+                setItems={setItems}
+                style={{
+                  borderWidth: h('0.3%'),
+                  borderColor: Colors.Primary,
+                  zIndex: 100000,
+                  backgroundColor: 'white',
                 }}
               />
             </View>
-          </View>
-          {/* img */}
-          <Text style={styles.NameC}>{route.params.data.title}</Text>
+            {/* dropdown */}
 
-          {/* dropdown */}
-
-          <View style={{zIndex: 2000, marginTop: h('1%')}}>
-            <Text style={styles.NameC2}>Packages</Text>
-            <DropDownPicker
-              open={open}
-              value={value}
-              items={items}
-              setOpen={setOpen}
-              zIndex={3000}
-              setValue={setValue}
-              setItems={setItems}
-              style={{
-                borderWidth: h('0.3%'),
-                borderColor: Colors.Primary,
-                zIndex: 100000,
-                backgroundColor: 'white',
-              }}
-            />
-          </View>
-          {/* dropdown */}
-
-          {/* terms & condition */}
-          <View style={styles.RemeberMebOx2}>
-            <CheckBox
-              value={toggleCheckBox3}
-              style={{width: 20, height: 20}}
-              onValueChange={newValue => setToggleCheckBox3(newValue)}
-              boxType={'circle'}
-              tintColors={{true: Colors.Primary}}
-              onTintColor={'#F4DCF8'}
-            />
-            <Text style={styles.RemebermeText2}>
-              I Agree to{' '}
-              <Text
-                style={{
-                  color: Colors.Primary,
-                  fontWeight: 'bold',
-                  fontSize: h('2.2%'),
-                }}>
-                Terms & Condition
+            {/* terms & condition */}
+            <View style={styles.RemeberMebOx2}>
+              <CheckBox
+                value={toggleCheckBox3}
+                style={{width: 20, height: 20}}
+                onValueChange={newValue => setToggleCheckBox3(newValue)}
+                boxType={'circle'}
+                tintColors={{true: Colors.Primary}}
+                onTintColor={'#F4DCF8'}
+              />
+              <Text style={styles.RemebermeText2}>
+                I Agree to{' '}
+                <Text
+                  style={{
+                    color: Colors.Primary,
+                    fontWeight: 'bold',
+                    fontSize: h('2.2%'),
+                  }}>
+                  Terms & Condition
+                </Text>
               </Text>
-            </Text>
-          </View>
-          {/* terms & condition */}
-          {/* sqbook */}
-          <View style={styles.SqBook}>
-            <View style={styles.leftSQ}>
-              <Image
-                style={{width: '70%', height: '70%', resizeMode: 'contain'}}
-                source={require('../../../assets/csq.png')}
-              />
             </View>
-            <View style={styles.leftSQ2}>
-              <Text style={styles.SSQ1}>Get more exposure</Text>
+            {/* terms & condition */}
+            {/* sqbook */}
+            <View style={styles.SqBook}>
+              <View style={styles.leftSQ}>
+                <Image
+                  style={{width: '70%', height: '70%', resizeMode: 'contain'}}
+                  source={require('../../../assets/csq.png')}
+                />
+              </View>
+              <View style={styles.leftSQ2}>
+                <Text style={styles.SSQ1}>Get more exposure</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.SqBook}>
-            <View style={styles.leftSQ}>
-              <Image
-                style={{width: '70%', height: '70%', resizeMode: 'contain'}}
-                source={require('../../../assets/csq.png')}
-              />
+            <View style={styles.SqBook}>
+              <View style={styles.leftSQ}>
+                <Image
+                  style={{width: '70%', height: '70%', resizeMode: 'contain'}}
+                  source={require('../../../assets/csq.png')}
+                />
+              </View>
+              <View style={styles.leftSQ2}>
+                <Text style={styles.SSQ1}>Promote for multiple days</Text>
+              </View>
             </View>
-            <View style={styles.leftSQ2}>
-              <Text style={styles.SSQ1}>Promote for multiple days</Text>
+            <View style={styles.SqBook}>
+              <View style={styles.leftSQ}>
+                <Image
+                  style={{width: '70%', height: '70%', resizeMode: 'contain'}}
+                  source={require('../../../assets/csq.png')}
+                />
+              </View>
+              <View style={styles.leftSQ2}>
+                <Text style={styles.SSQ1}>Generate more sales</Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.SqBook}>
-            <View style={styles.leftSQ}>
-              <Image
-                style={{width: '70%', height: '70%', resizeMode: 'contain'}}
-                source={require('../../../assets/csq.png')}
-              />
-            </View>
-            <View style={styles.leftSQ2}>
-              <Text style={styles.SSQ1}>Generate more sales</Text>
-            </View>
-          </View>
-          {/* sqbook */}
-          <View style={{marginBottom: h('1%')}} />
-          <Appbutton
-            text={'Start Promotion'}
-            onPress={() => {
-              // adposted();
-              if (toggleCheckBox3) {
-                setModalVisible(true);
-              } else {
-                alert('Please accept the Terms & Condition ');
-              }
+            {/* sqbook */}
+            <View style={{marginBottom: h('1%')}} />
+            <Appbutton
+              text={'Start Promotion'}
+              onPress={() => {
+                // adposted();
+                if (toggleCheckBox3) {
+                  setModalVisible(true);
+                } else {
+                  alert('Please accept the Terms & Condition ');
+                }
 
-              // navigation.navigate('MakePost');
-            }}
-          />
-        </View>
-      </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          alert('Modal has been closed.');
-          setModalVisible(false);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Stripe</Text>
-            <PaymentScreen
-              amount={value}
-              email={MyData.email}
-              onLoading={() => {
-                setloading(true);
-              }}
-              onDone={() => {
-                setModalVisible(!modalVisible);
-                PostAd();
+                // navigation.navigate('MakePost');
               }}
             />
-            <TouchableOpacity
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => {
-                setModalVisible(false);
-              }}>
-              <Text style={styles.textStyle}>Cancel</Text>
-            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-    </>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            alert('Modal has been closed.');
+            setModalVisible(false);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Stripe</Text>
+              <PaymentScreen
+                amount={value}
+                email={MyData.email}
+                onLoading={() => {
+                  setloading(true);
+                }}
+                onDone={() => {
+                  setModalVisible(!modalVisible);
+                  PostAd();
+                }}
+              />
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => {
+                  setModalVisible(false);
+                }}>
+                <Text style={styles.textStyle}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </>
+    </ScrollView>
   );
 };
 function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
@@ -394,7 +413,7 @@ export default PostPromotion;
 
 const styles = StyleSheet.create({
   MainContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: 'white',
   },
   Header: {
@@ -453,12 +472,22 @@ const styles = StyleSheet.create({
   },
   NameC: {
     color: '#000',
-    fontSize: h('2.5%'),
+    fontSize: h('1.5%'),
   },
   NameC2: {
     color: Colors.Primary,
     fontSize: h('2.5%'),
     marginBottom: h('0.5%'),
+  },
+  inputContainercc: {
+    borderColor: Colors.Primary,
+    borderWidth: h('0.2%'),
+    height: h('7%'),
+    width: '100%',
+    fontSize: h('2%'),
+    paddingLeft: h('1.5%'),
+    marginTop: h('1%'),
+    marginBottom: 20
   },
   RemeberMebOx2: {
     width: '100%',
@@ -475,7 +504,7 @@ const styles = StyleSheet.create({
   SqBook: {
     // backgroundColor: 'red',
     width: '100%',
-    height: '7%',
+    height: '5%',
     flexDirection: 'row',
   },
   leftSQ: {

@@ -21,6 +21,7 @@ import {useSelector} from 'react-redux';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import MsgComponent from '../../Components/MsgComponent';
+import { useFocusEffect } from '@react-navigation/native';
 
 const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
 
@@ -94,56 +95,25 @@ const Inbox = ({navigation, route}) => {
       // AutSender(); dont know why this was added
     }
   }, []);
-
-  React.useEffect(() => {
-    console.log({params: route.params})
-    let {
-      itemPrice,
-      itemImage,
-      sellersName,
-      sellersImage: _sellersImage,
-      roomId,
-      id: otherUserId,
-    } = route.params.receiverData
-
-    setItemOfDiscussionImage(itemImage)
-    setItemOfDiscussionPrice(itemPrice)
-    setSellersImage(_sellersImage)
-    // console.log(receiverData?.id) // PtElk401JWN4M6PnCIGonhNJaOt2
-    // console.log(userData?.UserID) // KaKBwexWyBX26BRoys6NaIMoBtV2
-    
-    // NOT NEEDED ANYMRORE
-    //   database()
-    //     .ref('/chatlist/' + receiverData?.id) // PtElk401JWN4M6PnCIGonhNJaOt2
-    //     .once('value')
-    //     .then(snapshot => {
-    //       console.log("THIS!!!!!!! 1111")
-    //       console.log({this: snapshot.val()})
-    //       // querySnapshot.forEach(snapshot => {
-    //       //   console.log("THIS!!!!!!! 1111")
-    //       //   console.log({this: Object.values(snapshot.val())})
-    //       // });
-    //     })
-
-    //   database()
-    //     .ref('/chatlist/' + userData?.UserID) // KaKBwexWyBX26BRoys6NaIMoBtV2
-    //     .once('value')
-    //     .then(snapshot => {
-    //       console.log("THIS!!!!!!! 2")
-    //       console.log({this: snapshot.val()})
-    //       // querySnapshot.forEach(snapshot => {
-    //       //   console.log("THIS!!!!!!! 1111")
-    //       //   console.log({this: Object.values(snapshot.val())})
-    //       // });
-    //     })
-
-      
-
-
-      // '/chatlist/' + receiverData?.id + '/' + userData?.UserID
-
-    console.log({itemPrice, itemImage, sellersName, sellersImage, otherUserId, roomId})
-  }, [])
+ 
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed Notification.js, running getNotification")
+			let {
+        itemPrice,
+        itemImage,
+        sellersName,
+        sellersImage: _sellersImage,
+        roomId,
+        id: otherUserId,
+      } = route.params.receiverData
+  
+      setItemOfDiscussionImage(itemImage)
+      setItemOfDiscussionPrice(itemPrice)
+      setSellersImage(_sellersImage)
+			return () => null;
+		}, [])
+	);
 
   const AutSender = () => {
     let msgData = {
@@ -205,7 +175,10 @@ const Inbox = ({navigation, route}) => {
   }, [receiverData.roomId]);
 
   return (
-    <ScrollView automaticallyAdjustKeyboardInsets={true}>
+    <ScrollView
+      // automaticallyAdjustKeyboardInsets={true}
+      keyboardShouldPersistTaps='handled'
+    >
       <View style={styles.MainContainer}>
         {/* header */}
         <View style={styles.Header}>

@@ -9,6 +9,7 @@ import {
   Linking,
   ScrollView,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import React, {useEffect} from 'react';
 import Colors from '../../utils/Colors';
@@ -38,6 +39,20 @@ const OtherUserProfile = ({navigation, route}) => {
   const [loading, setloading] = React.useState(true);
   const [User, setUser] = React.useState([]);
   // console.warn(User[0].BussinessDetails);
+
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed OtherUserProfile.js, running MyData, allmypost")
+			MyData();
+      allmypost();
+		}, [])
+	);
+
+
+  // useEffect(() => {
+  //   MyData();
+  //   allmypost();
+  // }, []);
 
   const allmypost = async () => {
     let SellingData = [];
@@ -88,21 +103,6 @@ const OtherUserProfile = ({navigation, route}) => {
         console.warn(err);
       });
   };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      MyData();
-      allmypost();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-
-  // useEffect(() => {
-  //   MyData();
-  //   allmypost();
-  // }, []);
 
   return (
     <>

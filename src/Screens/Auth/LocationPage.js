@@ -17,6 +17,7 @@ import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-
 import LoadingScreen from '../../Components/LoadingScreen';
 import {DataInsert} from '../../redux/counterSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const LocationPage = ({navigation}) => {
   const dispatch = useDispatch();
@@ -59,9 +60,13 @@ const LocationPage = ({navigation}) => {
     await dispatch(ServiceAdd(ServiceData));
   };
 
-  useEffect(() => {
-    allmypost();
-  }, []);
+  useFocusEffect(
+		React.useCallback(() => {
+			console.log("Focussed LocationPage.js, running allmypost")
+			allmypost();
+			return () => null;
+		}, [])
+	);
 
   return (
     <>
