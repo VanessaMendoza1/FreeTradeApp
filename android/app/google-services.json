@@ -15,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "836632075133-ubaqd9021ll6pcc48k4o9ha13aq28pcl.apps.googleusercontent.com",
+          "client_id": "836632075133-e3vi3rgefkfh3vb171rp1ngi5m59s9sf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.freetrade",
+            "certificate_hash": "b6b924b6b5ab7c3dd2906a79e6a1b8bec21e7595"
+          }
+        },
+        {
+          "client_id": "836632075133-icfofnqj20u7f3n2c9986eamlfobveg3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -28,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "836632075133-ubaqd9021ll6pcc48k4o9ha13aq28pcl.apps.googleusercontent.com",
+              "client_id": "836632075133-icfofnqj20u7f3n2c9986eamlfobveg3.apps.googleusercontent.com",
               "client_type": 3
             },
             {

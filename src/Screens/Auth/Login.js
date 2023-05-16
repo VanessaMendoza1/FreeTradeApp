@@ -4,8 +4,9 @@ import {
   View,
   ImageBackground,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {cloneElement, useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
 import CheckBox from '@react-native-community/checkbox';
 import Firebase from '../../utils/Firebase';
@@ -21,7 +22,6 @@ import {useSelector, useDispatch} from 'react-redux';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   PostAdd,
@@ -30,6 +30,12 @@ import {
   ServiceAdd,
 } from '../../redux/postSlice';
 import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import appleAuth from '@invertase/react-native-apple-authentication';
+import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 
 const Login = ({navigation}) => {
   const [toggleCheckBox, setToggleCheckBox] = React.useState(false);
@@ -130,7 +136,6 @@ const Login = ({navigation}) => {
         .then(async userCredential => {
           const user = userCredential.user;
 
-          
           if (user.emailVerified) {
             let userData = [];
             await firestore()
@@ -202,8 +207,210 @@ const Login = ({navigation}) => {
         });
     }
   };
+  //  =================== Facebook Authenication ================
+  async function onFacebookButtonPress() {
+    // Attempt login with permissions
+    const result = await LoginManager.logInWithPermissions([
+      'email',
+      'public_profile',
+    ]);
+    if (result.isCancelled) {
+      throw 'User cancelled the login process';
+    }
 
+    // Once signed in, get the users AccesToken
+    const data = await AccessToken.getCurrentAccessToken();
+    if (!data) {
+      throw 'Something went wrong obtaining access token';
+    } else {
+      // initUser(data?.accessToken);
+    }
+
+    // Create a Firebase credential with the AccessToken
+    const facebookCredential = auth.FacebookAuthProvider.credential(
+      data.accessToken,
+    );
+    console.log('facebookCredential', facebookCredential);
+    // Sign-in the user with the credential
+    return auth()
+      .signInWithCredential(facebookCredential)
+      .then(async res => {
+        console.log(res?.user?.uid, 'fbid');
+        await dispatch(DataInsert(res));
+        if (toggleCheckBox) {
+          await AsyncStorage.setItem(
+            '@userData2',
+            JSON.stringify(res?.user?.uid),
+          );
+        }
+
+        try {
+          const value = await AsyncStorage.getItem('@user');
+          if (value !== null) {
+            // allmypost();
+            navigation.navigate('TabNavigation');
+            console.warn(value);
+          } else {
+            navigation.navigate('TabNavigation');
+
+            // navigation.navigate('LocationPage');
+            console.warn(value);
+            setloading(false);
+          }
+        } catch (e) {
+          setloading(false);
+          console.warn(e);
+          // error reading value
+        }
+      })
+      .catch(e => {
+        console.log(e, 'e');
+        alert('Something went wrong');
+      });
+  }
+  // ================== Google Login =========================
+  async function onGoogleButtonPress() {
+    // Get the users ID token
+    try {
+      const {idToken, user} = await GoogleSignin.signIn();
+
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      console.log('googleCredential', googleCredential);
+      // Sign-in the user with the credential
+      return auth()
+        .signInWithCredential(googleCredential)
+        .then(async res => {
+          console.log(res?.user?.uid, 'res?.user?.uid');
+          await dispatch(DataInsert(res));
+          if (toggleCheckBox) {
+            await AsyncStorage.setItem(
+              '@userData2',
+              JSON.stringify(res?.user?.uid),
+            );
+          }
+
+          try {
+            const value = await AsyncStorage.getItem('@user');
+            if (value !== null) {
+              // allmypost();
+              navigation.navigate('TabNavigation');
+              console.warn(value);
+            } else {
+              navigation.navigate('TabNavigation');
+
+              // navigation.navigate('LocationPage');
+              console.warn(value);
+              setloading(false);
+            }
+          } catch (e) {
+            setloading(false);
+            console.warn(e);
+            // error reading value
+          }
+        })
+        .catch(e => {
+          alert('Something went wrong');
+          console.log(e, 'e');
+        });
+      // Singup(user?.name, user?.email, '', '', 'gmail');
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        alert(error);
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        alert(error);
+
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+        alert(error);
+      } else {
+        // some other error happened
+        alert(error);
+      }
+    }
+  }
+  ////apple login
+  const applelogin = async () => {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+    const {identityToken, nonce} = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce,
+    );
+    return auth()
+      .signInWithCredential(appleCredential)
+      .then(async res => {
+        console.log(res, 'res');
+        await dispatch(DataInsert(res));
+        if (toggleCheckBox) {
+          await AsyncStorage.setItem(
+            '@userData2',
+            JSON.stringify(res?.user?.uid),
+          );
+        }
+
+        try {
+          const value = await AsyncStorage.getItem('@user');
+          if (value !== null) {
+            // allmypost();
+            navigation.navigate('TabNavigation');
+            console.warn(value);
+          } else {
+            navigation.navigate('TabNavigation');
+
+            // navigation.navigate('LocationPage');
+            console.warn(value);
+            setloading(false);
+          }
+        } catch (e) {
+          setloading(false);
+          console.warn(e);
+          // error reading value
+        }
+      })
+      .catch(e => {
+        console.log(e, 'e');
+        alert('Something went wrong');
+      });
+
+    // console.log('signed in', appleAuthRequestResponse);
+    // console.log(appleAuthRequestResponse.email);
+    // var user_email = appleAuthRequestResponse.email;
+    // var user_name = appleAuthRequestResponse.fullName.givenName;
+    // // Singup(user_name, user_email, '', '', 'apple');
+    // const credentialState = await appleAuth.getCredentialStateForUser(
+    //   appleAuthRequestResponse.user,
+    // );
+    // // use credentialState response to ensure the user is authenticated
+    // if (credentialState === appleAuth.State.AUTHORIZED) {
+    //   // user is authenticated
+    //   //alert(JSON.stringify(appleAuthRequestResponse));
+    // }
+  };
+  // /////init user
+  // const initUser = token => {
+  //   fetch(
+  //     'https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=' +
+  //       token,
+  //   )
+  //     .then(response => response.json())
+  //     .then(json => {
+  //       // Singup(json?.name, json?.email, '', '', 'fb');
+  //     })
+  //     .catch(() => {
+  //       console.log('ERROR GETTING DATA FROM FACEBOOK');
+  //     });
+  // };
   React.useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '836632075133-e3vi3rgefkfh3vb171rp1ngi5m59s9sf.apps.googleusercontent.com',
+    });
     Allads();
   }, []);
 
@@ -258,25 +465,27 @@ const Login = ({navigation}) => {
             <View style={styles.SocialButtonContainer}>
               <SocialButton
                 onPress={() => {
-                  alert('This is in Production');
+                  onGoogleButtonPress();
                 }}
                 BgColor={'#EA4335'}
                 img={require('../../../assets/google.png')}
               />
               <SocialButton
                 onPress={() => {
-                  alert('This is in Production');
+                  onFacebookButtonPress();
                 }}
                 BgColor={'#3B5998'}
                 img={require('../../../assets/facebook.png')}
               />
-              <SocialButton
-                onPress={() => {
-                  alert('This is in Production');
-                }}
-                BgColor={'#ffff'}
-                img={require('../../../assets/apple.png')}
-              />
+              {Platform.OS === 'ios' && (
+                <SocialButton
+                  onPress={() => {
+                    applelogin();
+                  }}
+                  BgColor={'#ffff'}
+                  img={require('../../../assets/apple.png')}
+                />
+              )}
             </View>
 
             <TouchableOpacity

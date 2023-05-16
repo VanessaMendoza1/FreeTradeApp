@@ -5,7 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  ScrollView
+  ScrollView,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -19,24 +20,28 @@ import Icons from '../../utils/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import {LoginManager} from 'react-native-fbsdk-next';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const Setting = ({navigation}) => {
   const dispatch = useDispatch();
   const [isBusinessAccount, setIsBusinessAccount] = React.useState(false);
   // const [ loading, setloading ] = React.useState(false)
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed Setting.js, running isUserHavingBussinessSubscription")
-			isUserHavingBussinessSubscription();
-			return () => null;
-		}, [])
-	);
+    React.useCallback(() => {
+      console.log(
+        'Focussed Setting.js, running isUserHavingBussinessSubscription',
+      );
+      isUserHavingBussinessSubscription();
+      return () => null;
+    }, []),
+  );
 
   React.useEffect(() => {
-    console.log({isBusinessAccount})
-  }, [isBusinessAccount])
-  
+    console.log({isBusinessAccount});
+  }, [isBusinessAccount]);
+
   const MyData = useSelector(state => state.counter.data);
   console.warn(MyData.name);
 
@@ -45,14 +50,31 @@ const Setting = ({navigation}) => {
 
   const clearAll = async () => {
     try {
-      auth().signOut().then(async function() {
-        console.log('Signed Out');
-        await dispatch(DataInsert({}));
-        await AsyncStorage.clear();
-        navigation.replace('Login');
-      }, function(error) {
-        console.error('Sign Out Error', error);
-      });
+      await LoginManager.logOut()
+        .then(async () => {
+          await AsyncStorage.clear();
+          navigation.replace('Login');
+        })
+        .catch(e => {});
+      await GoogleSignin.signOut()
+        .then(async () => {
+          await AsyncStorage.clear();
+          navigation.replace('Login');
+        })
+        .catch(e => {});
+      auth()
+        .signOut()
+        .then(
+          async function () {
+            console.log('Signed Out');
+            await dispatch(DataInsert({}));
+            await AsyncStorage.clear();
+            navigation.replace('Login');
+          },
+          function (error) {
+            console.error('Sign Out Error', error);
+          },
+        );
     } catch (e) {
       // clear error
     }
@@ -61,7 +83,7 @@ const Setting = ({navigation}) => {
   };
 
   const isUserHavingBussinessSubscription = () => {
-    if (subdata.length > 0 && subdata[0].plan === 'Bussiness'){
+    if (subdata.length > 0 && subdata[0].plan === 'Bussiness') {
       setIsBusinessAccount(true);
     }
     // let currentUserId = auth().currentUser.uid;
@@ -136,7 +158,7 @@ const Setting = ({navigation}) => {
             })}
           </SettingItem> */}
           {isBusinessAccount ? (
-          // {subdata.length > 0 && subdata[0].plan === 'Bussiness' ? (
+            // {subdata.length > 0 && subdata[0].plan === 'Bussiness' ? (
             <SettingItem
               onPress={() => {
                 navigation.navigate('BussinessAccountEdits');
