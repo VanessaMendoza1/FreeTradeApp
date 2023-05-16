@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">FreeTrade</string>
+    <string name="facebook_app_id">1562231380885440</string>
+    <string name="fb_login_protocol_scheme">fb1562231380885440</string>
+    <string name="facebook_client_token">3954f9565f5a697f44f4c88c09fc20ab</string>
 </resources>
