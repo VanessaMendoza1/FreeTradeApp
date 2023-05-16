@@ -32,7 +32,7 @@ import {
 } from '../Profile/OtherUserPostDetails'
 import { areNotificationsHidden } from '../../utils/appConfigurations'
 import { useFocusEffect } from '@react-navigation/native';
-
+import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 
 const PostScreen = ({navigation, route}) => {
@@ -482,6 +482,11 @@ const PostScreen = ({navigation, route}) => {
                 ) : null}
               </>
             ))}
+            {(route.params.data.images.length >! 0 ) && (
+              <>
+                <Text>No image available</Text>
+              </>
+            )}
           </View>
           {/* imges */}
 
@@ -574,9 +579,37 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer5}>
             <TouchableOpacity
               onPress={() => {
+                const currentUserId = auth().currentUser.uid
+                if (route.params.data.UserID == currentUserId){
+                  alert("You are the owner of this item, can't send message !")
+                  return
+                }
+                // TEMPORARILY ADDED
+                // navigation.navigate('StartConversation', {
+                //   data: route.params.data,
+                //   receiverData: {
+                //     // roomId,
+                //     // lastMsg: txt,
+                //     // route.params.data.user.image
+                //     id: route.params.data.UserID,
+                //     name: route.params.data.name,
+                //     img: route.params.data.image,
+                //     emailId: route.params.data.email,
+                //     about: route.params.data.Bio,
+                //     Token: route.params.data.NotificationToken,
+
+                //     itemPrice: route.params.data.Price,
+                //     itemImage: route.params.data.images[0],
+                //     sellersName: route.params.data.user.name,
+                //     sellersImage: route.params.data.user.image,
+                //   },
+                // });
                 console.log({subdata});
                 if (subdata.length > 0) {
+                  
                   // createChatList(route.params.data.user);
+                  // console.log({ID1: route.params.data.UserID, ID2: currentUserId,})
+                  
                   navigation.navigate('StartConversation', {
                     data: route.params.data,
                     receiverData: {
@@ -608,6 +641,14 @@ const PostScreen = ({navigation, route}) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
+                const currentUserId = auth().currentUser.uid
+                console.log({THIS: route.params.data.UserID, currentUserId})
+                if (route.params.data.UserID == currentUserId){
+                  alert("You are the owner of this item, can't send message !")
+                  return
+                }
+                // TEMPORARILY ADDED
+                // NotificationSystem();
                 if (subdata.length > 0) {
                   if (route.params.data.PostType === 'Trading') {
                     NotificationSystem();
@@ -651,23 +692,29 @@ const PostScreen = ({navigation, route}) => {
                           }}
                         />
                       </View>
-                      <View style={styles.overlay}>
-                        <Text style={styles.videoShoesTag}>
-                          {VideoAd[0].title}
-                        </Text>
-                        <Text style={styles.videoShoesTag2}>
-                          {VideoAd[0].TagLine}
-                        </Text>
-
-                        <Text style={styles.MainText2}>
-                          {VideoAd[0].user.Address}
-                        </Text>
-                        {VideoAd[0].user?.Phone !== undefined && (
-                          <Text style={styles.MainText2}>
-                            Call: {VideoAd[0].user.Phone}
+                      <TouchableOpacity onPress={() => {
+                        navigation.navigate("OtherUserProfile", {
+                          data: VideoAd[0].user,
+                        })
+                      }}>
+                        <View style={styles.overlay}>
+                          <Text style={styles.videoShoesTag}>
+                            {VideoAd[0].title}
                           </Text>
-                        )}
-                      </View>
+                          <Text style={styles.videoShoesTag2}>
+                            {VideoAd[0].TagLine}
+                          </Text>
+
+                          <Text style={styles.MainText2}>
+                            {VideoAd[0].user.Address}
+                          </Text>
+                          {VideoAd[0].user?.Phone !== undefined && (
+                            <Text style={styles.MainText2}>
+                              Call: {VideoAd[0].user.Phone}
+                            </Text>
+                          )}
+                        </View>
+                      </TouchableOpacity>
                     </>
                   )}
                 </>
@@ -807,7 +854,7 @@ const styles = StyleSheet.create({
   HeadingTextContainer2: {
     width: '90%',
     // backgroundColor: 'red',
-    height: h('2%'),
+    height: h('2.5%'),
     alignSelf: 'center',
 
     flexDirection: 'row',
@@ -817,7 +864,7 @@ const styles = StyleSheet.create({
   HeadingTextContainer2222: {
     width: '90%',
     // backgroundColor: 'red',
-    height: h('2%'),
+    height: h('2.3%'),
     alignSelf: 'center',
 
     flexDirection: 'row',

@@ -97,74 +97,14 @@ const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callb
   }
 }
 
-const showItemsThroughLocationFilterWithoutSearchText = (activeField, userData, setServiceData, setSellingData, setTradingData, searchText) => {
-  let tradingData = []
-  let sellingData = []
-  let serviceData = []
-  firestore()
-    .collection('Post')
-    .get()
-    .then(async querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        let postData = {...documentSnapshot.data(), id: documentSnapshot.id}
-        // console.log({postData})
-        let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType, Title } = postData
-        // if (user){
-          // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
-          const searchLatitude = userData?.LocationFilter?.latitude;
-          const searchLongitude = userData?.LocationFilter?.longitude;
-          const searchDistanceLimit = userData?.LocationFilter?.LocalDistance
-          const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
 
-          if (Title && Title != ""){
-            Title = Title.toLowerCase()
-          }
-          if (searchText && searchText != ""){
-            searchText = searchText.toLowerCase()
-          }
-
-          if (searchText != ""){
-
-            if (Title && (Title.includes(searchText) || Title == searchText)){
-
-              if (status == false){
-                if (distanceInKm <= searchDistanceLimit){
-                  
-                    if (PostType === 'Trading' && activeField == "Trading") {
-                      tradingData.push(postData);
-                    }
-                    if (PostType === 'Selling' && activeField == "Selling") {
-                      sellingData.push(postData);
-                    }
-                    if (PostType === 'Service' && activeField == "Services") {
-                      serviceData.push(postData);
-                    }
-
-                }
-              }
-            }
-          } else {
-
-            if (status == false){
-              if (distanceInKm <= searchDistanceLimit){
-                  if (PostType === 'Trading' && activeField == "Trading") {
-                    tradingData.push(postData);
-                  }
-                  if (PostType === 'Selling' && activeField == "Selling") {
-                    sellingData.push(postData);
-                  }
-                  if (PostType === 'Service' && activeField == "Services") {
-                    serviceData.push(postData);
-                  }
-              }
-            }
-          }  
-      });
-      setServiceData(serviceData)
-      setSellingData(sellingData)
-      setTradingData(tradingData)
-
-    });
+const markAllMessagesSeen = (callback) => {
+  const currentUserId = auth().currentUser.uid
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .update({hasUnseenMessages: false})
+      .then(() => callback())
 }
 
 const checkIfNewMessagesAvailable = (callback) => {
@@ -216,11 +156,95 @@ const Home = ({navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Focussed Home.js, running checkIfNewMessagesAvailable")
+      console.log("Focussed Home.js, running checkIfNewMessagesAvailable CheckValidSubscription getCategoriesAndSubCategories showItemsThroughLocationFilterWithoutSearchText")
       checkIfNewMessagesAvailable(setIsHavingNewMessages)
-      return () => null;
+      CheckValidSubscription()
+      getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
+      // showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
+      _stopAutoPlay();
+      _startAutoPlay();
+    
+      return () => {
+        // setServiceData([])
+        // setSellingData([])
+        // setTradingData([])
+        _stopAutoPlay();
+      }
     }, [])
   );
+
+  const showItemsThroughLocationFilterWithoutSearchText = (activeField, setServiceData, setSellingData, setTradingData, searchText) => {
+    console.log({UserData})
+    let tradingData = []
+    let sellingData = []
+    let serviceData = []
+    firestore()
+      .collection('Post')
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          let postData = {...documentSnapshot.data(), id: documentSnapshot.id}
+          // console.log({postData})
+          let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType, Title } = postData
+          // if (user){
+            // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
+            const searchLatitude = UserData?.LocationFilter?.latitude;
+            const searchLongitude = UserData?.LocationFilter?.longitude;
+            const searchDistanceLimit = UserData?.LocationFilter?.LocalDistance
+            const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
+  
+            if (Title && Title != ""){
+              Title = Title.toLowerCase()
+            }
+            if (searchText && searchText != ""){
+              searchText = searchText.toLowerCase()
+            }
+  
+            if (searchText != ""){
+  
+              if (Title && (Title.includes(searchText) || Title == searchText)){
+  
+                if (status == false){
+                  if (distanceInKm <= searchDistanceLimit){
+                    
+                      if (PostType === 'Trading' && activeField == "Trading") {
+                        tradingData.push(postData);
+                      }
+                      if (PostType === 'Selling' && activeField == "Selling") {
+                        sellingData.push(postData);
+                      }
+                      if (PostType === 'Service' && activeField == "Services") {
+                        serviceData.push(postData);
+                      }
+  
+                  }
+                }
+              }
+            } else {
+  
+              if (status == false){
+                if (distanceInKm <= searchDistanceLimit){
+                    if (PostType === 'Trading' && activeField == "Trading") {
+                      tradingData.push(postData);
+                    }
+                    if (PostType === 'Selling' && activeField == "Selling") {
+                      sellingData.push(postData);
+                    }
+                    if (PostType === 'Service' && activeField == "Services") {
+                      serviceData.push(postData);
+                    }
+                }
+              }
+            }  
+        });
+        setServiceData(serviceData)
+        setSellingData(sellingData)
+        setTradingData(tradingData)
+  
+      });
+  }
+  
+
 
   const CheckValidSubscription = () => {
     axios
@@ -251,14 +275,11 @@ const Home = ({navigation}) => {
       });
   };
 
-  React.useEffect(() => {
-    CheckValidSubscription();
-  }, []);
 
   React.useEffect(() => {
     console.log({activeField})
-    showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
-  }, [activeField])
+    showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
+  }, [activeField, UserData])
 
   React.useEffect(() => {
     setSelectedSubCategory(null)
@@ -266,17 +287,17 @@ const Home = ({navigation}) => {
   }, [selectedCategory])
 
   
-  React.useEffect(() => {
-    getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
-    showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, searchValue)
-  }, [])
+  // React.useEffect(() => {
+  //   getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
+  //   showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
+  // }, [])
 
-  React.useEffect(() => {
-    _stopAutoPlay();
-    _startAutoPlay();
+  // React.useEffect(() => {
+  //   _stopAutoPlay();
+  //   _startAutoPlay();
 
-    return () => _stopAutoPlay()
-  }, [])
+  //   return () => _stopAutoPlay()
+  // }, [])
   
   const ImageAds = useSelector(state => state.ads.ImageData);
   const subdata = useSelector(state => state.sub.subdata);
@@ -590,7 +611,7 @@ const Home = ({navigation}) => {
           setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
           onSearch={(text) => showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, text)}
           onMessage={() => {
-            setIsHavingNewMessages(false)
+            markAllMessagesSeen(() => setIsHavingNewMessages(false))
             navigation.navigate('MessageScreen');
           }}
           onNotification={() => {

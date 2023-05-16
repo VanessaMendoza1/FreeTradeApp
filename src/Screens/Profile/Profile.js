@@ -247,6 +247,7 @@ const Profile = ({navigation}) => {
           <View style={styles.linebar} />
 
           {subdata.length < 0 && subdata[0].plan === 'Bussiness' && (
+          // {true && (
             <>
               <View style={styles.adminMode}>
                 {/* call button */}
@@ -283,14 +284,33 @@ const Profile = ({navigation}) => {
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
                 {MyData.Website ? (
-                  <View style={styles.MainCCor}>
+                  <View style={{...styles.MainCCor, marginTop: 20}}>
                     <View style={styles.IconCCR}>
                       <Icon name="globe" size={25} color={Colors.Primary} />
                     </View>
                     <View style={styles.IconCCR2}>
-                      <Text style={styles.IIICTxt}>
-                        {MyData.Website ? MyData.Website : 'Add from Setting'}
-                      </Text>
+                      {MyData.Website ? (
+                        <TouchableOpacity
+                          style={styles.adminButton}
+                          onPress={() => {
+                            Linking.canOpenURL("https://" + MyData.Website).then(supported => {
+                              if (supported) {
+                                Linking.openURL("https://" + MyData.Website);
+                              } else {
+                                alert("The url shown can't be opened as its not supported by the browser")
+                              }
+                            });
+                          }}
+                        >
+                          <Text style={styles.numberadmin}>
+                            {MyData.Website}
+                          </Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <Text style={styles.IIICTxt}>
+                          'Add from Setting'
+                        </Text>
+                      )}
                     </View>
                   </View>
                 ) : null}
@@ -302,7 +322,7 @@ const Profile = ({navigation}) => {
                 MyData.bussinessHoursto &&
                 MyData.bussinessdaysFrom &&
                 MyData.bussinessdaysto ? (
-                  <View style={{...styles.MainCCor, height: h('10%')}}>
+                  <View style={{...styles.MainCCor, height: h('12%')}}>
                     <View style={{...styles.IconCCR, paddingBottom: 15}}>
                       <Icon name="calendar" size={25} color={Colors.Primary} />
                     </View>
@@ -656,7 +676,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: h('4%'),
+    marginTop: h('8%'),
     marginBottom: h('2%'),
   },
   Btn: {

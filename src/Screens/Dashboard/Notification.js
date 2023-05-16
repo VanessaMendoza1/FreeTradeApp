@@ -104,7 +104,7 @@ const Notification = ({navigation}) => {
             return (
               <NotificationHead
                 onPress={async () => {
-                  console.log({item});
+                  // console.log({item});
                   if (item.text.endsWith("an item from your favorites just posted. Click to view.")){
                     await firestore()
                       .collection('Post')
@@ -117,15 +117,26 @@ const Notification = ({navigation}) => {
                         }
                       });
                   } else if (item.text.endsWith("would like to trade with you, click to see profile!")){
-                    navigation.navigate('OtherUserProfile', {
-                      data: item.userID,
-                    });
+                    await firestore()
+                      .collection('Users')
+                      .doc(item.userID)
+                      .get()
+                      .then(async documentSnapshot => {
+                        if (documentSnapshot.exists) {
+                          let userData = documentSnapshot.data()
+                          navigation.navigate('OtherUserProfile', {
+                            data: {
+                              UserID: item.userID,
+                              image: userData.image
+                            },
+                          });
+                        }
+                      });
                   } else if (item.text.endsWith("just rated her experience, click to rate yours.")){
                     navigation.navigate('Review', {
-                      data: item.userID,
+                      data: item.sellerData,
                     });
                   }
-                  // trade , links to profile
                 }}
                 data={item}
                 notifications={Notii}
