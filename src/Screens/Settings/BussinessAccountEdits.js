@@ -182,9 +182,11 @@ const BussinessAccountEdits = ({navigation}) => {
   // console.warn(subdata[0].plan === 'Bussiness');
 
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed BussinessAcountEdits.js, running getCurrentBusinessDetails")
-			getCurrentBusinessDetails(
+    React.useCallback(() => {
+      console.log(
+        'Focussed BussinessAcountEdits.js, running getCurrentBusinessDetails',
+      );
+      getCurrentBusinessDetails(
         // setOldPassword,
         setBusiness,
         setAddress,
@@ -195,13 +197,13 @@ const BussinessAccountEdits = ({navigation}) => {
         setValue3,
         setValue4,
         setClosedOnDayModalValue,
-      )
-			return () => null;
-		}, [])
-	);
+      );
+      return () => null;
+    }, []),
+  );
 
   const PostChangeName = async () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     let newarr = [];
     await firestore()
       .collection('Post')
@@ -229,10 +231,10 @@ const BussinessAccountEdits = ({navigation}) => {
   };
 
   const UpdateData = () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     setloading(true);
     if (
-      Business !== '' 
+      Business !== ''
       // && Address !== '' &&
       // Website !== '' &&
       // Phone !== '' &&
@@ -289,7 +291,6 @@ const BussinessAccountEdits = ({navigation}) => {
     }
   };
 
-
   const updatePassword = () => {
     setloading(true);
     if (newCPassword === newPassword) {
@@ -338,7 +339,7 @@ const BussinessAccountEdits = ({navigation}) => {
               <Icon name="arrow-back-outline" size={30} color="#ffff" />
             </TouchableOpacity>
             <View style={styles.MiddleContainer}>
-              <Text style={styles.FontWork}>Setting</Text>
+              <Text style={styles.FontWork}>Settings</Text>
             </View>
           </View>
           {/* header */}
@@ -361,8 +362,6 @@ const BussinessAccountEdits = ({navigation}) => {
                 }}
               />
             </TouchableOpacity> */}
-            
-
 
           <TouchableOpacity
             style={styles.ProfileContainer}
@@ -395,82 +394,79 @@ const BussinessAccountEdits = ({navigation}) => {
           </TouchableOpacity>
           {/* profile Containr */}
 
-          <Text style={styles.NamePlate}>Change Password</Text>
-            <View style={styles.PasswordContainer}>
-              <TextInput
-                style={styles.inputContainercc2}
-                placeholder={'Old Password'}
-                value={oldPassword}
-                placeholderTextColor={Colors.Primary}
-                secureTextEntry={OPassword}
-                onChangeText={e => setOldPassword(e)}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  setOpassword(!OPassword);
-                }}
-                style={styles.iconContainercc2}>
-                {OPassword ? (
-                  <Icon name="eye-off" size={30} color={Colors.Primary} />
-                ) : (
-                  <Icon name="eye" size={30} color={Colors.Primary} />
-                )}
-              </TouchableOpacity>
-            </View>
-            <View style={styles.PasswordContainer}>
-              <TextInput
-                style={styles.inputContainercc2}
-                placeholder={'New Password'}
-                placeholderTextColor={Colors.Primary}
-                secureTextEntry={Password}
-                onChangeText={e => setNewPassword(e)}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  setpassword(!Password);
-                }}
-                style={styles.iconContainercc2}>
-                {Password ? (
-                  <Icon name="eye-off" size={30} color={Colors.Primary} />
-                ) : (
-                  <Icon name="eye" size={30} color={Colors.Primary} />
-                )}
-              </TouchableOpacity>
-            </View>
-            {/* passwordCC */}
-            {/* passwordCC */}
-            <View style={styles.PasswordContainer}>
-              <TextInput
-                style={styles.inputContainercc2}
-                placeholder={'Confirm New Password'}
-                placeholderTextColor={Colors.Primary}
-                secureTextEntry={CPassword}
-                onChangeText={e => setNewCPassword(e)}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  setCpassword(!CPassword);
-                }}
-                style={styles.iconContainercc2}>
-                {CPassword ? (
-                  <Icon name="eye-off" size={30} color={Colors.Primary} />
-                ) : (
-                  <Icon name="eye" size={30} color={Colors.Primary} />
-                )}
-              </TouchableOpacity>
-            </View>
-            <View style={styles.AppBtn1}>
-              <Appbutton
-                onPress={() => {
-                  updatePassword();
-                }}
-                CustomWidth={'83%'}
-                text={'Change Password'}
-              />
-            </View>
-            
-
-
+          {/* <Text style={styles.NamePlate}>Change Password</Text> */}
+          <View style={styles.PasswordContainer}>
+            <TextInput
+              style={styles.inputContainercc2}
+              placeholder={'Old Password'}
+              value={oldPassword}
+              placeholderTextColor={Colors.Primary}
+              secureTextEntry={OPassword}
+              onChangeText={e => setOldPassword(e)}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                setOpassword(!OPassword);
+              }}
+              style={styles.iconContainercc2}>
+              {OPassword ? (
+                <Icon name="eye-off" size={30} color={Colors.Primary} />
+              ) : (
+                <Icon name="eye" size={30} color={Colors.Primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.PasswordContainer}>
+            <TextInput
+              style={styles.inputContainercc2}
+              placeholder={'New Password'}
+              placeholderTextColor={Colors.Primary}
+              secureTextEntry={Password}
+              onChangeText={e => setNewPassword(e)}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                setpassword(!Password);
+              }}
+              style={styles.iconContainercc2}>
+              {Password ? (
+                <Icon name="eye-off" size={30} color={Colors.Primary} />
+              ) : (
+                <Icon name="eye" size={30} color={Colors.Primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+          {/* passwordCC */}
+          {/* passwordCC */}
+          <View style={styles.PasswordContainer}>
+            <TextInput
+              style={styles.inputContainercc2}
+              placeholder={'Confirm New Password'}
+              placeholderTextColor={Colors.Primary}
+              secureTextEntry={CPassword}
+              onChangeText={e => setNewCPassword(e)}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                setCpassword(!CPassword);
+              }}
+              style={styles.iconContainercc2}>
+              {CPassword ? (
+                <Icon name="eye-off" size={30} color={Colors.Primary} />
+              ) : (
+                <Icon name="eye" size={30} color={Colors.Primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.AppBtn1}>
+            <Appbutton
+              onPress={() => {
+                updatePassword();
+              }}
+              CustomWidth={'90%'}
+              text={'Change Password'}
+            />
+          </View>
 
           <View style={styles.bottomContaaainers}>
             <TextInput
@@ -502,13 +498,10 @@ const BussinessAccountEdits = ({navigation}) => {
               value={Phone}
             />
 
-            
-            
-            
-
             <View style={{height: h('2%')}} />
 
             <Appbutton
+              CustomWidth={'100%'}
               text={'Add Hours'}
               onPress={() => {
                 setmodalType('Hours');
@@ -519,6 +512,7 @@ const BussinessAccountEdits = ({navigation}) => {
             <View style={{height: h('2%')}} />
             <Appbutton
               text={'Add Days'}
+              CustomWidth={'100%'}
               onPress={() => {
                 setmodalType('days');
                 setModalVisible(true);
@@ -789,7 +783,7 @@ const styles = StyleSheet.create({
     marginTop: h('2%'),
   },
   PasswordContainer: {
-    alignSelf: "center",
+    alignSelf: 'center',
     width: '90%',
     height: h('7%'),
     borderColor: Colors.Primary,
