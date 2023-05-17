@@ -51,15 +51,15 @@ const PostPromotion = ({navigation, route}) => {
 
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
-  const [businessName, setBusinessName] = React.useState(MyData?.BusinessName)
+  const [businessName, setBusinessName] = React.useState(MyData?.BusinessName);
 
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed PostPromotion.js, running getAdsPrices")
-			getAdsPrices(setItems);
-			return () => null;
-		}, [])
-	);
+    React.useCallback(() => {
+      console.log('Focussed PostPromotion.js, running getAdsPrices');
+      getAdsPrices(setItems);
+      return () => null;
+    }, []),
+  );
 
   const adposted = () => {
     setloading(true);
@@ -117,7 +117,9 @@ const PostPromotion = ({navigation, route}) => {
             startDate: JSON.stringify(now),
             endDate: JSON.stringify(end),
             BussinessName:
-              MyData.AccountType === 'Bussiness' ? MyData.BusinessName : businessName,
+              MyData.AccountType === 'Bussiness'
+                ? MyData.BusinessName
+                : businessName,
           })
           .then(() => {
             Allads();
@@ -128,6 +130,7 @@ const PostPromotion = ({navigation, route}) => {
           .catch(err => {
             setloading(false);
             console.warn(err);
+            console.warn('ERROR');
           });
       } else {
         setloading(false);
@@ -159,9 +162,8 @@ const PostPromotion = ({navigation, route}) => {
   };
 
   return (
-    <ScrollView  style={styles.MainContainer}>
+    <ScrollView style={styles.MainContainer}>
       <>
-
         {loading && <LoadingScreen />}
         <PopupModal
           visible={modalVisble}
@@ -329,9 +331,10 @@ const PostPromotion = ({navigation, route}) => {
                 email={MyData.email}
                 onLoading={() => {
                   setloading(true);
+                  setModalVisible(false);
                 }}
                 onDone={() => {
-                  setModalVisible(!modalVisible);
+                  setModalVisible(false);
                   PostAd();
                 }}
               />
@@ -374,7 +377,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
       )
       .then(res => {
         if (res.data.message === 'Payment successfull.') {
-          // alert('ALL CLEAR');
           onDone();
         }
       })
@@ -382,8 +384,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
         alert('something went wrong');
       });
   };
-
-
 
   return (
     <>
