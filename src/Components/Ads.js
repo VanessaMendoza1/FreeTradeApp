@@ -49,12 +49,12 @@ const styles = StyleSheet.create({
     width: w('36%'),
     height: '100%',
     // backgroundColor: 'white',
-    padding: 5,
+    padding: 2,
     backgroundColor: '#0002',
     // margin: 0.5,
     borderRadius: h('1%'),
-    marginLeft: 5,
-    marginRight: 5,
+    marginLeft: 1,
+    marginRight: 1,
     alignItems: 'center',
 
     // borderColor: '#0008',
@@ -68,11 +68,11 @@ const styles = StyleSheet.create({
   },
   MainText: {
     color: '#000',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     paddingTop: 0,
     paddingBottom: 0,
-    marginBottom: 0
+    marginBottom: 0,
     // paddingLeft: h('0.6%'),
   },
   MainText2: {
