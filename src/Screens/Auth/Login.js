@@ -34,7 +34,7 @@ import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import appleAuth from '@invertase/react-native-apple-authentication';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 
 const Login = ({navigation}) => {
@@ -333,19 +333,38 @@ const Login = ({navigation}) => {
   }
   ////apple login
   const applelogin = async () => {
+    // const appleAuthRequestResponse = await appleAuth.performRequest({
+    //   requestedOperation: appleAuth.Operation.LOGIN,
+    //   requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    // });
+    // const {identityToken, nonce} = appleAuthRequestResponse;
+    // const appleCredential = appleAuth.AppleAuthProvider.credential(
+    //   identityToken,
+    //   nonce,
+    // );
     const appleAuthRequestResponse = await appleAuth.performRequest({
       requestedOperation: appleAuth.Operation.LOGIN,
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
+
+    // Ensure Apple returned a user identityToken
+    if (!appleAuthRequestResponse.identityToken) {
+      throw new Error('Apple Sign-In failed - no identify token returned');
+    }
+
+    // Create a Firebase credential from the response
     const {identityToken, nonce} = appleAuthRequestResponse;
     const appleCredential = auth.AppleAuthProvider.credential(
       identityToken,
       nonce,
     );
+    console.log(appleCredential, 'appleCredential');
+
+    // Sign the user in with the credential
+    // return auth().signInWithCredential(appleCredential);
     return auth()
       .signInWithCredential(appleCredential)
       .then(async res => {
-        console.log(res, 'res');
         await dispatch(DataInsert(res));
         if (toggleCheckBox) {
           await AsyncStorage.setItem(
@@ -409,7 +428,7 @@ const Login = ({navigation}) => {
   React.useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '836632075133-e3vi3rgefkfh3vb171rp1ngi5m59s9sf.apps.googleusercontent.com',
+        '836632075133-icfofnqj20u7f3n2c9986eamlfobveg3.apps.googleusercontent.com',
     });
     Allads();
   }, []);
