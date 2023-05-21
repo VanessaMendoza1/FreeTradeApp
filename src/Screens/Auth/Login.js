@@ -428,7 +428,7 @@ const Login = ({navigation}) => {
   React.useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '836632075133-e3vi3rgefkfh3vb171rp1ngi5m59s9sf.apps.googleusercontent.com',
+        '836632075133-icfofnqj20u7f3n2c9986eamlfobveg3.apps.googleusercontent.com',
     });
     Allads();
   }, []);
