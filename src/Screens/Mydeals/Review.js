@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Appbutton from '../../Components/Appbutton';
 
 const Review = ({navigation, route}) => {
-  console.warn(route.params.data.image);
   const [currentValue, setCurrentValue] = React.useState(0);
   const stars = Array(5).fill(0);
   const [Reliable, setReliable] = React.useState(false);

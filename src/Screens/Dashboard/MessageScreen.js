@@ -16,15 +16,15 @@ import firestore from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
 import uuid from 'react-native-uuid';
 import auth from '@react-native-firebase/auth';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 const removeNewMessagesAvailableDot = () => {
-  const currentUserId = auth().currentUser.uid
-    firestore()
-      .collection('Users')
-      .doc(currentUserId)
-      .update({hasUnseenMessages: null})
-}
+  const currentUserId = auth().currentUser.uid;
+  firestore()
+    .collection('Users')
+    .doc(currentUserId)
+    .update({hasUnseenMessages: null});
+};
 
 const MessageScreen = ({navigation}) => {
   // const [inboxData, setInboxData] = useState(inboxDataSet);
@@ -39,17 +39,16 @@ const MessageScreen = ({navigation}) => {
   const Userdata = useSelector(state => state.counter.data);
 
   React.useEffect(() => {
-    removeNewMessagesAvailableDot()
-  }, [])
+    removeNewMessagesAvailableDot();
+  }, []);
 
   const getAllUser = () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     database()
       .ref('chatlist/' + currentUserId)
       .once('value')
       .then(snapshot => {
-        // console.warn('all User data: ', Object.values(snapshot.val()));
-        console.log({VAL: snapshot.val()})
+        console.log({VAL: snapshot.val()});
         setusers(
           Object.values(snapshot.val()).filter(it => it.id != currentUserId),
         );
@@ -61,12 +60,11 @@ const MessageScreen = ({navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Focussed MessageScreen.js, running getAllUser")
+      console.log('Focussed MessageScreen.js, running getAllUser');
       getAllUser();
       return () => null;
-    }, [])
+    }, []),
   );
-
 
   return (
     <View style={styles.MainContainer}>
@@ -87,13 +85,13 @@ const MessageScreen = ({navigation}) => {
 
       {users &&
         users?.map((item, idx) => {
-          console.log({USERS: users})
+          console.log({USERS: users});
           return (
             <MessageHead
               key={idx}
               onPress={() => {
-                console.log({item})
-                navigation.navigate('Inbox', {receiverData: item})
+                console.log({item});
+                navigation.navigate('Inbox', {receiverData: item});
               }}
               username={item.sellersName}
               img={item.sellersImage}

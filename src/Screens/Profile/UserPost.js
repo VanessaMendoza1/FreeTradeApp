@@ -31,10 +31,9 @@ import {
 import LoadingScreen from '../../Components/LoadingScreen';
 
 import axios from 'axios';
-import { areNotificationsHidden } from '../../utils/appConfigurations'
+import {areNotificationsHidden} from '../../utils/appConfigurations';
 
 const UserPost = ({navigation, route}) => {
-  console.warn(route.params.data.images);
   const [modalVisible, setModalVisible] = useState(false);
   const [imgeUrl2, setimgeUrl2] = React.useState([]);
   const [imgeUrl, setimgeUrl] = React.useState(
@@ -57,7 +56,6 @@ const UserPost = ({navigation, route}) => {
       .ref('chatlist/' + Userdata.UserID)
       .once('value')
       .then(snapshot => {
-        // console.warn('all User data: ', Object.values(snapshot.val()));
         setusers(
           Object.values(snapshot.val()).filter(it => it.id != Userdata.UserID),
         );
@@ -127,12 +125,10 @@ const UserPost = ({navigation, route}) => {
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
           });
       })
       .catch(err => {
         setloading(false);
-        console.warn(err);
       });
   };
   const ItemTraded = item => {
@@ -168,20 +164,15 @@ const UserPost = ({navigation, route}) => {
           })
           .then(async () => {
             updatePost();
-            let isTrade = true
+            let isTrade = true;
             NotificationSystem(item.Token, item.id, isTrade);
-            console.warn('DONE');
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
           });
-
-        console.warn('DONE');
       })
       .catch(err => {
         setloading(false);
-        console.warn(err);
       });
   };
 
@@ -230,13 +221,16 @@ const UserPost = ({navigation, route}) => {
   // };
 
   const NotificationSystem = async (token, id, isTrade = null) => {
-    let dealType = isTrade ? "item Traded with" : "item Sold to"
+    let dealType = isTrade ? 'item Traded with' : 'item Sold to';
     firestore()
       .collection('Notification')
       .doc()
       .set({
         userID: id,
-        text: "Hi " + Userdata.name + ' just rated her experience, click to rate yours.',
+        text:
+          'Hi ' +
+          Userdata.name +
+          ' just rated her experience, click to rate yours.',
         // text: Userdata.name + ' has marked an ' + {dealType} + ' you ! Review it now ',
         sellerData: Userdata,
         seen: false,
@@ -246,7 +240,10 @@ const UserPost = ({navigation, route}) => {
           data: {},
           notification: {
             body: 'Someone sent you a Request',
-            title: "Hi " + Userdata.name + ' just rated her experience, click to rate yours.',
+            title:
+              'Hi ' +
+              Userdata.name +
+              ' just rated her experience, click to rate yours.',
             // title: Userdata.name + 'has marked an ' + {dealType} + ' you ! Review it now ',
           },
           to: token,
@@ -264,14 +261,12 @@ const UserPost = ({navigation, route}) => {
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
             console.log(JSON.stringify(response.data));
-            areNotificationsHidden(callBackIfNotificationsNotHidden, id)
+            areNotificationsHidden(callBackIfNotificationsNotHidden, id);
             navigation.navigate('Review');
           })
-          .catch(function (error) {
-            console.warn(error);
-          });
+          .catch(function (error) {});
       })
-      .catch(err => console.warn(err));
+      .catch(err => {});
   };
 
   const allImage = () => {
@@ -329,9 +324,8 @@ const UserPost = ({navigation, route}) => {
               <SliderBox
                 images={imgeUrl2}
                 onCurrentImagePressed={index => {
-                  let imageData = imgeUrl2[index]
+                  let imageData = imgeUrl2[index];
                   navigation.navigate('ImageScreen', {data: imageData});
-                  console.warn(`image ${index} pressed`)
                 }}
               />
 
@@ -372,9 +366,7 @@ const UserPost = ({navigation, route}) => {
                     {item !== '' ? (
                       <TouchableOpacity
                         onPress={() => {
-                          // console.warn(index);
                           navigation.navigate('ImageScreen', {data: item});
-                          // setimgeUrl(item);
                         }}
                         style={styles.miniImg}>
                         <Image

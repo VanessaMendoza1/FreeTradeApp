@@ -8,37 +8,37 @@ import {
   FlatList,
   ScrollView,
   ImageBackground,
-  Keyboard
+  Keyboard,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MessageHead from '../../Components/MessageHead';
-import { getCurrentTimeStamp } from '../../utils/time'
+import {getCurrentTimeStamp} from '../../utils/time';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector} from 'react-redux';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import MsgComponent from '../../Components/MsgComponent';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
 
-const indicateOtherUserAsHavingUnreadMessages = (otherUserId) => {
+const indicateOtherUserAsHavingUnreadMessages = otherUserId => {
   firestore()
     .collection('Users')
     .doc(otherUserId)
-    .update({hasUnseenMessages: true})
-}
+    .update({hasUnseenMessages: true});
+};
 
 const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
-  console.log({msg, receiverData})
-  const currentUserId = auth().currentUser.uid
+  console.log({msg, receiverData});
+  const currentUserId = auth().currentUser.uid;
   try {
     if (msg == '' || msgvalid(msg) == 0) {
       alert('Enter something....');
-  
+
       return false;
     }
     setdisabled(true);
@@ -50,42 +50,53 @@ const sendMsg = (msg, setMsg, setdisabled, userData, receiverData) => {
       sendTime: getCurrentTimeStamp(),
       msgType: 'text',
     };
-  
+
     const newReference = database()
       .ref('/messages/' + receiverData.roomId)
       .push();
     msgData.id = newReference.key;
-    newReference.set(msgData).then(() => {
-      console.log({NEW_MESSAGE_SENT_DATA: msgData})
-      indicateOtherUserAsHavingUnreadMessages(receiverData.id)
-      console.log("MESSAGE SENT")
-      console.log({msgData})
-      let chatListupdate = {
-        lastMsg: msg,
-        sendTime: msgData.sendTime,
-      };
-      database()
-        .ref('/chatlist/' + receiverData?.id + '/' + currentUserId)
-        .update(chatListupdate)
-        .then(() => console.log({CHAT_NODE_UPDATED_1: '/chatlist/' + receiverData?.id + '/' + currentUserId}));
-  
-      database()
-        .ref('/chatlist/' + currentUserId + '/' + receiverData?.id)
-        .update(chatListupdate)
-        .then(() => console.log({CHAT_NODE_UPDATED_2: '/chatlist/' + currentUserId + '/' + receiverData?.id}));
-  
-      setMsg('');
-      setdisabled(false);
-    })
-    .catch((err) => {
-      console.log("ERROR CAUGHT WHILE SENDING MESSAGE")
-      console.log(err)
-    })
-  } catch (_err){
-    console.log({_err})
+    newReference
+      .set(msgData)
+      .then(() => {
+        console.log({NEW_MESSAGE_SENT_DATA: msgData});
+        indicateOtherUserAsHavingUnreadMessages(receiverData.id);
+        console.log('MESSAGE SENT');
+        console.log({msgData});
+        let chatListupdate = {
+          lastMsg: msg,
+          sendTime: msgData.sendTime,
+        };
+        database()
+          .ref('/chatlist/' + receiverData?.id + '/' + currentUserId)
+          .update(chatListupdate)
+          .then(() =>
+            console.log({
+              CHAT_NODE_UPDATED_1:
+                '/chatlist/' + receiverData?.id + '/' + currentUserId,
+            }),
+          );
+
+        database()
+          .ref('/chatlist/' + currentUserId + '/' + receiverData?.id)
+          .update(chatListupdate)
+          .then(() =>
+            console.log({
+              CHAT_NODE_UPDATED_2:
+                '/chatlist/' + currentUserId + '/' + receiverData?.id,
+            }),
+          );
+
+        setMsg('');
+        setdisabled(false);
+      })
+      .catch(err => {
+        console.log('ERROR CAUGHT WHILE SENDING MESSAGE');
+        console.log(err);
+      });
+  } catch (_err) {
+    console.log({_err});
   }
 };
-
 
 const Inbox = ({navigation, route}) => {
   const userData = useSelector(state => state.counter.data);
@@ -97,25 +108,25 @@ const Inbox = ({navigation, route}) => {
       // AutSender(); dont know why this was added
     }
   }, []);
- 
+
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed Notification.js, running getNotification")
-			let {
+    React.useCallback(() => {
+      console.log('Focussed Notification.js, running getNotification');
+      let {
         itemPrice,
         itemImage,
         sellersName,
         sellersImage: _sellersImage,
         roomId,
         id: otherUserId,
-      } = route.params.receiverData
-  
-      setItemOfDiscussionImage(itemImage)
-      setItemOfDiscussionPrice(itemPrice)
-      setSellersImage(_sellersImage)
-			return () => null;
-		}, [])
-	);
+      } = route.params.receiverData;
+
+      setItemOfDiscussionImage(itemImage);
+      setItemOfDiscussionPrice(itemPrice);
+      setSellersImage(_sellersImage);
+      return () => null;
+    }, []),
+  );
 
   const AutSender = () => {
     let msgData = {
@@ -159,8 +170,8 @@ const Inbox = ({navigation, route}) => {
   const [itemOfDiscussionPrice, setItemOfDiscussionPrice] = React.useState(0);
 
   React.useEffect(() => {
-    console.log({allChat})
-  }, [allChat])
+    console.log({allChat});
+  }, [allChat]);
 
   React.useEffect(() => {
     const onChildAdd = database()
@@ -179,8 +190,7 @@ const Inbox = ({navigation, route}) => {
   return (
     <ScrollView
       // automaticallyAdjustKeyboardInsets={true}
-      keyboardShouldPersistTaps='handled'
-    >
+      keyboardShouldPersistTaps="handled">
       <View style={styles.MainContainer}>
         {/* header */}
         <View style={styles.Header}>
@@ -204,29 +214,39 @@ const Inbox = ({navigation, route}) => {
                 />
               </View>
             </View>
-            
+
             <View style={styles.ProfileContainer2}>
               <Text style={styles.FontWork}>{receiverData.sellersName}</Text>
             </View>
-          
           </View>
-          
-          <View style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
-          }}>
+
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
             <ImageBackground
-              style={{width: h('8%'), height: h('8%'), resizeMode: 'cover', borderRadius: 10, marginBottom: 2}}
-              source={{uri: itemOfDiscussionImage ? itemOfDiscussionImage : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80'}}
-            >
-              <Text style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                color:  "white",
-                textAlign: "center",
-                marginTop:  h('5.5%')
+              style={{
+                width: h('8%'),
+                height: h('8%'),
+                resizeMode: 'cover',
+                borderRadius: 10,
+                marginBottom: 2,
+              }}
+              source={{
+                uri: itemOfDiscussionImage
+                  ? itemOfDiscussionImage
+                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
               }}>
+              <Text
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  color: 'white',
+                  textAlign: 'center',
+                  marginTop: h('5.5%'),
+                }}>
                 ${itemOfDiscussionPrice}
               </Text>
               {/* <Text style={{textAlign: "center", color: "white"}}>
@@ -237,7 +257,6 @@ const Inbox = ({navigation, route}) => {
         {/* header */}
 
         <View style={{flex: 1}}>
-          
           <FlatList
             style={{flex: 1}}
             data={allChat}
@@ -245,7 +264,6 @@ const Inbox = ({navigation, route}) => {
             keyExtractor={(item, index) => index}
             inverted
             renderItem={({item}) => {
-              console.warn(userData.userid);
               return (
                 <>
                   <MsgComponent
@@ -292,10 +310,12 @@ const Inbox = ({navigation, route}) => {
             onChangeText={val => setMsg(val)}
             // onChangeText={val => setMsg(val)}
           />
-          <TouchableOpacity style={styles.BtnCCW} onPress={() => {
-            Keyboard.dismiss();
-            sendMsg(msg, setMsg, setdisabled, userData, receiverData)
-          }}>
+          <TouchableOpacity
+            style={styles.BtnCCW}
+            onPress={() => {
+              Keyboard.dismiss();
+              sendMsg(msg, setMsg, setdisabled, userData, receiverData);
+            }}>
             <Icon name="chatbubbles" size={25} color={'#fff'} />
             <Text style={{color: '#fff', fontSize: 18}}>Send</Text>
           </TouchableOpacity>
@@ -307,7 +327,7 @@ const Inbox = ({navigation, route}) => {
 
 export default Inbox;
 
-export { sendMsg }
+export {sendMsg};
 
 const styles = StyleSheet.create({
   MainContainer: {

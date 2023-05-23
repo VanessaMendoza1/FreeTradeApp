@@ -44,11 +44,9 @@ const openPhoto = (setloading, setShowUploadBox, setImgeUrl, updateDetails) => {
           var progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           if (progress == 100) {
-            // console.warn('DONE');
           }
         },
         error => {
-          console.log(error);
           setloading(false);
           alert('Something went wrong');
         },
@@ -65,13 +63,17 @@ const openPhoto = (setloading, setShowUploadBox, setImgeUrl, updateDetails) => {
     })
     .catch(err => {
       setShowUploadBox(false);
-      console.warn(err);
       setloading(false);
       alert('Something went wrong');
     });
 };
 
-const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => {
+const openCamera = (
+  setShowUploadBox,
+  setloading,
+  setImgeUrl,
+  updateDetails,
+) => {
   // setloading(true);
   ImagePicker.openCamera({
     width: 300,
@@ -79,7 +81,10 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
     cropping: true,
   })
     .then(image => {
-      console.log({IMAGE: image.path, PATH: `/items/${Date.now()}` + image.path});
+      console.log({
+        IMAGE: image.path,
+        PATH: `/items/${Date.now()}` + image.path,
+      });
       setShowUploadBox(false);
       // end
       const uploadTask = storage()
@@ -92,7 +97,6 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
           var progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           if (progress == 100) {
-            // console.warn('DONE');
           }
         },
         error => {
@@ -103,7 +107,7 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
         () => {
           uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
             // setloading(false);
-            console.log({downloadURL})
+            console.log({downloadURL});
             setImgeUrl(downloadURL);
             updateDetails(downloadURL, setloading);
           });
@@ -114,17 +118,16 @@ const openCamera = (setShowUploadBox, setloading, setImgeUrl, updateDetails) => 
     })
     .catch(err => {
       setShowUploadBox(false);
-      console.warn(err);
       setloading(false);
       alert('Something went wrong');
     });
 };
 
 const updateDetails = (downloadURL, setloading) => {
-  console.log({NEW_IMAGE: downloadURL})
-  const currentUserId = auth().currentUser.uid
-  
-  if (downloadURL){
+  console.log({NEW_IMAGE: downloadURL});
+  const currentUserId = auth().currentUser.uid;
+
+  if (downloadURL) {
     setloading(true);
     firestore()
       .collection('Users')
@@ -140,15 +143,14 @@ const updateDetails = (downloadURL, setloading) => {
           .get()
           .then(documentSnapshot => {
             if (documentSnapshot.exists) {
-              console.log({NEW_IMAGE: documentSnapshot.data().image})
+              console.log({NEW_IMAGE: documentSnapshot.data().image});
               userData.push();
             }
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
           });
-  
+
         await dispatch(DataInsert(userData[0]));
         alert('Profile Picture Updated');
         setloading(false);
@@ -162,10 +164,8 @@ const updateDetails = (downloadURL, setloading) => {
 };
 
 const EditAccount = ({navigation}) => {
-  const MyData = useSelector(state => state.counter.data);
-  // console.warn(MyData.email);
+  const MyData = useSelector(state => state.counter?.data);
   const dispatch = useDispatch();
-  
 
   const [OPassword, setOpassword] = React.useState(true);
   const [Password, setpassword] = React.useState(true);
@@ -175,58 +175,51 @@ const EditAccount = ({navigation}) => {
   const [newPassword, setNewPassword] = React.useState('');
   const [newCPassword, setNewCPassword] = React.useState('');
 
-  const [Name, setName] = React.useState(MyData.name);
+  const [Name, setName] = React.useState(MyData?.name);
   const [loading, setloading] = React.useState(false);
 
   const [showUploadBox, setShowUploadBox] = React.useState(false);
 
   const [ImageUrl, setImgeUrl] = React.useState('');
- 
 
   const PostChangeName = async () => {
-    let  newarr = []
+    let newarr = [];
     await firestore()
       .collection('Post')
       .get()
-  .then(querySnapshot => {
-   
-      querySnapshot.forEach(documentSnapshot => {
-     
-        // console.log("sdsjdskdjsdk", documentSnapshot.data().UserID)
-         
-        if (documentSnapshot.data().UserID === MyData.UserID){
-         
-          newarr.push(documentSnapshot.data().DocId)
-        }
-      });
-  });
-  if (newarr){
-    newarr.map( async(item, index)=>{
-      await firestore()
-      .collection('Post')
-      .doc(`${item}`)
-      .update({
-        'user.name': Name ? Name : MyData.name,
-      })
-      .then(() => {
-        console.log('User updated!');
-      });
-    })
-  }
-  };
- 
+      .then(querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          // console.log("sdsjdskdjsdk", documentSnapshot.data().UserID)
 
-  useEffect(() => {
-  
-  }, []);
+          if (documentSnapshot.data()?.UserID === MyData?.UserID) {
+            newarr.push(documentSnapshot.data().DocId);
+          }
+        });
+      });
+    if (newarr) {
+      newarr.map(async (item, index) => {
+        await firestore()
+          .collection('Post')
+          .doc(`${item}`)
+          .update({
+            'user.name': Name ? Name : MyData?.name,
+          })
+          .then(() => {
+            console.log('User updated!');
+          });
+      });
+    }
+  };
+
+  useEffect(() => {}, []);
 
   const updateName = () => {
     setloading(true);
     firestore()
       .collection('Users')
-      .doc(MyData.UserID)
+      .doc(MyData?.UserID)
       .update({
-        name: Name ? Name : MyData.name,
+        name: Name ? Name : MyData?.name,
         AccountType: 'Free',
         Post: 0,
       })
@@ -234,7 +227,7 @@ const EditAccount = ({navigation}) => {
         let userData = [];
         await firestore()
           .collection('Users')
-          .doc(MyData.UserID)
+          .doc(MyData?.UserID)
           .get()
           .then(documentSnapshot => {
             if (documentSnapshot.exists) {
@@ -243,12 +236,11 @@ const EditAccount = ({navigation}) => {
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
           });
 
         await dispatch(DataInsert(userData[0]));
         alert('Name has been Changed');
-        PostChangeName()
+        PostChangeName();
         setloading(false);
       })
       .catch(err => {
@@ -261,7 +253,7 @@ const EditAccount = ({navigation}) => {
     setloading(true);
     if (newCPassword === newPassword) {
       auth()
-        .signInWithEmailAndPassword(MyData.email, oldPassword)
+        .signInWithEmailAndPassword(MyData?.email, oldPassword)
         .then(async userCredential => {
           const user = userCredential.user;
           user.updatePassword(newPassword);
@@ -288,7 +280,7 @@ const EditAccount = ({navigation}) => {
       setloading(false);
     }
   };
-  console.log({IMAGE:MyData.image})
+  console.log({IMAGE: MyData?.image});
   return (
     <KeyboardAvoidingScrollView>
       {loading ? (
@@ -322,8 +314,8 @@ const EditAccount = ({navigation}) => {
               <Image
                 style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                 source={{
-                  uri: MyData.image
-                    ? MyData.image
+                  uri: MyData?.image
+                    ? MyData?.image
                     : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                 }}
               />
@@ -436,13 +428,22 @@ const EditAccount = ({navigation}) => {
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={() => openCamera(setShowUploadBox, setloading, setImgeUrl, updateDetails)}>
+            onPress={() =>
+              openCamera(
+                setShowUploadBox,
+                setloading,
+                setImgeUrl,
+                updateDetails,
+              )
+            }>
             <Text>From Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.captureOptionItem}
             activeOpacity={0.9}
-            onPress={() => openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)}>
+            onPress={() =>
+              openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)
+            }>
             <Text>From Gallery</Text>
           </TouchableOpacity>
         </View>
@@ -451,7 +452,7 @@ const EditAccount = ({navigation}) => {
   );
 };
 
-export { openPhoto, openCamera, updateDetails }
+export {openPhoto, openCamera, updateDetails};
 export default EditAccount;
 
 const styles = StyleSheet.create({

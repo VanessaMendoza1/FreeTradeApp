@@ -16,7 +16,6 @@ import SettingItem from '../../Components/SettingItem';
 import Icons from '../../utils/icons';
 
 const OtpScreen = ({navigation, route}) => {
-  console.warn(route.params.data);
   const [value, setValue] = React.useState('');
   const [input1, setInput1] = React.useState('');
   const [input2, setInput2] = React.useState('');
@@ -45,11 +44,9 @@ const OtpScreen = ({navigation, route}) => {
   }, []);
 
   async function confirmCode(v) {
-    console.warn(v);
     try {
       await route.params.data.confirm.confirm(v);
     } catch (error) {
-      console.warn(error);
       // alert('Invalid code.');
     }
   }
@@ -173,7 +170,6 @@ const OtpScreen = ({navigation, route}) => {
             setInput6(in6);
             setCode(input1 + input2 + input3 + input4 + input5 + input6);
             const v = input1 + input2 + input3 + input4 + input5 + input6;
-            console.warn(v);
             Keyboard.dismiss();
             confirmCode(v);
           }}

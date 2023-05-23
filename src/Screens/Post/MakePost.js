@@ -34,10 +34,8 @@ const MakePost = ({navigation}) => {
   const [Price, setPrice] = React.useState(0);
   const [loading, setloading] = React.useState(false);
   const [VideoUrl, setVideoUrl] = React.useState('');
-  const MyData = useSelector(state => state.counter.data);
-  // console.warn(MyData.Post);
-  const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(MyData.Post < 3 || subdata[0].plan === 'Business');
+  const MyData = useSelector(state => state?.counter?.data);
+  const subdata = useSelector(state => state?.sub?.subdata);
 
   // images
 
@@ -96,7 +94,6 @@ const MakePost = ({navigation}) => {
             var progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             if (progress == 100) {
-              // console.warn('DONE');
             }
           },
           error => {
@@ -140,7 +137,6 @@ const MakePost = ({navigation}) => {
       })
       .catch(err => {
         setShowUploadBox(false);
-        console.warn(err);
         setloading(false);
         alert('Something went wrong');
       });
@@ -167,7 +163,6 @@ const MakePost = ({navigation}) => {
             var progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             if (progress == 100) {
-              // console.warn('DONE');
             }
           },
           error => {
@@ -211,7 +206,6 @@ const MakePost = ({navigation}) => {
       })
       .catch(err => {
         setShowUploadBox(false);
-        console.warn(err);
         setloading(false);
         alert('Something went wrong');
       });
@@ -224,8 +218,6 @@ const MakePost = ({navigation}) => {
         mediaType: 'video',
       },
       response => {
-        // console.warn(response);
-        // alert(response);
         response.assets?.map(i => {
           console.log('response', i.uri);
           let d = i?.uri;
@@ -240,7 +232,6 @@ const MakePost = ({navigation}) => {
                 (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
               console.log('Progress', progress);
               if (progress == 100) {
-                // console.warn('DONE');
               }
             },
             error => {
@@ -667,16 +658,10 @@ const MakePost = ({navigation}) => {
               </TouchableOpacity>
 
               <View style={styles.Btncc}>
-                {MyData.Post < 3 || subdata.length > 0 ? (
+                {MyData?.Post < 3 || subdata?.length > 0 ? (
                   <Appbutton
                     onPress={() => {
                       if (Title === '') {
-                        // toggleCheckBox
-                        //   ? console.warn('Service')
-                        //   : toggleCheckBox4
-                        //   ? console.warn('Trading')
-                        //   : console.warn('Selling');
-
                         alert('Title is required');
                       } else {
                         const images = [

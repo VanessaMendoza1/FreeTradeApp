@@ -21,7 +21,6 @@ const VerifyNumber = ({navigation}) => {
   const [confirm, setConfirm] = useState(null);
 
   async function Otp() {
-    console.warn(phone);
     try {
       const confirmation = await auth().signInWithPhoneNumber(phone);
       await setConfirm(confirmation);

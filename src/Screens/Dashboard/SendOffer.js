@@ -13,24 +13,21 @@ import firestore from '@react-native-firebase/firestore';
 
 import Appbutton from '../../Components/Appbutton';
 import {useSelector, useDispatch} from 'react-redux';
-import { areNotificationsHidden } from '../../utils/appConfigurations'
+import {areNotificationsHidden} from '../../utils/appConfigurations';
 import database from '@react-native-firebase/database';
 import axios from 'axios';
 import uuid from 'react-native-uuid';
-import { sendMsg } from './Inbox';
+import {sendMsg} from './Inbox';
 
 const SendOffer = ({navigation, route}) => {
-  
   const [offer, setoffer] = React.useState('');
   const [Notii, setNotii] = React.useState(
     route.params.data.user.NotificationToken,
   );
-  const [loading, setloading]= React.useState(false);
+  const [loading, setloading] = React.useState(false);
   const UserData = useSelector(state => state.counter.data);
-  // console.warn(UserData.name);
-
   const NotificationSystem = async (id, name, token) => {
-    console.log({PARAMS: route.params})
+    console.log({PARAMS: route.params});
     firestore()
       .collection('Notification')
       .doc()
@@ -40,7 +37,6 @@ const SendOffer = ({navigation, route}) => {
         text: UserData.name + ' sent you $' + offer + ' offer',
       })
       .then(async () => {
-        
         var data = JSON.stringify({
           data: {},
           notification: {
@@ -54,28 +50,29 @@ const SendOffer = ({navigation, route}) => {
           method: 'post',
           url: 'https://fcm.googleapis.com/fcm/send',
           headers: {
-            "Authorization":
-              "key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls",
-            "Content-Type": "application/json",
+            Authorization:
+              'key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls',
+            'Content-Type': 'application/json',
           },
           data: data,
         };
-        
+
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
-            areNotificationsHidden((dummyArg) => callBackIfNotificationsNotHidden, route.params.data.user.UserID)
+            areNotificationsHidden(
+              dummyArg => callBackIfNotificationsNotHidden,
+              route.params.data.user.UserID,
+            );
             navigation.goBack();
             alert('Offer Sent');
           })
-          .catch(function (error) {
-            console.warn(error);
-          });
+          .catch(function (error) {});
       })
-      .catch(err => console.warn(err));
+      .catch(err => {});
   };
 
-  const data = route.params.data
-  
+  const data = route.params.data;
+
   return (
     <View style={styles.MainContainer}>
       {/* header */}
@@ -123,7 +120,6 @@ const SendOffer = ({navigation, route}) => {
           onPress={() => {
             // NotificationSystem();
 
-
             // navigation.navigate('StartConversation', {
             //   data: route.params.data,
             //   receiverData: {
@@ -136,7 +132,7 @@ const SendOffer = ({navigation, route}) => {
             //     emailId: route.params.data.email,
             //     about: route.params.data.Bio,
             //     Token: route.params.data.NotificationToken,
-                
+
             //     itemPrice: route.params.data.Price,
             //     itemImage: route.params.data.images[0],
             //     sellersName: route.params.data.user.name,
@@ -144,18 +140,17 @@ const SendOffer = ({navigation, route}) => {
             //   }
             // });
 
-
             database()
               .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
               .once('value')
               .then(async snapshot => {
-                let roomId
+                let roomId;
                 if (snapshot.val() == null) {
                   roomId = uuid.v4();
                 } else {
-                  roomId = snapshot.val().roomId
+                  roomId = snapshot.val().roomId;
                 }
-                console.log({roomId})
+                console.log({roomId});
                 let SendData = {
                   roomId,
                   id: data.UserID,
@@ -165,18 +160,22 @@ const SendOffer = ({navigation, route}) => {
                   about: data.Bio,
                   lastMsg: offer,
                   Token: data.NotificationToken,
-                  
+
                   itemPrice: data.Price,
                   itemImage: data.images[0],
                   sellersName: data.user.name,
                   sellersImage: data.user.image,
                 };
-                sendMsg(offer, setoffer, setloading, UserData, SendData)
+                sendMsg(offer, setoffer, setloading, UserData, SendData);
                 database()
                   .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
                   .once('value')
                   .then(async snapshot => {
-                    if ((snapshot.val() == null) || (snapshot.val().itemPrice == null && snapshot.val().itemImage == null)) {
+                    if (
+                      snapshot.val() == null ||
+                      (snapshot.val().itemPrice == null &&
+                        snapshot.val().itemImage == null)
+                    ) {
                       let myData = {
                         roomId,
                         id: UserData.UserID,
@@ -186,7 +185,7 @@ const SendOffer = ({navigation, route}) => {
                         about: UserData.Bio,
                         lastMsg: offer,
                         Token: UserData.NotificationToken,
-                        
+
                         itemPrice: data.Price,
                         itemImage: data.images[0],
                         sellersName: data.user.name,
@@ -196,22 +195,22 @@ const SendOffer = ({navigation, route}) => {
                         .ref('/chatlist/' + data.UserID + '/' + UserData.UserID)
                         .update(myData)
                         .then(() => console.log('Data updated.'));
-            
+
                       data.lastMsg = offer;
                       data.roomId = roomId;
-            
+
                       database()
                         .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
                         .update(SendData)
                         .then(() => {
-                          console.log('Data updated.')
-                          alert("Offer Sent")
+                          console.log('Data updated.');
+                          alert('Offer Sent');
                           navigation.goBack();
                         });
                       // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
                       setloading(false);
                     } else {
-                      alert("Offer Sent")
+                      alert('Offer Sent');
                       navigation.goBack();
                       // navigation.navigate('Inbox', {
                       //   txt: txt,
@@ -226,11 +225,10 @@ const SendOffer = ({navigation, route}) => {
                       setloading(false);
                     }
                   });
-              })
-
-        }}
-        text={'Make offer'}
-      />
+              });
+          }}
+          text={'Make offer'}
+        />
       </View>
     </View>
   );

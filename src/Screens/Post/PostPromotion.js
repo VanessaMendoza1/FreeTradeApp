@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Modal,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -32,17 +32,12 @@ import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import LoadingScreen from '../../Components/LoadingScreen';
 import {getAdsPrices} from '../Dashboard/Postad';
 import axios from 'axios';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 const PostPromotion = ({navigation, route}) => {
-  console.warn(route.params.data.title);
   const dispatch = useDispatch();
-  const [items, setItems] = React.useState([
-    // {label: '$1 (1 ad for 15 days)', value: 100},
-    // {label: '$5 (1 ad for 30 days)', value: 500},
-    // {label: '$8 (2 ad for 30 days)', value: 800},
-  ]);
+  const [items, setItems] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
@@ -77,12 +72,10 @@ const PostPromotion = ({navigation, route}) => {
         })
         .then(() => {
           setmodalVisble(true);
-          console.warn('Ad Posted');
           setloading(false);
         })
         .catch(err => {
           setloading(false);
-          console.warn(err);
         });
     } else {
       alert('You need to Agree to Terms and Condition');
@@ -91,7 +84,6 @@ const PostPromotion = ({navigation, route}) => {
 
   const PostAd = async () => {
     let currentUserId = auth().currentUser.uid;
-    // console.warn('HEHHE');
     const now = moment.utc();
     var end = moment().add(value === 100 ? 15 : 30, 'days');
     var days = now.diff(end, 'days');
@@ -124,13 +116,10 @@ const PostPromotion = ({navigation, route}) => {
           .then(() => {
             Allads();
             setmodalVisble(true);
-            console.warn('Ad Posted');
             setloading(false);
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
-            console.warn('ERROR');
           });
       } else {
         setloading(false);
@@ -358,12 +347,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
   const [cardData, setCardData] = React.useState('');
 
   const _createToken = async Token => {
-    console.warn(cardData.number);
-    console.warn(email);
-    console.warn(amount);
-    console.warn(cardData.expiry);
-    console.warn(cardData.cvc);
-
     // setloading(false);
     axios
       .get(
@@ -390,7 +373,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
       <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
         <LiteCreditCardInput
           onChange={({values}) => {
-            // console.warn(values);
             setCardData(values);
           }}
         />
@@ -487,7 +469,7 @@ const styles = StyleSheet.create({
     fontSize: h('2%'),
     paddingLeft: h('1.5%'),
     marginTop: h('1%'),
-    marginBottom: 20
+    marginBottom: 20,
   },
   RemeberMebOx2: {
     width: '100%',

@@ -5,7 +5,9 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Dimensions,
+  Alert,
 } from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -28,100 +30,105 @@ import Icons from '../../utils/icons';
 import Collapsible from 'react-native-collapsible';
 import {FlatListSlider} from 'react-native-flatlist-slider';
 import auth from '@react-native-firebase/auth';
-import { useFocusEffect } from '@react-navigation/native';
-
+import {useFocusEffect} from '@react-navigation/native';
 
 import {getPreciseDistance} from 'geolib';
 
 import moment from 'moment';
 import axios from 'axios';
+import Carousel from 'react-native-reanimated-carousel';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
-
-const getCategoriesAndSubCategories = (callback) => {
-  let categoryAlongSubCategories = {}
+const getCategoriesAndSubCategories = callback => {
+  let categoryAlongSubCategories = {};
   firestore()
     .collection('Category')
     .get()
     .then(async querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        let categoryData = documentSnapshot.data()
-        let { title, subCategory } = categoryData
-        let subCategories = []
-        if (subCategory != null && subCategory != undefined && Array.isArray(subCategory)){
-          subCategory.map((categoryData) => {
-            let { title: subCategoryTitle } = categoryData
-            subCategories.push(subCategoryTitle)
-          })
+        let categoryData = documentSnapshot.data();
+        let {title, subCategory} = categoryData;
+        let subCategories = [];
+        if (
+          subCategory != null &&
+          subCategory != undefined &&
+          Array.isArray(subCategory)
+        ) {
+          subCategory.map(categoryData => {
+            let {title: subCategoryTitle} = categoryData;
+            subCategories.push(subCategoryTitle);
+          });
         }
-        categoryAlongSubCategories[ title ] = subCategories
+        categoryAlongSubCategories[title] = subCategories;
       });
-      console.log({categoryAlongSubCategories})
+      // console.log({categoryAlongSubCategories});
 
-      callback(categoryAlongSubCategories)
-
+      callback(categoryAlongSubCategories);
     });
-}
-const getItemsFromCategoryAndSubCategory = (categoryName, subCategoryName, callback) => {
+};
+const getItemsFromCategoryAndSubCategory = (
+  categoryName,
+  subCategoryName,
+  callback,
+) => {
   let collectionReferece = firestore()
     .collection('Post')
     .where('Category', '==', categoryName)
-    .where('SubCategory', '==', subCategoryName)
-  
+    .where('SubCategory', '==', subCategoryName);
+
   let collectionRefereceWithoutSubCategory = firestore()
     .collection('Post')
-    .where('Category', '==', categoryName)
+    .where('Category', '==', categoryName);
 
-  let callbackAfterGettingData = (querySnapshot) => {
-    if (querySnapshot.empty){
-      console.log('NO ITEMS FOUND');
-      return
+  let callbackAfterGettingData = querySnapshot => {
+    if (querySnapshot.empty) {
+      // console.log('NO ITEMS FOUND');
+      return;
     }
-    let filteredItemsThroughCategoryAndSubCategory = []
-    querySnapshot.forEach((doc) => {     
-      filteredItemsThroughCategoryAndSubCategory.push({...doc.data(), id: doc.id})
-    })
+    let filteredItemsThroughCategoryAndSubCategory = [];
+    querySnapshot.forEach(doc => {
+      filteredItemsThroughCategoryAndSubCategory.push({
+        ...doc.data(),
+        id: doc.id,
+      });
+    });
 
-    console.log({filteredItemsThroughCategoryAndSubCategory})
+    // console.log({filteredItemsThroughCategoryAndSubCategory});
 
-    callback(filteredItemsThroughCategoryAndSubCategory)
-  }
+    callback(filteredItemsThroughCategoryAndSubCategory);
+  };
 
   if (subCategoryName == null) {
-    collectionRefereceWithoutSubCategory
-      .get()
-      .then(callbackAfterGettingData)
+    collectionRefereceWithoutSubCategory.get().then(callbackAfterGettingData);
   } else {
-    collectionReferece
-      .get()
-      .then(callbackAfterGettingData)
+    collectionReferece.get().then(callbackAfterGettingData);
   }
-}
+};
 
+const markAllMessagesSeen = callback => {
+  const currentUserId = auth().currentUser.uid;
+  firestore()
+    .collection('Users')
+    .doc(currentUserId)
+    .update({hasUnseenMessages: false})
+    .then(() => callback());
+};
 
-const markAllMessagesSeen = (callback) => {
-  const currentUserId = auth().currentUser.uid
-    firestore()
-      .collection('Users')
-      .doc(currentUserId)
-      .update({hasUnseenMessages: false})
-      .then(() => callback())
-}
-
-const checkIfNewMessagesAvailable = (callback) => {
-  const currentUserId = auth().currentUser.uid
-    firestore()
-      .collection('Users')
-      .doc(currentUserId)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          let userData = documentSnapshot.data()
-          if (userData.hasUnseenMessages && userData.hasUnseenMessages == true){
-            callback(true)
-          }
+const checkIfNewMessagesAvailable = callback => {
+  const currentUserId = auth().currentUser.uid;
+  firestore()
+    .collection('Users')
+    .doc(currentUserId)
+    .get()
+    .then(documentSnapshot => {
+      if (documentSnapshot.exists) {
+        let userData = documentSnapshot.data();
+        if (userData.hasUnseenMessages && userData.hasUnseenMessages == true) {
+          callback(true);
         }
-      })
-}
+      }
+    });
+};
 
 const Home = ({navigation}) => {
   const [longitude, setLongitude] = React.useState(0);
@@ -138,136 +145,152 @@ const Home = ({navigation}) => {
   const SellingAllData = useSelector(state => state.post.SellingData);
   const TradingAllData = useSelector(state => state.post.TradingData);
   const [Notii, setNotii] = React.useState('');
-  console.log({SellingAllData})
+  // console.log({SellingAllData});
   const [searchValue, setSearchValue] = React.useState('');
   const [ServiceData, setServiceData] = React.useState(ServiceAllData);
   const [SellingData, setSellingData] = React.useState(SellingAllData);
   const [TradingData, setTradingData] = React.useState(TradingAllData);
-  const [ categoriesWithSubCategoryData, setCategoriesWithSubCategoryData ] = React.useState({})
-  const [ showCategoryAndSubCategory, setShowCategoryAndSubCategory ] = React.useState(false)
-  const [ showItemsFromCategoryAndSubCategory , setShowItemsFromCategoryAndSubCategory ] = React.useState(false)
-  const [ selectedCategory, setSelectedCategory ] = React.useState(null)
-  const [ selectedSubCategory, setSelectedSubCategory ] = React.useState(null)
-  const [ itemsFromCategoryAndSubCategoryFilteration, setItemsFromCategoryAndSubCategoryFilteration ] = React.useState([])
-  
+  const [categoriesWithSubCategoryData, setCategoriesWithSubCategoryData] =
+    React.useState({});
+  const [showCategoryAndSubCategory, setShowCategoryAndSubCategory] =
+    React.useState(false);
+  const [
+    showItemsFromCategoryAndSubCategory,
+    setShowItemsFromCategoryAndSubCategory,
+  ] = React.useState(false);
+  const [selectedCategory, setSelectedCategory] = React.useState(null);
+  const [selectedSubCategory, setSelectedSubCategory] = React.useState(null);
+  const [
+    itemsFromCategoryAndSubCategoryFilteration,
+    setItemsFromCategoryAndSubCategoryFilteration,
+  ] = React.useState([]);
+
   const _timerId = useRef(null);
 
-  const [ isHavingNewMessages, setIsHavingNewMessages ] = React.useState(false)
+  const [isHavingNewMessages, setIsHavingNewMessages] = React.useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Focussed Home.js, running checkIfNewMessagesAvailable CheckValidSubscription getCategoriesAndSubCategories showItemsThroughLocationFilterWithoutSearchText")
-      checkIfNewMessagesAvailable(setIsHavingNewMessages)
-      CheckValidSubscription()
-      getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
+      // console.log(
+      //   'Focussed Home.js, running checkIfNewMessagesAvailable CheckValidSubscription getCategoriesAndSubCategories showItemsThroughLocationFilterWithoutSearchText',
+      // );
+      checkIfNewMessagesAvailable(setIsHavingNewMessages);
+      CheckValidSubscription();
+      getCategoriesAndSubCategories(setCategoriesWithSubCategoryData);
       // showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
       _stopAutoPlay();
       _startAutoPlay();
-    
+
       return () => {
         // setServiceData([])
         // setSellingData([])
         // setTradingData([])
         _stopAutoPlay();
-      }
-    }, [])
+      };
+    }, []),
   );
 
-  const showItemsThroughLocationFilterWithoutSearchText = (activeField, setServiceData, setSellingData, setTradingData, searchText) => {
-    console.log({UserData})
-    let tradingData = []
-    let sellingData = []
-    let serviceData = []
+  const showItemsThroughLocationFilterWithoutSearchText = (
+    activeField,
+    setServiceData,
+    setSellingData,
+    setTradingData,
+    searchText,
+  ) => {
+    // console.log({UserData});
+    let tradingData = [];
+    let sellingData = [];
+    let serviceData = [];
     firestore()
       .collection('Post')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          let postData = {...documentSnapshot.data(), id: documentSnapshot.id}
+          let postData = {...documentSnapshot.data(), id: documentSnapshot.id};
           // console.log({postData})
-          let { latitude: sellerLatitude, longitude: sellerLongitude, status, user, PostType, Title } = postData
+          let {
+            latitude: sellerLatitude,
+            longitude: sellerLongitude,
+            status,
+            user,
+            PostType,
+            Title,
+          } = postData;
           // if (user){
-            // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
-            const searchLatitude = UserData?.LocationFilter?.latitude;
-            const searchLongitude = UserData?.LocationFilter?.longitude;
-            const searchDistanceLimit = UserData?.LocationFilter?.LocalDistance
-            const distanceInKm = Distance(searchLatitude, searchLongitude, sellerLatitude, sellerLongitude);
-  
-            if (Title && Title != ""){
-              Title = Title.toLowerCase()
-            }
-            if (searchText && searchText != ""){
-              searchText = searchText.toLowerCase()
-            }
-  
-            if (searchText != ""){
-  
-              if (Title && (Title.includes(searchText) || Title == searchText)){
-  
-                if (status == false){
-                  if (distanceInKm <= searchDistanceLimit){
-                    
-                      if (PostType === 'Trading' && activeField == "Trading") {
-                        tradingData.push(postData);
-                      }
-                      if (PostType === 'Selling' && activeField == "Selling") {
-                        sellingData.push(postData);
-                      }
-                      if (PostType === 'Service' && activeField == "Services") {
-                        serviceData.push(postData);
-                      }
-  
+          // let { latitude: sellerLatitude, longitude: sellerLongitude } = user
+          const searchLatitude = UserData?.LocationFilter?.latitude;
+          const searchLongitude = UserData?.LocationFilter?.longitude;
+          const searchDistanceLimit = UserData?.LocationFilter?.LocalDistance;
+          const distanceInKm = Distance(
+            searchLatitude,
+            searchLongitude,
+            sellerLatitude,
+            sellerLongitude,
+          );
+
+          if (Title && Title != '') {
+            Title = Title.toLowerCase();
+          }
+          if (searchText && searchText != '') {
+            searchText = searchText.toLowerCase();
+          }
+
+          if (searchText != '') {
+            if (Title && (Title.includes(searchText) || Title == searchText)) {
+              if (status == false) {
+                if (distanceInKm <= searchDistanceLimit) {
+                  if (PostType === 'Trading' && activeField == 'Trading') {
+                    tradingData.push(postData);
+                  }
+                  if (PostType === 'Selling' && activeField == 'Selling') {
+                    sellingData.push(postData);
+                  }
+                  if (PostType === 'Service' && activeField == 'Services') {
+                    serviceData.push(postData);
                   }
                 }
               }
-            } else {
-  
-              if (status == false){
-                if (distanceInKm <= searchDistanceLimit){
-                    if (PostType === 'Trading' && activeField == "Trading") {
-                      tradingData.push(postData);
-                    }
-                    if (PostType === 'Selling' && activeField == "Selling") {
-                      sellingData.push(postData);
-                    }
-                    if (PostType === 'Service' && activeField == "Services") {
-                      serviceData.push(postData);
-                    }
+            }
+          } else {
+            if (status == false) {
+              if (distanceInKm <= searchDistanceLimit) {
+                if (PostType === 'Trading' && activeField == 'Trading') {
+                  tradingData.push(postData);
+                }
+                if (PostType === 'Selling' && activeField == 'Selling') {
+                  sellingData.push(postData);
+                }
+                if (PostType === 'Service' && activeField == 'Services') {
+                  serviceData.push(postData);
                 }
               }
-            }  
+            }
+          }
         });
-        setServiceData(serviceData)
-        setSellingData(sellingData)
-        setTradingData(tradingData)
-  
+        setServiceData(serviceData);
+        setSellingData(sellingData);
+        setTradingData(tradingData);
       });
-  }
-  
-
+  };
 
   const CheckValidSubscription = () => {
     axios
       .get(
-        `https://umeraftabdev.com/FreeTradeApi/public/api/valid_subscription?email=${UserData.email}`,
+        `https://umeraftabdev.com/FreeTradeApi/public/api/valid_subscription?email=${UserData?.email}`,
       )
-      .then(res => {
-        console.warn(res.data.hasActiveSubscription);
-      })
+      .then(res => {})
       .catch(err => {
         uploadSubscription();
       });
   };
 
   let uploadSubscription = () => {
-    // console.warn(days >= 0);
-
     firestore()
       .collection('sub')
       .doc(UserData.UserID)
       .delete()
       .then(async () => {
-        console.log('Document successfully deleted!');
+        // console.log('Document successfully deleted!');
         await dispatch(SubDataAdd([]));
       })
       .catch(error => {
@@ -275,18 +298,22 @@ const Home = ({navigation}) => {
       });
   };
 
+  React.useEffect(() => {
+    // console.log({activeField});
+    showItemsThroughLocationFilterWithoutSearchText(
+      activeField,
+      setServiceData,
+      setSellingData,
+      setTradingData,
+      searchValue,
+    );
+  }, [activeField, UserData]);
 
   React.useEffect(() => {
-    console.log({activeField})
-    showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
-  }, [activeField, UserData])
+    setSelectedSubCategory(null);
+    setItemsFromCategoryAndSubCategoryFilteration([]);
+  }, [selectedCategory]);
 
-  React.useEffect(() => {
-    setSelectedSubCategory(null)
-    setItemsFromCategoryAndSubCategoryFilteration([])
-  }, [selectedCategory])
-
-  
   // React.useEffect(() => {
   //   getCategoriesAndSubCategories(setCategoriesWithSubCategoryData)
   //   showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
@@ -298,40 +325,34 @@ const Home = ({navigation}) => {
 
   //   return () => _stopAutoPlay()
   // }, [])
-  
+
   const ImageAds = useSelector(state => state.ads.ImageData);
   const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(subdata[0].plan === 'Business');
-  // console.warn(subdata.length > 0);
 
   const NotificationData = async () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     let NotificationData = [];
     await firestore()
       .collection('Notification')
-      .get()       
+      .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          // console.warn(data.UserID);
           if (documentSnapshot.data().userID == currentUserId) {
             if (documentSnapshot.data().seen == false) {
               NotificationData.push({
-                ...documentSnapshot.data(), 
-                id: documentSnapshot.id
+                ...documentSnapshot.data(),
+                id: documentSnapshot.id,
               });
             }
           }
         });
         setNotii(NotificationData);
-        console.warn(NotificationData);
       })
-      .catch(err => {
-        console.warn(err);
-      });
+      .catch(err => {});
   };
 
   const MySubscriptionPackage = async () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     let data = [];
     await firestore()
       .collection('sub')
@@ -358,7 +379,7 @@ const Home = ({navigation}) => {
   };
 
   const DeletePost = () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     firestore()
       .collection('sub')
       .doc(currentUserId)
@@ -442,8 +463,6 @@ const Home = ({navigation}) => {
 
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
-
-    // console.warn(ImageData);
   };
 
   const allpost = async () => {
@@ -458,15 +477,26 @@ const Home = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data()){
+          if (documentSnapshot.data()) {
             const lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
             const lon2 = documentSnapshot.data().user.longitude;
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-  
+
             if (documentSnapshot.data().status === false) {
-              console.log("DISTANCE FOUND IS " + distanceInKm + " WHEREAS USER HAS SET DISTANCE TO " + UserData?.LocationFilter?.LocalDistance)
-              if (Math.ceil(distanceInKm) <= UserData?.LocationFilter?.LocalDistance) {
-                let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
+              // console.log(
+              //   'DISTANCE FOUND IS ' +
+              //     distanceInKm +
+              //     ' WHEREAS USER HAS SET DISTANCE TO ' +
+              //     UserData?.LocationFilter?.LocalDistance,
+              // );
+              if (
+                Math.ceil(distanceInKm) <=
+                UserData?.LocationFilter?.LocalDistance
+              ) {
+                let newDataObject = {
+                  ...documentSnapshot.data(),
+                  id: documentSnapshot._data.DocId,
+                };
                 if (documentSnapshot.data().PostType === 'Trading') {
                   TradingData.push(newDataObject);
                 }
@@ -481,9 +511,9 @@ const Home = ({navigation}) => {
           }
         });
       })
-      .catch((err) =>  {
-        console.log(err)
-      })
+      .catch(err => {
+        console.log(err);
+      });
 
     await dispatch(SellingAdd(SellingData));
     await dispatch(TradingAdd(TradingData));
@@ -494,7 +524,7 @@ const Home = ({navigation}) => {
 
   useEffect(() => {
     allpost();
-    NotificationData()
+    NotificationData();
   }, []);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
@@ -508,36 +538,32 @@ const Home = ({navigation}) => {
     }
   }, [focus]);
 
-  console.log({SellingAllData1: SellingAllData})
+  // console.log({SellingAllData1: SellingAllData});
 
   const searchFilter = text => {
     if (activeField === 'Services') {
-      console.warn('This ran');
-      console.log({TEXT: text})
-      console.log({SEARCHtEXT: searchText})
       const newData = ServiceData.filter(item => {
-        let itemTitle = item.Title.toLowerCase()
-        let searchText = text.toLowerCase()
-        if (itemTitle.includes(searchText) || itemTitle == searchText){
-          console.log({MATCHED: itemTitle})
-          return item
+        let itemTitle = item.Title.toLowerCase();
+        let searchText = text.toLowerCase();
+        if (itemTitle.includes(searchText) || itemTitle == searchText) {
+          // console.log({MATCHED: itemTitle});
+          return item;
         }
       });
-      console.log({ NewData: newData})
+      // console.log({NewData: newData});
       if (text.trim().length === 0) {
         setServiceData(ServiceAllData);
       } else {
-        console.log("NEW SEARCH DATA SET SUCCESSFULLY")
+        // console.log('NEW SEARCH DATA SET SUCCESSFULLY');
         setServiceData(newData);
       }
       setSearchValue(text);
     }
     if (activeField === 'Selling') {
-      console.warn('This ran 2');
       const newData = SellingData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });
-      
+
       if (text.trim().length === 0) {
         setSellingData(SellingAllData);
       } else {
@@ -546,7 +572,6 @@ const Home = ({navigation}) => {
       setSearchValue(text);
     }
     if (activeField === 'Trading') {
-      console.warn('This ran 3');
       const newData = TradingData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });
@@ -562,11 +587,11 @@ const Home = ({navigation}) => {
   // moving slider content starts here
   let CurrentSlide = 0;
   let IntervalTime = 2000;
-  
-  const _goToNextPage = () => {
-    if ( CurrentSlide >= ImageAds.length-1 ) CurrentSlide = 0;
 
-    if (animatedFlatlist.current != null){
+  const _goToNextPage = () => {
+    if (CurrentSlide >= ImageAds.length - 1) CurrentSlide = 0;
+
+    if (animatedFlatlist.current != null) {
       animatedFlatlist.current.scrollToIndex({
         index: ++CurrentSlide,
         animated: true,
@@ -575,7 +600,7 @@ const Home = ({navigation}) => {
   };
 
   const _startAutoPlay = () => {
-    _timerId.current = setInterval(_goToNextPage, IntervalTime)
+    _timerId.current = setInterval(_goToNextPage, IntervalTime);
     // this._timerId = setInterval(this._goToNextPage, IntervalTime);
   };
 
@@ -588,14 +613,58 @@ const Home = ({navigation}) => {
 
   const _renderItem = ({item, index}) => {
     return <Image source={{uri: item}} style={styles.sliderItems} />;
-  }
-
+  };
+  const renderSlider = () => {
+    const width = Dimensions.get('window').width;
+    return (
+      <GestureHandlerRootView>
+        <View style={{flex: 1}}>
+          <Carousel
+            loop
+            width={width}
+            height={'39%'}
+            autoPlay={true}
+            windowSize={100}
+            data={ImageAds}
+            scrollAnimationDuration={1500}
+            // panGestureHandlerProps={{
+            //   activeOffsetX: [-10, 10],
+            // }}
+            onSnapToItem={index => console.log('current index:', index)}
+            renderItem={({item, index}) => {
+              return (
+                <Ads
+                  onPress={() => {
+                    // await alert('It will take to User Screen');
+                    navigation.navigate('OtherUserProfile', {
+                      data: item.user,
+                    });
+                  }}
+                  data={item}
+                />
+                // <View
+                //   style={{
+                //     borderWidth: 1,
+                //     justifyContent: 'center',
+                //     backgroundColor: 'red',
+                //   }}>
+                //   <Text style={{textAlign: 'center', fontSize: 30, color: 'black'}}>
+                //     {index}
+                //   </Text>
+                // </View>
+              );
+            }}
+          />
+        </View>
+      </GestureHandlerRootView>
+    );
+  };
   const _keyExtractor = (item, index) => {
     // console.log(item);
     return index.toString();
-  }
+  };
   // moving slider content starts here
-  console.log({NOTI: Notii.length})
+  // console.log({NOTI: Notii.length});
 
   return (
     <>
@@ -605,13 +674,24 @@ const Home = ({navigation}) => {
         <Appheader
           isHavingNewMessages={isHavingNewMessages}
           setSearchValue={setSearchValue}
-          setShowItemsFromCategoryAndSubCategory={setShowItemsFromCategoryAndSubCategory}
+          setShowItemsFromCategoryAndSubCategory={
+            setShowItemsFromCategoryAndSubCategory
+          }
           showCategoryAndSubCategory={showCategoryAndSubCategory}
           setShowCategoryAndSubCategory={setShowCategoryAndSubCategory}
           setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
-          onSearch={(text) => showItemsThroughLocationFilterWithoutSearchText(activeField, UserData, setServiceData, setSellingData, setTradingData, text)}
+          onSearch={text =>
+            showItemsThroughLocationFilterWithoutSearchText(
+              activeField,
+              UserData,
+              setServiceData,
+              setSellingData,
+              setTradingData,
+              text,
+            )
+          }
           onMessage={() => {
-            markAllMessagesSeen(() => setIsHavingNewMessages(false))
+            markAllMessagesSeen(() => setIsHavingNewMessages(false));
             navigation.navigate('MessageScreen');
           }}
           onNotification={() => {
@@ -620,24 +700,26 @@ const Home = ({navigation}) => {
           noti={Notii.length >= 1}
         />
         {(() => {
-          if (showItemsFromCategoryAndSubCategory){
+          if (showItemsFromCategoryAndSubCategory) {
             return (
               <ScrollView>
                 <>
-                  <TouchableOpacity onPress={() => {
-                    setShowItemsFromCategoryAndSubCategory(false)
-                    setShowCategoryAndSubCategory(true)
-                    setItemsFromCategoryAndSubCategoryFilteration([])
-                    setSelectedCategory(null)
-                    setSelectedSubCategory(null)
-                  }}>
-                    <Text style={{
-                      textAlign: "center", 
-                      fontWeight: "bold",
-                      paddingVertical: 10,
-                      backgroundColor: "#eee",
-                      marginBottom: 10
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowItemsFromCategoryAndSubCategory(false);
+                      setShowCategoryAndSubCategory(true);
+                      setItemsFromCategoryAndSubCategoryFilteration([]);
+                      setSelectedCategory(null);
+                      setSelectedSubCategory(null);
                     }}>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        paddingVertical: 10,
+                        backgroundColor: '#eee',
+                        marginBottom: 10,
+                      }}>
                       Select Category And Sub-category Again
                     </Text>
                   </TouchableOpacity>
@@ -669,7 +751,9 @@ const Home = ({navigation}) => {
                               <ServiceItem
                                 item={item}
                                 onPress={() => {
-                                  navigation.navigate('PostScreen', {data: item});
+                                  navigation.navigate('PostScreen', {
+                                    data: item,
+                                  });
                                 }}
                               />
                             </View>
@@ -686,148 +770,123 @@ const Home = ({navigation}) => {
                   )}
                 </>
               </ScrollView>
-            )
-          } else if (showCategoryAndSubCategory){
+            );
+          } else if (showCategoryAndSubCategory) {
             return (
               <ScrollView>
                 <>
-                  <TouchableOpacity onPress={() => {
-                    setShowItemsFromCategoryAndSubCategory(false)
-                    setShowCategoryAndSubCategory(false)
-                    // setSelectedCategory(null)
-                    setSelectedSubCategory(null)
-                    setItemsFromCategoryAndSubCategoryFilteration([])
-                  }}>
-                    <Text style={{
-                      textAlign: "center", 
-                      fontWeight: "bold",
-                      paddingVertical: 10,
-                      backgroundColor: "#eee",
-                      marginBottom: 10
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowItemsFromCategoryAndSubCategory(false);
+                      setShowCategoryAndSubCategory(false);
+                      // setSelectedCategory(null)
+                      setSelectedSubCategory(null);
+                      setItemsFromCategoryAndSubCategoryFilteration([]);
                     }}>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                        paddingVertical: 10,
+                        backgroundColor: '#eee',
+                        marginBottom: 10,
+                      }}>
                       X All Categories
                     </Text>
                   </TouchableOpacity>
                   <Collapsible collapsed={!showCategoryAndSubCategory}>
-                    
-                    {Object.keys(categoriesWithSubCategoryData).map((categoryName) => {
-                      return (
-                        <TouchableOpacity onPress={() => {
-                          if (selectedCategory == categoryName){
-                            setSelectedCategory(null)
-                          } else {
-                            setSelectedCategory(categoryName)
-                          }
-                        }}>
-                          <Text style={{
-                            fontWeight: "bold",
-                            fontSize: 18,
-                            marginVertical: 12,
-                            paddingLeft: w("10%")
-                          }}>
-                            {categoryName}
-                          </Text>
-                          {(selectedCategory == categoryName) && (
-                            <>
-                              {categoriesWithSubCategoryData[categoryName].map((subCategoryName, index) => {
-                                return (
-                                  <TouchableOpacity onPress={() => {
-                                    setSelectedSubCategory(subCategoryName)
-                                    setSelectedCategory(categoryName)
-                                    setShowCategoryAndSubCategory(false)
-                                    setShowItemsFromCategoryAndSubCategory(true)
-                                    getItemsFromCategoryAndSubCategory(categoryName, subCategoryName, setItemsFromCategoryAndSubCategoryFilteration)
+                    {Object.keys(categoriesWithSubCategoryData).map(
+                      categoryName => {
+                        return (
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (selectedCategory == categoryName) {
+                                setSelectedCategory(null);
+                              } else {
+                                setSelectedCategory(categoryName);
+                              }
+                            }}>
+                            <Text
+                              style={{
+                                fontWeight: 'bold',
+                                fontSize: 18,
+                                marginVertical: 12,
+                                paddingLeft: w('10%'),
+                              }}>
+                              {categoryName}
+                            </Text>
+                            {selectedCategory == categoryName && (
+                              <>
+                                {categoriesWithSubCategoryData[
+                                  categoryName
+                                ].map((subCategoryName, index) => {
+                                  return (
+                                    <TouchableOpacity
+                                      onPress={() => {
+                                        setSelectedSubCategory(subCategoryName);
+                                        setSelectedCategory(categoryName);
+                                        setShowCategoryAndSubCategory(false);
+                                        setShowItemsFromCategoryAndSubCategory(
+                                          true,
+                                        );
+                                        getItemsFromCategoryAndSubCategory(
+                                          categoryName,
+                                          subCategoryName,
+                                          setItemsFromCategoryAndSubCategoryFilteration,
+                                        );
+                                      }}>
+                                      <Text
+                                        style={{
+                                          // fontWeight: "bold",
+                                          fontSize: 18,
+                                          marginVertical: 12,
+                                          paddingLeft: w('15%'),
+                                        }}>
+                                        {subCategoryName}
+                                      </Text>
+                                    </TouchableOpacity>
+                                  );
+                                })}
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    setSelectedSubCategory(null);
+                                    setSelectedCategory(categoryName);
+                                    setShowCategoryAndSubCategory(false);
+                                    setShowItemsFromCategoryAndSubCategory(
+                                      true,
+                                    );
+                                    getItemsFromCategoryAndSubCategory(
+                                      categoryName,
+                                      null,
+                                      setItemsFromCategoryAndSubCategoryFilteration,
+                                    );
                                   }}>
-                                    <Text style={{
+                                  <Text
+                                    style={{
                                       // fontWeight: "bold",
                                       fontSize: 18,
                                       marginVertical: 12,
-                                      paddingLeft: w("15%")
+                                      paddingLeft: w('15%'),
                                     }}>
-                                      {subCategoryName}
-                                    </Text>
-                                  </TouchableOpacity>
-                                )
-                              })}
-                              <TouchableOpacity onPress={() => {
-                                setSelectedSubCategory(null)
-                                setSelectedCategory(categoryName)
-                                setShowCategoryAndSubCategory(false)
-                                setShowItemsFromCategoryAndSubCategory(true)
-                                getItemsFromCategoryAndSubCategory(categoryName, null, setItemsFromCategoryAndSubCategoryFilteration)
-                              }}>
-                                <Text style={{
-                                  // fontWeight: "bold",
-                                  fontSize: 18,
-                                  marginVertical: 12,
-                                  paddingLeft: w("15%")
-                                }}>
-                                  Select all in {categoryName}
-                                </Text>
-                              </TouchableOpacity>
-                            </>
-                          )
-                        }
-                        </TouchableOpacity>
-                      )
-                    })}
+                                    Select all in {categoryName}
+                                  </Text>
+                                </TouchableOpacity>
+                              </>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      },
+                    )}
                   </Collapsible>
                 </>
               </ScrollView>
-            )
+            );
           } else {
             return (
               <>
-                <View style={styles.HeaderBar}>
-                {/* <FlatList
-                  style={{
-                    flex: 1,
-                    // TODO Remove extera global padding
-                    // marginLeft: -size.padding,
-                    // marginRight: -size.padding,
-                  }}
-                  data={this.state.link}
-                  keyExtractor={this._keyExtractor.bind(this)}
-                  renderItem={this._renderItem.bind(this)}
-                  horizontal={true}
-                  flatListRef={React.createRef()}
-                  ref={this.flatList}
-                /> */}
-                <FlatList
-                  showsHorizontalScrollIndicator={false}
-                  // onViewableItemsChanged={onViewableItemsChangedHandler}
-                  viewabilityConfig={{
-                    itemVisiblePercentThreshold: 50,
-                  }}
-                  ref={animatedFlatlist}
-                  onScrollToIndexFailed={info => {
-                    const wait = new Promise(resolve => setTimeout(resolve, 500));
-                    wait.then(() => {
-                      animatedFlatlist.current?.scrollToIndex({ index: info.index, animated: true });
-                    });
-                  }}
-                  initialScrollIndex={0}  
-                  flatListRef={React.createRef()}
-                  pagingEnabled
-                  data={ImageAds}
-                  horizontal
-                  keyExtractor={_keyExtractor}
-                  // keyExtractor={(item, index) => String(index)}
-                  renderItem={({item, index}) => (
-                    <Ads
-                      onPress={() => {
-                        // await alert('It will take to User Screen');
-                        navigation.navigate('OtherUserProfile', {
-                          data: item.user,
-                        });
-                      }}
-                      data={item}
-                    />
-                  )}
-                />
-              </View>
-              
-              {/* {ImageAds.length > 0 ? (
+                <View style={styles.HeaderBar}>{renderSlider()}</View>
+
+                {/* {ImageAds.length > 0 ? (
                 <>
                   {subdata.length > 0 && (
                     <>
@@ -862,7 +921,7 @@ const Home = ({navigation}) => {
                   )}
                 </>
               ) : null} */}
-              {/* 
+                {/* 
             {ImageAds.length > 0 ? (
               <View style={styles.HeaderBar}>
                 <FlatList
@@ -880,227 +939,231 @@ const Home = ({navigation}) => {
               </View>
             ) : null} */}
 
-              {/* location meter */}
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('LocationScreen');
-                }}
-                style={styles.LocationMeter}>
-                <View style={styles.ImgContainer2}>
-                  {Icons.LocationIcon({
-                    tintColor: 'red',
-                  })}
-                  {/* <Image
+                {/* location meter */}
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('LocationScreen');
+                  }}
+                  style={styles.LocationMeter}>
+                  <View style={styles.ImgContainer2}>
+                    {Icons.LocationIcon({
+                      tintColor: 'red',
+                    })}
+                    {/* <Image
                     style={{width: '70%', height: '70%', resizeMode: 'contain'}}
                     source={require('../../../assets/carimg.png')}
                   /> */}
+                  </View>
+                  <Text style={styles.LondonUkText}>
+                    {UserData?.LocationFilter?.location === '' ||
+                    !UserData?.LocationFilter?.location
+                      ? 'Set Search Location'
+                      : UserData?.LocationFilter?.location}
+                  </Text>
+                </TouchableOpacity>
+                {/* location meter */}
+                {/* button Containers */}
+                <View style={styles.BtnContainer}>
+                  {activeField === 'Services' ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveField('Services');
+                      }}
+                      style={styles.Btn}>
+                      <Text style={styles.Txt1}>Services</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveField('Services');
+                      }}
+                      style={styles.Btn2}>
+                      <Text style={styles.Txt2}>Services</Text>
+                    </TouchableOpacity>
+                  )}
+                  {activeField === 'Selling' ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveField('Selling');
+                      }}
+                      style={styles.Btn}>
+                      <Text style={styles.Txt1}>Selling</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveField('Selling');
+                      }}
+                      style={styles.Btn2}>
+                      <Text style={styles.Txt2}>Selling</Text>
+                    </TouchableOpacity>
+                  )}
+                  {activeField === 'Trading' ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveField('Trading');
+                      }}
+                      style={styles.Btn}>
+                      <Text style={styles.Txt1}>Trading</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setActiveField('Trading');
+                      }}
+                      style={styles.Btn2}>
+                      <Text style={styles.Txt2}>Trading</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
-                <Text style={styles.LondonUkText}>
-                  {(UserData?.LocationFilter?.location === '' || !UserData?.LocationFilter?.location)
-                    ? 'Press To Set Search Location'
-                    : UserData?.LocationFilter?.location}
-                </Text>
-              </TouchableOpacity>
-              {/* location meter */}
-              {/* button Containers */}
-              <View style={styles.BtnContainer}>
-                {activeField === 'Services' ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setActiveField('Services');
-                    }}
-                    style={styles.Btn}>
-                    <Text style={styles.Txt1}>Services</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setActiveField('Services');
-                    }}
-                    style={styles.Btn2}>
-                    <Text style={styles.Txt2}>Services</Text>
-                  </TouchableOpacity>
+                {/* button Containers */}
+
+                {activeField === 'Services' && (
+                  <>
+                    {ServiceData.length >= 1 ? (
+                      <FlatList
+                        keyExtractor={(item, index) => String(index)}
+                        // data={(searchValue == '') ? ServiceAllData : ServiceData} // ServiceData SellingData TradingData
+                        data={ServiceData}
+                        contentContainerStyle={{paddingBottom: h('3%')}}
+                        numColumns={3}
+                        renderItem={({item}) => {
+                          const lat1 = latitude; // Latitude of first coordinate
+                          const lon1 = longitude; // Longitude of first coordinate
+                          const lat2 = item.user.latitude; // Latitude of second coordinate
+                          const lon2 = item.user.longitude;
+                          const distanceInKm = Distance(lat1, lon1, lat2, lon2);
+
+                          return (
+                            <>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  margin: 2,
+                                  backgroundColor: '#fff',
+                                  height: h('19%'),
+                                }}>
+                                <ServiceItem
+                                  item={item}
+                                  onPress={() => {
+                                    navigation.navigate('PostScreen', {
+                                      data: item,
+                                    });
+                                  }}
+                                />
+                              </View>
+                            </>
+                          );
+                        }}
+                        keyExtractor={item => item.DocId}
+                      />
+                    ) : (
+                      <View style={styles.ViewMainFrame}>
+                        <Text>No search results. Please try changing your</Text>
+                        <Text>location to find in a different city.</Text>
+                      </View>
+                    )}
+                  </>
                 )}
-                {activeField === 'Selling' ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setActiveField('Selling');
-                    }}
-                    style={styles.Btn}>
-                    <Text style={styles.Txt1}>Selling</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setActiveField('Selling');
-                    }}
-                    style={styles.Btn2}>
-                    <Text style={styles.Txt2}>Selling</Text>
-                  </TouchableOpacity>
+                {activeField === 'Selling' && (
+                  <>
+                    {SellingData.length >= 1 ? (
+                      <FlatList
+                        // data={(searchValue == '') ? SellingAllData : SellingData} // ServiceData SellingData TradingData
+                        data={SellingData} // ServiceData SellingData TradingData
+                        contentContainerStyle={{paddingBottom: h('3%')}}
+                        numColumns={3}
+                        keyExtractor={(item, index) => String(index)}
+                        renderItem={({item, index}) => {
+                          // const lat1 = latitude; // Latitude of first coordinate
+                          // const lon1 = longitude; // Longitude of first coordinate
+                          // const lat2 = item.user.latitude; // Latitude of second coordinate
+                          // const lon2 = item.user.longitude;
+                          // const distanceInKm = Distance(lat1, lon1, lat2, lon2);
+
+                          // const distnaceMile = getPreciseDistance(
+                          //   {latitude: latitude, longitude: longitude},
+                          //   {latitude: lat2, longitude: lon2},
+                          // );
+
+                          // console.log({SellingAllData});
+
+                          return (
+                            <>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  margin: 2,
+                                  backgroundColor: '#fff',
+                                  height: h('19%'),
+                                }}>
+                                <ServiceItem
+                                  item={item}
+                                  onPress={() => {
+                                    navigation.navigate('PostScreen', {
+                                      data: item,
+                                    });
+                                  }}
+                                />
+                              </View>
+                            </>
+                          );
+                        }}
+                        keyExtractor={item => item.DocId}
+                      />
+                    ) : (
+                      <View style={styles.ViewMainFrame}>
+                        <Text>No search results. Please try changing your</Text>
+                        <Text>location to find in a different city.</Text>
+                      </View>
+                    )}
+                  </>
                 )}
-                {activeField === 'Trading' ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setActiveField('Trading');
-                    }}
-                    style={styles.Btn}>
-                    <Text style={styles.Txt1}>Trading</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setActiveField('Trading');
-                    }}
-                    style={styles.Btn2}>
-                    <Text style={styles.Txt2}>Trading</Text>
-                  </TouchableOpacity>
+                {activeField === 'Trading' && (
+                  <>
+                    {TradingData.length >= 1 ? (
+                      <FlatList
+                        // data={(searchValue == '') ? TradingAllData : TradingData} // ServiceData SellingData TradingData
+                        data={TradingData} // ServiceData SellingData TradingData
+                        contentContainerStyle={{paddingBottom: h('3%')}}
+                        numColumns={3}
+                        keyExtractor={(item, index) => String(index)}
+                        renderItem={({item}) => {
+                          return (
+                            <>
+                              <View
+                                style={{
+                                  flex: 1,
+                                  margin: 2,
+                                  backgroundColor: '#fff',
+                                  height: h('19%'),
+                                }}>
+                                <ServiceItem
+                                  item={item}
+                                  onPress={() => {
+                                    navigation.navigate('PostScreen', {
+                                      data: item,
+                                    });
+                                  }}
+                                />
+                              </View>
+                            </>
+                          );
+                        }}
+                        keyExtractor={item => item.DocId}
+                      />
+                    ) : (
+                      <View style={styles.ViewMainFrame}>
+                        <Text>No search results. Please try changing your</Text>
+                        <Text>location to find in a different city.</Text>
+                      </View>
+                    )}
+                  </>
                 )}
-              </View>
-              {/* button Containers */}
-
-
-              
-              {activeField === 'Services' && (
-                <>
-                  {ServiceData.length >= 1 ? (
-                    <FlatList
-                      keyExtractor={(item, index) => String(index)}
-                      // data={(searchValue == '') ? ServiceAllData : ServiceData} // ServiceData SellingData TradingData
-                      data={ServiceData}
-                      contentContainerStyle={{paddingBottom: h('3%')}}
-                      numColumns={3}
-                      renderItem={({item}) => {
-                        const lat1 = latitude; // Latitude of first coordinate
-                        const lon1 = longitude; // Longitude of first coordinate
-                        const lat2 = item.user.latitude; // Latitude of second coordinate
-                        const lon2 = item.user.longitude;
-                        const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
-                        return (
-                          <>
-                            <View
-                              style={{
-                                flex: 1,
-                                margin: 2,
-                                backgroundColor: '#fff',
-                                height: h('19%'),
-                              }}>
-                              <ServiceItem
-                                item={item}
-                                onPress={() => {
-                                  navigation.navigate('PostScreen', {data: item});
-                                }}
-                              />
-                            </View>
-                          </>
-                        );
-                      }}
-                      keyExtractor={item => item.DocId}
-                    />
-                  ) : (
-                    <View style={styles.ViewMainFrame}>
-                      <Text>No search results. Please try changing your</Text>
-                      <Text>location to find in a different city.</Text>
-                    </View>
-                  )}
-                </>
-              )}
-              {activeField === 'Selling' && (
-                <>
-                  {SellingData.length >= 1 ? (
-                    <FlatList
-                      // data={(searchValue == '') ? SellingAllData : SellingData} // ServiceData SellingData TradingData
-                      data={SellingData} // ServiceData SellingData TradingData
-                      contentContainerStyle={{paddingBottom: h('3%')}}
-                      numColumns={3}
-                      keyExtractor={(item, index) => String(index)}
-                      renderItem={({item, index}) => {
-                        // const lat1 = latitude; // Latitude of first coordinate
-                        // const lon1 = longitude; // Longitude of first coordinate
-                        // const lat2 = item.user.latitude; // Latitude of second coordinate
-                        // const lon2 = item.user.longitude;
-                        // const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
-                        // const distnaceMile = getPreciseDistance(
-                        //   {latitude: latitude, longitude: longitude},
-                        //   {latitude: lat2, longitude: lon2},
-                        // );
-
-                        console.log({SellingAllData})
-
-                        return (
-                          <>
-                            <View
-                              style={{
-                                flex: 1,
-                                margin: 2,
-                                backgroundColor: '#fff',
-                                height: h('19%'),
-                              }}>
-                              <ServiceItem
-                                item={item}
-                                onPress={() => {
-                                  navigation.navigate('PostScreen', {data: item});
-                                }}
-                              />
-                            </View>
-                          </>
-                        );
-                      }}
-                      keyExtractor={item => item.DocId}
-                    />
-                  ) : (
-                    <View style={styles.ViewMainFrame}>
-                      <Text>No search results. Please try changing your</Text>
-                      <Text>location to find in a different city.</Text>
-                    </View>
-                  )}
-                </>
-              )}
-              {activeField === 'Trading' && (
-                <>
-                  {TradingData.length >= 1 ? (
-                    <FlatList
-                      // data={(searchValue == '') ? TradingAllData : TradingData} // ServiceData SellingData TradingData
-                      data={TradingData} // ServiceData SellingData TradingData
-                      contentContainerStyle={{paddingBottom: h('3%')}}
-                      numColumns={3}
-                      keyExtractor={(item, index) => String(index)}
-                      renderItem={({item}) => {
-                        return (
-                          <>
-                            <View
-                              style={{
-                                flex: 1,
-                                margin: 2,
-                                backgroundColor: '#fff',
-                                height: h('19%'),
-                              }}>
-                              <ServiceItem
-                                item={item}
-                                onPress={() => {
-                                  navigation.navigate('PostScreen', {data: item});
-                                }}
-                              />
-                            </View>
-                          </>
-                        );
-                      }}
-                      keyExtractor={item => item.DocId}
-                    />
-                  ) : (
-                    <View style={styles.ViewMainFrame}>
-                      <Text>No search results. Please try changing your</Text>
-                      <Text>location to find in a different city.</Text>
-                    </View>
-                  )}
-                </>
-              )}
               </>
-            )
+            );
           }
         })()}
-        
       </View>
     </>
   );
@@ -1108,7 +1171,7 @@ const Home = ({navigation}) => {
 
 export default Home;
 
-export { getCategoriesAndSubCategories }
+export {getCategoriesAndSubCategories};
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -1116,19 +1179,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   HeaderBar: {
-    height: h('25%'),
+    height: h('45%'),
     // backgroundColor: 'red',
 
     marginTop: h('1%'),
     flexDirection: 'row',
+    marginHorizontal: 10,
   },
   LocationMeter: {
-    width: '100%',
+    width: '95%',
     height: h('7%'),
     // backgroundColor: 'green',
     flexDirection: 'row',
     paddingLeft: h('2%'),
     alignItems: 'center',
+    backgroundColor: '#0002',
+    marginTop: 5,
+    alignSelf: 'center',
+    borderRadius: 5,
   },
   ImgContainer2: {
     width: '13%',
@@ -1138,8 +1206,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   LondonUkText: {
-    color: Colors.Primary,
+    color: Colors.red,
     fontSize: h('2%'),
+    fontWeight: '700',
+    width: '90%',
   },
   BtnContainer: {
     // backgroundColor: 'red',

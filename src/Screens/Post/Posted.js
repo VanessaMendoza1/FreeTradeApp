@@ -14,7 +14,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Appbutton from '../../Components/Appbutton';
 
 const Posted = ({navigation, route}) => {
-  console.warn(route.params.condition);
   const [oldData, setoldData] = React.useState(route.params);
   const onShare = async () => {
     try {

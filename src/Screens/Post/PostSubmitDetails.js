@@ -25,7 +25,7 @@ import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {PostAdd} from '../../redux/postSlice';
 import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
-import { getCategoriesAndSubCategories } from '../Dashboard/Home'
+import {getCategoriesAndSubCategories} from '../Dashboard/Home';
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
     {label: 'Baby Care', value: 'Baby Care'},
@@ -58,9 +58,14 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [brand, setbrand] = React.useState('');
   const [Description, setDescription] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
-  const [isUserHavingLocation, setIsUserHavingLocation] = React.useState((MyData.latitude && MyData.longitude) ? true : false)
-  const [entireCategoryAndSubCategoryData, setEntireCategoryAndSubCategoryData] = React.useState({})
-  
+  const [isUserHavingLocation, setIsUserHavingLocation] = React.useState(
+    MyData.latitude && MyData.longitude ? true : false,
+  );
+  const [
+    entireCategoryAndSubCategoryData,
+    setEntireCategoryAndSubCategoryData,
+  ] = React.useState({});
+
   // React.useEffect(() => {
   //   if (value == "Services"){
   //     setItems3([
@@ -71,50 +76,60 @@ const PostSubmitDetails = ({navigation, route}) => {
   // }, [value])
 
   React.useEffect(() => {
-    setValue2({})
-    setValue3({})
-    if (Object.keys(entireCategoryAndSubCategoryData).length > 0 && value != null){
-      let relatedSubCategories = entireCategoryAndSubCategoryData[value]
-      let subCategories = []
-      relatedSubCategories.map((subCategory) => {
-        subCategories.push({label: subCategory, value: subCategory})
-      })
-      setItems2(subCategories)
+    setValue2({});
+    setValue3({});
+    if (
+      Object.keys(entireCategoryAndSubCategoryData).length > 0 &&
+      value != null
+    ) {
+      let relatedSubCategories = entireCategoryAndSubCategoryData[value];
+      let subCategories = [];
+      relatedSubCategories.map(subCategory => {
+        subCategories.push({label: subCategory, value: subCategory});
+      });
+      setItems2(subCategories);
     }
-  }, [value])
+  }, [value]);
 
-  const flattenCategoriesForDropDown = (data) => {
-    let categories = []
-    Object.keys(data).map((categoryName) => {
-      categories.push({label:categoryName, value: categoryName})
-    })
-    setEntireCategoryAndSubCategoryData(data)
-    setItems(categories)
-  }
+  const flattenCategoriesForDropDown = data => {
+    let categories = [];
+    Object.keys(data).map(categoryName => {
+      categories.push({label: categoryName, value: categoryName});
+    });
+    setEntireCategoryAndSubCategoryData(data);
+    setItems(categories);
+  };
   React.useEffect(() => {
-    getCategoriesAndSubCategories(flattenCategoriesForDropDown)
-  }, [])
+    getCategoriesAndSubCategories(flattenCategoriesForDropDown);
+  }, []);
 
-  console.log({MyData})
-  // console.warn(MyData.latitude);
+  console.log({MyData});
   const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
 
-  
   const onSubmit = () => {
     let POstId = uuid.v4();
     setloading(true);
-    console.log("DNASJDSAJ")
-    console.log("DNASJDSAJ")
-    console.log("DNASJDSAJ")
-    console.log({MyData, route: route.params, value, value2, value3, brand, Description, POstId})
+    console.log('DNASJDSAJ');
+    console.log('DNASJDSAJ');
+    console.log('DNASJDSAJ');
+    console.log({
+      MyData,
+      route: route.params,
+      value,
+      value2,
+      value3,
+      brand,
+      Description,
+      POstId,
+    });
     if (!isUserHavingLocation) {
-      alert("Please set your location in settings first")
+      alert('Please set your location in settings first');
       setloading(false);
-      navigation.navigate("Setting")
-      return
+      navigation.navigate('Setting');
+      return;
     }
-    console.log({LAT: MyData.latitude, LONG: MyData.longitude})
+    console.log({LAT: MyData.latitude, LONG: MyData.longitude});
     firestore()
       .collection('Post')
       .doc(POstId)
@@ -133,8 +148,10 @@ const PostSubmitDetails = ({navigation, route}) => {
         DocId: POstId,
         Discount: 0,
         status: false,
-        latitude: MyData.latitude ? MyData.latitude : "No Location Set By User",
-        longitude: MyData.longitude ? MyData.longitude : "No Location Set By User",
+        latitude: MyData.latitude ? MyData.latitude : 'No Location Set By User',
+        longitude: MyData.longitude
+          ? MyData.longitude
+          : 'No Location Set By User',
         Notification: MyData.NotificationToken,
         videUrl: route.params.VideoUrl,
       })
@@ -153,18 +170,15 @@ const PostSubmitDetails = ({navigation, route}) => {
             allmypost();
 
             await dispatch(PostAdd(PostData));
-
-            console.warn('Ad Posted');
           })
-          .catch((err) => {
-            console.log("Caught error while submitting post")
-            console.log(err)
-          })
+          .catch(err => {
+            console.log('Caught error while submitting post');
+            console.log(err);
+          });
         setloading(false);
       })
       .catch(err => {
         setloading(false);
-        console.warn(err);
       });
   };
 
@@ -182,8 +196,8 @@ const PostSubmitDetails = ({navigation, route}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           try {
-            let lat2
-            let lon2
+            let lat2;
+            let lon2;
             lat2 = documentSnapshot.data().user.latitude; // Latitude of second coordinate
             lon2 = documentSnapshot.data().user.longitude;
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
@@ -201,10 +215,12 @@ const PostSubmitDetails = ({navigation, route}) => {
                 }
               }
             }
-          } catch (_err){
-            console.log(_err)
-            console.log("Bad Data, user object not found in Post, check below object")
-            console.log(documentSnapshot.data())
+          } catch (_err) {
+            console.log(_err);
+            console.log(
+              'Bad Data, user object not found in Post, check below object',
+            );
+            console.log(documentSnapshot.data());
           }
         });
       });
@@ -268,7 +284,6 @@ const PostSubmitDetails = ({navigation, route}) => {
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
           });
 
         await dispatch(DataInsert(userData[0]));
@@ -352,7 +367,9 @@ const PostSubmitDetails = ({navigation, route}) => {
               )}
               {value2 && (
                 <>
-                  <Text style={styles.CategoryItem}>{(value == "Services") ? "Condition / Service" : "Condition"}</Text>
+                  <Text style={styles.CategoryItem}>
+                    {value == 'Services' ? 'Condition / Service' : 'Condition'}
+                  </Text>
                   <View style={{zIndex: 2000}}>
                     <DropDownPicker
                       open={open3}

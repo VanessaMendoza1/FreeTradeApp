@@ -31,7 +31,6 @@ const SearchScreen = ({navigation}) => {
 
   const searchFilter = text => {
     if (activeField === 'Services') {
-      console.warn('This ran');
       const newData = ServiceData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });
@@ -43,7 +42,6 @@ const SearchScreen = ({navigation}) => {
       setSearchValue(text);
     }
     if (activeField === 'Selling') {
-      console.warn('This ran 2');
       const newData = SellingData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });
@@ -55,7 +53,6 @@ const SearchScreen = ({navigation}) => {
       setSearchValue(text);
     }
     if (activeField === 'Trading') {
-      console.warn('This ran 3');
       const newData = TradingData.filter(item => {
         return item.Title.toUpperCase().search(text.toUpperCase()) > -1;
       });

@@ -21,9 +21,9 @@ import {DataInsert} from '../../redux/counterSlice';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import LoadingScreen from '../../Components/LoadingScreen';
-import { openPhoto, openCamera, updateDetails } from './EditAccount'
+import {openPhoto, openCamera, updateDetails} from './EditAccount';
 import auth from '@react-native-firebase/auth';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 const heightDropItem = 40;
 
@@ -53,7 +53,7 @@ const allowedTimings = [
   {label: '10:00 Pm', value: '10:00 Pm'},
   {label: '11:00 Pm', value: '11:00 Pm'},
   {label: '12:00 Pm', value: '12:00 Pm'},
-]
+];
 
 const getCurrentBusinessDetails = (
   // setOldPassword,
@@ -65,9 +65,9 @@ const getCurrentBusinessDetails = (
   setValue2,
   setValue3,
   setValue4,
-  setClosedOnDayModalValue
+  setClosedOnDayModalValue,
 ) => {
-  const currentUserId = auth().currentUser.uid
+  const currentUserId = auth().currentUser.uid;
   firestore()
     .collection('Users')
     .doc(currentUserId)
@@ -98,30 +98,25 @@ const getCurrentBusinessDetails = (
           closedDays,
           bussinessHoursFrom,
           bussinessHoursto,
-        } = documentSnapshot.data()
-        console.log({DATA:documentSnapshot.data()})
+        } = documentSnapshot.data();
+        console.log({DATA: documentSnapshot.data()});
 
         // setOldPassword(password)
-        setBusiness(BusinessName)
-        setAddress(Address)
-        setWebsite(Website)
-        sePhone(Phone)
-        setValue(bussinessHoursFrom)
-        setValue2(bussinessHoursto)
-        setValue3(bussinessdaysFrom)
-        setValue4(bussinessdaysto)
-        setClosedOnDayModalValue(closedDays)
+        setBusiness(BusinessName);
+        setAddress(Address);
+        setWebsite(Website);
+        sePhone(Phone);
+        setValue(bussinessHoursFrom);
+        setValue2(bussinessHoursto);
+        setValue3(bussinessdaysFrom);
+        setValue4(bussinessdaysto);
+        setClosedOnDayModalValue(closedDays);
       }
-    })
-}
-
-
-
+    });
+};
 
 const BussinessAccountEdits = ({navigation}) => {
-  const MyData = useSelector(state => state.counter.data);
-  console.warn(MyData.name);
-
+  const MyData = useSelector(state => state?.counter?.data);
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [modalType, setmodalType] = React.useState('');
@@ -179,7 +174,6 @@ const BussinessAccountEdits = ({navigation}) => {
 
   const [loading, setloading] = React.useState(false);
   const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(subdata[0].plan === 'Bussiness');
 
   useFocusEffect(
     React.useCallback(() => {
@@ -272,7 +266,6 @@ const BussinessAccountEdits = ({navigation}) => {
             })
             .catch(err => {
               setloading(false);
-              console.warn(err);
             });
 
           await dispatch(DataInsert(userData[0]));
@@ -295,7 +288,7 @@ const BussinessAccountEdits = ({navigation}) => {
     setloading(true);
     if (newCPassword === newPassword) {
       auth()
-        .signInWithEmailAndPassword(MyData.email, oldPassword)
+        .signInWithEmailAndPassword(MyData?.email, oldPassword)
         .then(async userCredential => {
           const user = userCredential.user;
           user.updatePassword(newPassword);
@@ -342,27 +335,6 @@ const BussinessAccountEdits = ({navigation}) => {
               <Text style={styles.FontWork}>Settings</Text>
             </View>
           </View>
-          {/* header */}
-          {/* profile Container */}
-
-          {/* <TouchableOpacity
-              onPress={() => {
-                setShowUploadBox(true);
-              }}
-              style={styles.ProfileCC}>
-              <View style={styles.CamerColar}>
-                <Icon name="camera" size={35} color="#ffff" />
-              </View>
-              <Image
-                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-                source={{
-                  uri: MyData.image
-                    ? MyData.image
-                    : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
-                }}
-              />
-            </TouchableOpacity> */}
-
           <TouchableOpacity
             style={styles.ProfileContainer}
             onPress={() => {
@@ -378,8 +350,8 @@ const BussinessAccountEdits = ({navigation}) => {
               <Image
                 style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                 source={{
-                  uri: MyData.image
-                    ? MyData.image
+                  uri: MyData?.image
+                    ? MyData?.image
                     : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                 }}
               />
@@ -387,9 +359,9 @@ const BussinessAccountEdits = ({navigation}) => {
             <Text style={styles.nameText}>
               {subdata.length > 0
                 ? subdata[0].plan === 'Bussiness'
-                  ? MyData.BusinessName
-                  : MyData.name
-                : MyData.name}
+                  ? MyData?.BusinessName
+                  : MyData?.name
+                : MyData?.name}
             </Text>
           </TouchableOpacity>
           {/* profile Containr */}

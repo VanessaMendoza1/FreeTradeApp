@@ -28,7 +28,6 @@ import auth from '@react-native-firebase/auth';
 import { useFocusEffect } from '@react-navigation/native';
 
 const StartConversation = ({navigation, route}) => {
-  //   console.warn(route.params.data.Notification !== '');
   const [loading, setloading] = React.useState(false);
   const [txt, settxt] = React.useState('');
   const userData = useSelector(state => state.counter.data);

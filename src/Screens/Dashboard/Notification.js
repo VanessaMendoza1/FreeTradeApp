@@ -13,56 +13,54 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import NotificationHead from '../../Components/NotificationHead';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
-import { areNotificationsHidden } from "../../utils/appConfigurations"
+import {areNotificationsHidden} from '../../utils/appConfigurations';
 import auth from '@react-native-firebase/auth';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
   const userData = useSelector(state => state.counter.data);
 
   const getNotification = () => {
-    console.log("Getting Notifications")
+    console.log('Getting Notifications');
     NotificationData();
     NotificationData2();
-  }
+  };
 
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed Notification.js, running getNotification")
-			getNotification()
-			return () => null;
-		}, [])
-	);
+    React.useCallback(() => {
+      console.log('Focussed Notification.js, running getNotification');
+      getNotification();
+      return () => null;
+    }, []),
+  );
 
   const NotificationData = async () => {
     let NotificationData = [];
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     await firestore()
       .collection('Notification')
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          // console.warn(data.UserID);
-          if (documentSnapshot.data() && documentSnapshot.data().userID == currentUserId) {
+          if (
+            documentSnapshot.data() &&
+            documentSnapshot.data().userID == currentUserId
+          ) {
             // if (documentSnapshot.data().seen == false) {
             NotificationData.push({
-              ...documentSnapshot.data(), 
-              id: documentSnapshot.id
+              ...documentSnapshot.data(),
+              id: documentSnapshot.id,
             });
             // }
           }
         });
         setNotii(NotificationData);
-        console.warn(NotificationData);
       })
-      .catch(err => {
-        console.warn(err);
-      });
+      .catch(err => {});
   };
   const NotificationData2 = async () => {
-    // console.warn('r');
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     await firestore()
       .collection('Notification')
       .where('userID', '==', currentUserId)
@@ -71,11 +69,7 @@ const Notification = ({navigation}) => {
         let batch = firestore().batch();
         snapshot.docs.forEach(doc => {
           const ref = doc.ref;
-          batch.update(ref, {seen: true});
-
-          // const docRef = firestore().collection('Notification').doc(doc.id);
-          // console.warn('runn');
-          // batch.update(docRef, );
+          batch.update(ref, { seen: true });
         });
         return batch.commit();
       });
@@ -105,34 +99,48 @@ const Notification = ({navigation}) => {
               <NotificationHead
                 onPress={async () => {
                   // console.log({item});
-                  if (item.text.endsWith("an item from your favorites just posted. Click to view.")){
+                  if (
+                    item.text.endsWith(
+                      'an item from your favorites just posted. Click to view.',
+                    )
+                  ) {
                     await firestore()
                       .collection('Post')
                       .doc(item.newlyAddedItemId)
                       .get()
                       .then(async documentSnapshot => {
                         if (documentSnapshot.exists) {
-                          let newlyAddedItemData = documentSnapshot.data()
-                          navigation.navigate('PostScreen', {data: newlyAddedItemData});
+                          let newlyAddedItemData = documentSnapshot.data();
+                          navigation.navigate('PostScreen', {
+                            data: newlyAddedItemData,
+                          });
                         }
                       });
-                  } else if (item.text.endsWith("would like to trade with you, click to see profile!")){
+                  } else if (
+                    item.text.endsWith(
+                      'would like to trade with you, click to see profile!',
+                    )
+                  ) {
                     await firestore()
                       .collection('Users')
                       .doc(item.userID)
                       .get()
                       .then(async documentSnapshot => {
                         if (documentSnapshot.exists) {
-                          let userData = documentSnapshot.data()
+                          let userData = documentSnapshot.data();
                           navigation.navigate('OtherUserProfile', {
                             data: {
                               UserID: item.userID,
-                              image: userData.image
+                              image: userData.image,
                             },
                           });
                         }
                       });
-                  } else if (item.text.endsWith("just rated her experience, click to rate yours.")){
+                  } else if (
+                    item.text.endsWith(
+                      'just rated her experience, click to rate yours.',
+                    )
+                  ) {
                     navigation.navigate('Review', {
                       data: item.sellerData,
                     });
