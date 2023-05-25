@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   BottomContainer: {
     width: '100%',
-    height: '30%',
+    height: '44%',
     // backgroundColor: 'red',
     paddingLeft: 5,
   },
@@ -112,14 +112,12 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: h('2%'),
     fontWeight: 'bold',
-    paddingLeft: 10,
   },
   boxview: {
     width: '80%',
     height: '40%',
     // backgroundColor: 'red',
-    flexDirection: 'row',
+    // flexDirection: 'row',
     // justifyContent: 'space-between',
-    alignItems: 'center',
   },
 });

@@ -517,6 +517,7 @@ const BussinessAccountEdits = ({navigation}) => {
                 setloading,
                 setImgeUrl,
                 updateDetails,
+                navigation,
               )
             }>
             <Text>From Camera</Text>
@@ -525,7 +526,14 @@ const BussinessAccountEdits = ({navigation}) => {
             style={styles.captureOptionItem}
             activeOpacity={0.9}
             onPress={() =>
-              openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)
+              openPhoto(
+                setloading,
+                setShowUploadBox,
+                setImgeUrl,
+                updateDetails,
+                dispatch,
+                navigation,
+              )
             }>
             <Text>From Gallery</Text>
           </TouchableOpacity>

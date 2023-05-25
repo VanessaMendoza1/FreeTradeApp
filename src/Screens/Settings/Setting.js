@@ -20,12 +20,14 @@ import Icons from '../../utils/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {LoginManager} from 'react-native-fbsdk-next';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const Setting = ({navigation}) => {
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
+
   const [isBusinessAccount, setIsBusinessAccount] = React.useState(false);
   // const [ loading, setloading ] = React.useState(false)
   useFocusEffect(
@@ -35,12 +37,12 @@ const Setting = ({navigation}) => {
       );
       isUserHavingBussinessSubscription();
       return () => null;
-    }, []),
+    }, [isFocused]),
   );
 
   React.useEffect(() => {
     console.log({isBusinessAccount});
-  }, [isBusinessAccount]);
+  }, [isBusinessAccount, isFocused]);
 
   const MyData = useSelector(state => state?.counter?.data);
   const subdata = useSelector(state => state?.sub?.subdata);
@@ -82,7 +84,6 @@ const Setting = ({navigation}) => {
     if (subdata.length > 0 && subdata[0].plan === 'Bussiness') {
       setIsBusinessAccount(true);
     }
-   
   };
   return (
     <ScrollView>

@@ -281,7 +281,6 @@ const PostScreen = ({navigation, route}) => {
   //     scrollViewRef.current.scrollTo({y: 0, animated: true});
   //   }
   // };
-  console.log({VideoAd: VideoAd[0]});
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -641,9 +640,12 @@ const PostScreen = ({navigation, route}) => {
           <View>
             <VideoPlayer
               video={{
-                uri: VideoAd[0].AdGraphicLink
-                  ? VideoAd[0].AdGraphicLink
-                  : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                uri:
+                  VideoAd.length > 0
+                    ? VideoAd[0]?.AdGraphicLink
+                    : VideoAd.length > 0
+                    ? VideoAd[0]?.AdGraphicLink
+                    : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
               }}
               autoplay
               paused={false}
@@ -661,13 +663,19 @@ const PostScreen = ({navigation, route}) => {
               });
             }}>
             <View style={styles.overlay}>
-              <Text style={styles.videoShoesTag}>{VideoAd[0].title}</Text>
-              <Text style={styles.videoShoesTag2}>{VideoAd[0].TagLine}</Text>
+              <Text style={styles.videoShoesTag}>
+                {VideoAd.length > 0 ? VideoAd[0]?.title : ''}
+              </Text>
+              <Text style={styles.videoShoesTag2}>
+                {VideoAd.length > 0 ? VideoAd[0]?.TagLine : ''}
+              </Text>
 
-              <Text style={styles.MainText2}>{VideoAd[0].user.Address}</Text>
-              {VideoAd[0].user?.Phone !== undefined && (
+              <Text style={styles.MainText2}>
+                {VideoAd.length > 0 ? VideoAd[0]?.user?.Address : ''}
+              </Text>
+              {VideoAd.length > 0 && VideoAd[0].user?.Phone !== undefined && (
                 <Text style={styles.MainText2}>
-                  Call: {VideoAd[0].user.Phone}
+                  Call: {VideoAd.length > 0 ? VideoAd[0]?.user?.Phone : ''}
                 </Text>
               )}
             </View>

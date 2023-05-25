@@ -65,13 +65,13 @@ const styles = StyleSheet.create({
   },
   ImageContainer: {
     width: '100%',
-    height: '84%',
+    height: '75%',
     backgroundColor: '#0007',
   },
   MainText: {
     color: '#000',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
     paddingTop: 0,
     paddingBottom: 0,
     marginBottom: 0,
@@ -80,14 +80,14 @@ const styles = StyleSheet.create({
   },
   MainText2: {
     color: '#0008',
-    fontSize: h('1.4%'),
+    fontSize: h('1.2%'),
 
     // paddingLeft: h('0.6%'),
   },
   MainText3: {
     color: '#000',
     fontSize: h('1.5%'),
-
+    fontWeight: '700',
     // paddingLeft: h('0.6%'),
   },
 });

@@ -622,7 +622,7 @@ const Home = ({navigation}) => {
           <Carousel
             loop
             width={width}
-            height={'39%'}
+            height={'45%'}
             autoPlay={true}
             windowSize={100}
             data={ImageAds}
@@ -883,7 +883,7 @@ const Home = ({navigation}) => {
             );
           } else {
             return (
-              <>
+              <ScrollView>
                 <View style={styles.HeaderBar}>{renderSlider()}</View>
 
                 {/* {ImageAds.length > 0 ? (
@@ -1160,7 +1160,7 @@ const Home = ({navigation}) => {
                     )}
                   </>
                 )}
-              </>
+              </ScrollView>
             );
           }
         })()}
@@ -1196,7 +1196,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0002',
     marginTop: 5,
     alignSelf: 'center',
-    borderRadius: 5,
+    borderRadius: 10,
   },
   ImgContainer2: {
     width: '13%',

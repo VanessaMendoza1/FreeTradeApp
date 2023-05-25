@@ -14,12 +14,12 @@ export const counterSlice = createSlice({
     },
 
     DataInsert: (state, action) => {
-      state.data = action.payload;
+      state.data = action?.payload;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const {increment, decrement, DataInsert} = counterSlice.actions;
+export const {increment, decrement, DataInsert} = counterSlice?.actions;
 
 export default counterSlice.reducer;

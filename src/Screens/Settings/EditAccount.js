@@ -22,8 +22,16 @@ import {DataInsert} from '../../redux/counterSlice';
 
 import auth from '@react-native-firebase/auth';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
+import {useIsFocused} from '@react-navigation/native';
 
-const openPhoto = (setloading, setShowUploadBox, setImgeUrl, updateDetails) => {
+const openPhoto = (
+  setloading,
+  setShowUploadBox,
+  setImgeUrl,
+  updateDetails,
+  dispatch,
+  navigation,
+) => {
   setloading(true);
   ImagePicker.openPicker({
     width: 300,
@@ -54,7 +62,7 @@ const openPhoto = (setloading, setShowUploadBox, setImgeUrl, updateDetails) => {
           uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
             setloading(false);
             setImgeUrl(downloadURL);
-            updateDetails(downloadURL, setloading);
+            updateDetails(downloadURL, setloading, dispatch);
           });
         },
       );
@@ -73,6 +81,7 @@ const openCamera = (
   setloading,
   setImgeUrl,
   updateDetails,
+  navigation,
 ) => {
   // setloading(true);
   ImagePicker.openCamera({
@@ -123,9 +132,9 @@ const openCamera = (
     });
 };
 
-const updateDetails = (downloadURL, setloading) => {
+const updateDetails = (downloadURL, setloading, dispatch, navigation) => {
   console.log({NEW_IMAGE: downloadURL});
-  const currentUserId = auth().currentUser.uid;
+  const currentUserId = auth().currentUser?.uid;
 
   if (downloadURL) {
     setloading(true);
@@ -150,7 +159,6 @@ const updateDetails = (downloadURL, setloading) => {
           .catch(err => {
             setloading(false);
           });
-
         await dispatch(DataInsert(userData[0]));
         alert('Profile Picture Updated');
         setloading(false);
@@ -159,6 +167,7 @@ const updateDetails = (downloadURL, setloading) => {
       .catch(err => {
         setloading(false);
         console.log(err);
+        alert(err);
       });
   }
 };
@@ -166,7 +175,7 @@ const updateDetails = (downloadURL, setloading) => {
 const EditAccount = ({navigation}) => {
   const MyData = useSelector(state => state.counter?.data);
   const dispatch = useDispatch();
-
+  const isFocused = useIsFocused();
   const [OPassword, setOpassword] = React.useState(true);
   const [Password, setpassword] = React.useState(true);
   const [CPassword, setCpassword] = React.useState(true);
@@ -211,7 +220,9 @@ const EditAccount = ({navigation}) => {
     }
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    console.log(' MyData?.image', MyData?.image);
+  }, [isFocused, MyData]);
 
   const updateName = () => {
     setloading(true);
@@ -280,7 +291,6 @@ const EditAccount = ({navigation}) => {
       setloading(false);
     }
   };
-  console.log({IMAGE: MyData?.image});
   return (
     <KeyboardAvoidingScrollView>
       {loading ? (
@@ -434,6 +444,8 @@ const EditAccount = ({navigation}) => {
                 setloading,
                 setImgeUrl,
                 updateDetails,
+                dispatch,
+                navigation,
               )
             }>
             <Text>From Camera</Text>
@@ -442,7 +454,14 @@ const EditAccount = ({navigation}) => {
             style={styles.captureOptionItem}
             activeOpacity={0.9}
             onPress={() =>
-              openPhoto(setloading, setShowUploadBox, setImgeUrl, updateDetails)
+              openPhoto(
+                setloading,
+                setShowUploadBox,
+                setImgeUrl,
+                updateDetails,
+                dispatch,
+                navigation,
+              )
             }>
             <Text>From Gallery</Text>
           </TouchableOpacity>
