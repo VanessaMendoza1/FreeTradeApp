@@ -168,23 +168,24 @@ const Home = ({navigation}) => {
   const _timerId = useRef(null);
 
   const [isHavingNewMessages, setIsHavingNewMessages] = React.useState(false);
+  const [searchTextt, setSearchTextt] = useState('');
+  const [filteredDataService, setFilteredDataService] = useState([]);
+  const [filteredDataSelling, setFilteredDataSelling] = useState([]);
+  const [filteredDataTrade, setFilteredDataTrade] = useState([]);
+  useEffect(() => {
+    console.log('SellingData', SellingData);
 
+    // customSearch(searchTextt);
+  }, [searchTextt]);
   useFocusEffect(
     React.useCallback(() => {
-      // console.log(
-      //   'Focussed Home.js, running checkIfNewMessagesAvailable CheckValidSubscription getCategoriesAndSubCategories showItemsThroughLocationFilterWithoutSearchText',
-      // );
       checkIfNewMessagesAvailable(setIsHavingNewMessages);
       CheckValidSubscription();
       getCategoriesAndSubCategories(setCategoriesWithSubCategoryData);
-      // showItemsThroughLocationFilterWithoutSearchText(activeField, setServiceData, setSellingData, setTradingData, searchValue)
       _stopAutoPlay();
       _startAutoPlay();
 
       return () => {
-        // setServiceData([])
-        // setSellingData([])
-        // setTradingData([])
         _stopAutoPlay();
       };
     }, []),
@@ -665,7 +666,49 @@ const Home = ({navigation}) => {
   };
   // moving slider content starts here
   // console.log({NOTI: Notii.length});
+  const customSearch = text => {
+    if (activeField === 'Selling') {
+      const filterdData = text // based on text, filter data and use filtered data
+        ? SellingData?.filter(item => {
+            const itemData = item?.Title
+              ? item?.Title.toUpperCase()
+              : ''.toUpperCase();
+            const textData = text.toUpperCase();
 
+            return itemData.indexOf(textData) > -1;
+          })
+        : SellingData; // on on text, u can return all data
+      setFilteredDataSelling(filterdData);
+      setSearchTextt(text);
+    } else if (activeField === 'Services') {
+      const filterdData = text // based on text, filter data and use filtered data
+        ? ServiceData?.filter(item => {
+            const itemData = item?.Title
+              ? item?.Title.toUpperCase()
+              : ''.toUpperCase();
+            const textData = text.toUpperCase();
+
+            return itemData.indexOf(textData) > -1;
+          })
+        : ServiceData; // on on text, u can return all data
+      setFilteredDataService(filterdData);
+      setSearchTextt(text);
+    } else if (activeField === 'Trading') {
+      const filterdData = text // based on text, filter data and use filtered data
+        ? TradingData?.filter(item => {
+            const itemData = item?.Title
+              ? item?.Title.toUpperCase()
+              : ''.toUpperCase();
+            const textData = text.toUpperCase();
+
+            return itemData.indexOf(textData) > -1;
+          })
+        : TradingData; // on on text, u can return all data
+      setFilteredDataTrade(filterdData);
+      setSearchTextt(text);
+    } else {
+    }
+  };
   return (
     <>
       {loading && <LoadingScreen />}
@@ -680,7 +723,9 @@ const Home = ({navigation}) => {
           showCategoryAndSubCategory={showCategoryAndSubCategory}
           setShowCategoryAndSubCategory={setShowCategoryAndSubCategory}
           setCategoriesWithSubCategoryData={setCategoriesWithSubCategoryData}
-          onSearch={text =>
+          onSearch={text => {
+            setSearchTextt(text);
+            customSearch(text);
             showItemsThroughLocationFilterWithoutSearchText(
               activeField,
               UserData,
@@ -688,8 +733,8 @@ const Home = ({navigation}) => {
               setSellingData,
               setTradingData,
               text,
-            )
-          }
+            );
+          }}
           onMessage={() => {
             markAllMessagesSeen(() => setIsHavingNewMessages(false));
             navigation.navigate('MessageScreen');
@@ -1024,7 +1069,7 @@ const Home = ({navigation}) => {
                       <FlatList
                         keyExtractor={(item, index) => String(index)}
                         // data={(searchValue == '') ? ServiceAllData : ServiceData} // ServiceData SellingData TradingData
-                        data={ServiceData}
+                        data={searchTextt ? filteredDataService : ServiceData}
                         contentContainerStyle={{paddingBottom: h('3%')}}
                         numColumns={3}
                         renderItem={({item}) => {
@@ -1070,24 +1115,11 @@ const Home = ({navigation}) => {
                     {SellingData.length >= 1 ? (
                       <FlatList
                         // data={(searchValue == '') ? SellingAllData : SellingData} // ServiceData SellingData TradingData
-                        data={SellingData} // ServiceData SellingData TradingData
+                        data={searchTextt ? filteredDataSelling : SellingData} // ServiceData SellingData TradingData
                         contentContainerStyle={{paddingBottom: h('3%')}}
                         numColumns={3}
                         keyExtractor={(item, index) => String(index)}
                         renderItem={({item, index}) => {
-                          // const lat1 = latitude; // Latitude of first coordinate
-                          // const lon1 = longitude; // Longitude of first coordinate
-                          // const lat2 = item.user.latitude; // Latitude of second coordinate
-                          // const lon2 = item.user.longitude;
-                          // const distanceInKm = Distance(lat1, lon1, lat2, lon2);
-
-                          // const distnaceMile = getPreciseDistance(
-                          //   {latitude: latitude, longitude: longitude},
-                          //   {latitude: lat2, longitude: lon2},
-                          // );
-
-                          // console.log({SellingAllData});
-
                           return (
                             <>
                               <View
@@ -1124,7 +1156,7 @@ const Home = ({navigation}) => {
                     {TradingData.length >= 1 ? (
                       <FlatList
                         // data={(searchValue == '') ? TradingAllData : TradingData} // ServiceData SellingData TradingData
-                        data={TradingData} // ServiceData SellingData TradingData
+                        data={searchTextt ? filteredDataTrade : TradingData} // ServiceData SellingData TradingData
                         contentContainerStyle={{paddingBottom: h('3%')}}
                         numColumns={3}
                         keyExtractor={(item, index) => String(index)}

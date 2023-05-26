@@ -9,6 +9,7 @@ import {
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../utils/Colors';
+import {priceFormatter} from '../utils/helpers/helperFunctions';
 
 const ServiceItem = ({onPress, item}) => {
   return (
@@ -27,13 +28,13 @@ const ServiceItem = ({onPress, item}) => {
             {item.Discount !== 0 ? (
               <View style={styles.boxview}>
                 <Text style={styles.BPTag22}>
-                  {item.Price !== '' ? '$' + item.Price : null}
+                  {item.Price !== '' ? priceFormatter(item.Price) : null}
                 </Text>
                 <Text style={styles.BPTag3}>${item.Discount}</Text>
               </View>
             ) : (
               <Text style={styles.BPTag2}>
-                {item.Price !== '' ? '$' + item.Price : null}
+                {item.Price !== '' ? priceFormatter(item.Price) : null}
               </Text>
             )}
           </View>
