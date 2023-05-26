@@ -23,7 +23,7 @@ import storage from '@react-native-firebase/storage';
 import LoadingScreen from '../../Components/LoadingScreen';
 import {openPhoto, openCamera, updateDetails} from './EditAccount';
 import auth from '@react-native-firebase/auth';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 const heightDropItem = 40;
 
@@ -115,7 +115,8 @@ const getCurrentBusinessDetails = (
     });
 };
 
-const BussinessAccountEdits = ({navigation}) => {
+const BussinessAccountEdits = () => {
+  const navigation = useNavigation();
   const MyData = useSelector(state => state?.counter?.data);
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = React.useState(false);

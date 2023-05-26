@@ -153,7 +153,7 @@ const updateDetails = (downloadURL, setloading, dispatch, navigation) => {
           .then(documentSnapshot => {
             if (documentSnapshot.exists) {
               console.log({NEW_IMAGE: documentSnapshot.data().image});
-              userData.push();
+              userData.push(documentSnapshot.data());
             }
           })
           .catch(err => {
@@ -162,7 +162,7 @@ const updateDetails = (downloadURL, setloading, dispatch, navigation) => {
         await dispatch(DataInsert(userData[0]));
         alert('Profile Picture Updated');
         setloading(false);
-        navigation.goBack();
+        // navigation.goBack();
       })
       .catch(err => {
         setloading(false);
