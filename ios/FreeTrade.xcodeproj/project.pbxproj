@@ -12,6 +12,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1854CFC62A211738005FBF51 /* hermes.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1854CFC32A211701005FBF51 /* hermes.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		18F64BCE2A139BB0009FBEDB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18F64BCD2A139BAD009FBEDB /* GoogleService-Info.plist */; };
 		1DDE3CEE7A85AA43E6D9C29E /* Pods_FreeTrade.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9504CDD5D5AB93101AFEBCA2 /* Pods_FreeTrade.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -28,6 +29,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		1854CFC72A211738005FBF51 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1854CFC62A211738005FBF51 /* hermes.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* FreeTradeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeTradeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -40,6 +55,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FreeTrade/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = FreeTrade/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FreeTrade/main.m; sourceTree = "<group>"; };
+		1854CFC32A211701005FBF51 /* hermes.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = hermes.xcframework; path = "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework"; sourceTree = "<group>"; };
 		18F64BCD2A139BAD009FBEDB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = FreeTrade/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9504CDD5D5AB93101AFEBCA2 /* Pods_FreeTrade.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FreeTrade.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -107,6 +123,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1854CFC32A211701005FBF51 /* hermes.xcframework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				9504CDD5D5AB93101AFEBCA2 /* Pods_FreeTrade.framework */,
 				DC9D17708873249AA4911E1B /* Pods_FreeTrade_FreeTradeTests.framework */,
@@ -193,6 +210,7 @@
 				0F4C9FA44D4394E97C226F59 /* [CP] Embed Pods Frameworks */,
 				736AAB5C79C5EB2D09983EEC /* [CP] Copy Pods Resources */,
 				CBC0E34DD7DB32C28FD10DAB /* [CP-User] [RNFB] Core Configuration */,
+				1854CFC72A211738005FBF51 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

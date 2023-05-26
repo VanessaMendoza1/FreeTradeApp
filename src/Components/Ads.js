@@ -20,28 +20,37 @@ const Ads = ({data, onPress}) => {
           source={{uri: data.AdGraphicLink ? data.AdGraphicLink : img}}
         />
       </View>
-      {data.BussinessName && (
-        <>
-          <Text style={styles.MainText}>{data?.BussinessName}</Text>
-        </>
-      )}
-      {data.title && <Text style={styles.MainText}>{data.title}</Text>}
-      {data.TagLine && (
-        <Text style={{...styles.MainText3, color: 'red'}}>{data.TagLine}</Text>
-      )}
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+        }}>
+        {data.BussinessName && (
+          <>
+            <Text style={styles.MainText}>{data?.BussinessName}</Text>
+          </>
+        )}
+        {data.title && <Text style={styles.MainText}>{data.title}</Text>}
+        {data.TagLine && (
+          <Text style={{...styles.MainText3, color: 'red'}}>
+            {data.TagLine}
+          </Text>
+        )}
 
-      {data.Adtype == 'Business' && (
-        <>
-          <Text style={styles.MainText2}>{data.user.Address}</Text>
-          {data.user?.Phone !== undefined && (
-            <Text style={styles.MainText2}>
-              Call: {formatPhoneNumber(data.user.Phone)}
-            </Text>
-          )}
-        </>
-      )}
+        {data.Adtype == 'Business' && (
+          <>
+            <Text style={styles.MainText2}>{data.user.Address}</Text>
+            {data.user?.Phone !== undefined && (
+              <Text style={styles.MainText2}>
+                Call: {formatPhoneNumber(data.user.Phone)}
+              </Text>
+            )}
+          </>
+        )}
 
-      <Text style={styles.MainText3}>{data.user.location}</Text>
+        <Text style={styles.MainText3}>{data.user.location}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
