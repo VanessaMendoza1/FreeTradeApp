@@ -30,7 +30,7 @@ const ServiceItem = ({onPress, item}) => {
                 <Text style={styles.BPTag22}>
                   {item.Price !== '' ? priceFormatter(item.Price) : null}
                 </Text>
-                <Text style={styles.BPTag3}>${item.Discount}</Text>
+                <Text style={styles.BPTag3}>{priceFormatter(item.Discount)}</Text>
               </View>
             ) : (
               <Text style={styles.BPTag2}>

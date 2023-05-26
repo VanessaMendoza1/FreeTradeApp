@@ -28,6 +28,7 @@ import LoadingScreen from '../../Components/LoadingScreen';
 
 import axios from 'axios';
 import {areNotificationsHidden} from '../../utils/appConfigurations';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const isItemLiked = (itemId, setLikedCallback) => {
   let currentUserId = auth().currentUser.uid;
@@ -418,17 +419,17 @@ const OtherUserPostDetails = ({navigation, route}) => {
             {route.params.data.Discount !== 0 ? (
               <View style={styles.Discountbox}>
                 <Text style={styles.HeadingText33}>
-                  ${route.params.data.Discount}
+                  {priceFormatter(route.params.data.Discount)}
                 </Text>
                 <Text style={styles.HeadingText22}>
                   {route.params.data.Price !== '' &&
-                    '$' + route.params.data.Price}
+                    priceFormatter(route.params.data.Price)}
                 </Text>
               </View>
             ) : (
               <Text style={styles.HeadingText}>
                 {route.params.data.Price !== '' &&
-                  '$' + route.params.data.Price}
+                  priceFormatter(route.params.data.Price)}
               </Text>
             )}
           </View>

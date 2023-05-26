@@ -32,6 +32,7 @@ import {
   CreditCardInput,
   LiteCreditCardInput,
 } from 'react-native-credit-card-input';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const getSubscriptionTarriff = (
   setIndividualSubscriptionPricing,
@@ -195,7 +196,8 @@ const SubscriptionPage = ({navigation}) => {
                   setsub(!sub);
                 }}>
                 <Text style={styles.mainText123}>
-                  Personal Plan ${individualSubscriptionPricing}/Month
+                  Personal Plan {priceFormatter(individualSubscriptionPricing)}
+                  /Month
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -206,7 +208,8 @@ const SubscriptionPage = ({navigation}) => {
                 }}
                 style={styles.mainViewCC}>
                 <Text style={styles.mainText123}>
-                  Business Plan ${businessSubscriptionPricing}/Month
+                  Business Plan {priceFormatter(businessSubscriptionPricing)}
+                  /Month
                 </Text>
                 <Text style={styles.mainText1233}>
                   Let’s grow your business!

@@ -45,6 +45,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import moment from 'moment';
 import CreatePaymentIntent from '../../utils/stripe';
 import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const getAdsPrices = callback => {
   let adsPrices = [];
@@ -61,12 +62,16 @@ const getAdsPrices = callback => {
             let {charges, duration, numberOfAds} = tariffData;
             if (numberOfAds > 1) {
               adsPrices.push({
-                label: `$${charges} (${numberOfAds} ads for ${duration} days)`,
+                label: `${priceFormatter(
+                  charges,
+                )} (${numberOfAds} ads for ${duration} days)`,
                 value: charges,
               });
             } else {
               adsPrices.push({
-                label: `$${charges} (${numberOfAds} ad for ${duration} days)`,
+                label: `${priceFormatter(
+                  charges,
+                )} (${numberOfAds} ad for ${duration} days)`,
                 value: charges,
               });
             }

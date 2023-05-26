@@ -18,6 +18,7 @@ import database from '@react-native-firebase/database';
 import axios from 'axios';
 import uuid from 'react-native-uuid';
 import {sendMsg} from './Inbox';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const SendOffer = ({navigation, route}) => {
   const [offer, setoffer] = React.useState('');
@@ -34,14 +35,15 @@ const SendOffer = ({navigation, route}) => {
       .set({
         seen: false,
         userID: route.params.data.user.UserID,
-        text: UserData.name + ' sent you $' + offer + ' offer',
+        text: UserData.name + ' sent you ' + priceFormatter(offer) + ' offer',
       })
       .then(async () => {
         var data = JSON.stringify({
           data: {},
           notification: {
             body: 'Someone sent you a Request',
-            title: UserData.name + 'sent you $' + offer + ' offer',
+            title:
+              UserData.name + 'sent you $' + priceFormatter(offer) + ' offer',
           },
           // to: JSON.parse(Notii),
           to: Notii,
