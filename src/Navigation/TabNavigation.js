@@ -85,7 +85,7 @@ function TabNavigation({route: pRoute, visible, ...props}) {
                       color: focused ? Colors.Primary : '#0009',
                       fontSize: h('2%'),
                     }}>
-                    My Deals
+                    History
                   </Text>
                 </>
               );

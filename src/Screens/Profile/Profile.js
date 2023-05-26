@@ -201,9 +201,17 @@ const Profile = ({navigation}) => {
 
                 <View style={styles.HeadingTextContainer45}>
                   <View style={styles.HeartContainer}>
-                    <Icon name="star" size={20} color="gold" />
+                    <Icon
+                      name="star"
+                      size={20}
+                      color={MyData?.reviews > 0 ? 'gold' : 'grey'}
+                    />
                   </View>
-                  <Text style={styles.HeadingText5}>{MyData?.reviews}</Text>
+                  {MyData?.reviews > 0 ? (
+                    <Text style={styles.HeadingText5}>{MyData?.reviews}</Text>
+                  ) : (
+                    <Text style={styles.HeadingText5}>Not ratted yet</Text>
+                  )}
                 </View>
 
                 <View style={styles.BtoomTobCC}>
@@ -626,7 +634,7 @@ const styles = StyleSheet.create({
     marginRight: h('0.5%'),
   },
   HeadingTextContainer45: {
-    width: '18%',
+    width: '50%',
     // backgroundColor: 'orange',
     height: h('2.5%'),
     flexDirection: 'row',
@@ -758,4 +766,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  HeadingText5: {marginHorizontal: 5, width: '100%'},
 });

@@ -930,11 +930,10 @@ const styles = StyleSheet.create({
     fontSize: h('2%'),
   },
   Discountbox: {
-    width: '30%',
+    width: '60%',
     height: '100%',
     // backgroundColor: 'green',
-    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
 });

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,7 +22,9 @@ const Review = ({navigation, route}) => {
   const [Good, setGood] = React.useState(false);
   //   const [activeField, setActiveField] = React.useState(false);
   //   const [activeField, setActiveField] = React.useState(false);
-
+  useEffect(() => {
+    console.log('data', route?.params?.data);
+  }, []);
   const handleClick = value => {
     setCurrentValue(value);
   };
@@ -49,19 +51,19 @@ const Review = ({navigation, route}) => {
           <Image
             style={{width: '100%', height: '100%', resizeMode: 'cover'}}
             source={{
-              uri: route.params.data.image
-                ? route.params.data.image
+              uri: route?.params?.data?.BuyerImage
+                ? route?.params?.data?.BuyerImage
                 : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
             }}
           />
         </View>
       </View>
       {/* abc */}
-      <Text style={styles.nameText}>{route.params.data.name}</Text>
+      <Text style={styles.nameText}>{route?.params?.data?.name}</Text>
       <Text style={styles.nameText2}>How was your expirence?</Text>
 
       <View style={styles.starContainer}>
-        {stars.map((_, index) => {
+        {stars?.map((_, index) => {
           return (
             <TouchableOpacity
               onPress={() => handleClick(index + 1)}

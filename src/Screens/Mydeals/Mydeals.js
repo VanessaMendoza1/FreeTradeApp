@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -26,7 +27,7 @@ const Mydeals = ({navigation}) => {
 
   const SoldPost = async () => {
     let SOLDDATA = [];
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     await firestore()
       .collection('Sold')
       .get()
@@ -43,7 +44,7 @@ const Mydeals = ({navigation}) => {
 
   const BoughtData = async () => {
     let BoughtD = [];
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
 
     await firestore()
       .collection('Bought')
@@ -60,7 +61,7 @@ const Mydeals = ({navigation}) => {
   };
   const TradeData = async () => {
     let TradeD = [];
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     await firestore()
       .collection('Trade')
       .get()
@@ -74,7 +75,39 @@ const Mydeals = ({navigation}) => {
 
     setTrade(TradeD);
   };
-
+  const deleteSold = async id => {
+    console.log(id);
+    await firestore()
+      .collection('Sold')
+      .doc(id)
+      .delete()
+      .then(res => {
+        console.log(res);
+      })
+      .catch(error => {
+        console.error('Error removing document: ', error);
+      });
+  };
+  const deleteBought = id => {
+    firestore()
+      .collection('Trade')
+      .doc(id)
+      .delete()
+      .then(() => {})
+      .catch(error => {
+        console.error('Error removing document: ', error);
+      });
+  };
+  const deleteTrade = id => {
+    firestore()
+      .collection('Bought')
+      .doc(id)
+      .delete()
+      .then(() => {})
+      .catch(error => {
+        console.error('Error removing document: ', error);
+      });
+  };
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       SoldPost();
@@ -104,7 +137,7 @@ const Mydeals = ({navigation}) => {
             {/* <Icon name="arrow-back-outline" size={30} color="#ffff" /> */}
           </TouchableOpacity>
           <View style={styles.MiddleContainer}>
-            <Text style={styles.FontWork}>My Deals </Text>
+            <Text style={styles.FontWork}>History</Text>
           </View>
         </View>
         {/* header */}
@@ -197,9 +230,9 @@ const Mydeals = ({navigation}) => {
               <>
                 {sold.map(item => (
                   <MydealItem
-                    // onPress={() => {
-                    //   setShow(true);
-                    // }}
+                    onPress={() => {
+                      deleteSold(item?.ItemID);
+                    }}
                     Property={'Sold'}
                     data={item}
                   />
@@ -223,9 +256,9 @@ const Mydeals = ({navigation}) => {
               <>
                 {Bought.map(item => (
                   <MydealItem
-                    // onPress={() => {
-                    //   navigation.navigate('Review');
-                    // }}
+                    onPress={() => {
+                      navigation.navigate('Review', {data: item});
+                    }}
                     Property={'Bought'}
                     iconName={'checkmark-circle'}
                     iconColor={Colors.Primary}
