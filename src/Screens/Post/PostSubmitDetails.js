@@ -292,6 +292,7 @@ const PostSubmitDetails = ({navigation, route}) => {
           title: route.params.Title,
           images: route.params.images,
           condition: value3,
+          brand: brand,
         });
 
         setloading(false);

@@ -6,7 +6,7 @@ import {
   Image,
   Share,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Colors from '../../utils/Colors';
 import {h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -33,7 +33,9 @@ const Posted = ({navigation, route}) => {
       alert(error.message);
     }
   };
-
+  useEffect(() => {
+    console.log('route.param', route.params);
+  }, []);
   return (
     <View style={styles.MainContainer}>
       {/* header */}
@@ -73,6 +75,9 @@ const Posted = ({navigation, route}) => {
             <Text style={styles.NameC}>{route.params.title}</Text>
             <View style={styles.HeadingTextContainer45}>
               <Text style={styles.HeadingText5}>{route.params.condition}</Text>
+            </View>
+            <View style={styles.HeadingTextContainer45}>
+              <Text style={styles.HeadingText5}>{route.params.brand}</Text>
             </View>
           </View>
         </View>
