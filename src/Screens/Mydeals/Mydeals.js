@@ -261,6 +261,9 @@ const Mydeals = ({navigation}) => {
                 <>
                   {sold.map(item => (
                     <MydealItem
+                      onPress={() => {
+                        navigation.navigate('Review', {data: item});
+                      }}
                       onPressDelete={() => {
                         confirmationAlert('Sold', item?.ItemID);
                       }}
