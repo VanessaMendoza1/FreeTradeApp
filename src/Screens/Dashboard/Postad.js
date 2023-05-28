@@ -572,6 +572,9 @@ const Postad = ({navigation}) => {
                 <Text style={styles.RemebermeText2}>
                   I Agree to{' '}
                   <Text
+                    onPress={() => {
+                      navigation.navigate('TermsAndConditions');
+                    }}
                     style={{
                       color: Colors.Primary,
                       fontWeight: 'bold',

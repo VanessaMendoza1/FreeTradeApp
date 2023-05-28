@@ -7,7 +7,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import React from 'react';
+import React, {cloneElement, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import MydealItem from '../../Components/MydealItem';
@@ -15,6 +15,7 @@ import BottomContactAdmin from '../../Components/BottomContactAdmin';
 import firestore from '@react-native-firebase/firestore';
 import {useSelector, useDispatch} from 'react-redux';
 import auth from '@react-native-firebase/auth';
+import LoadingScreen from '../../Components/LoadingScreen';
 
 const Mydeals = ({navigation}) => {
   const [activeField, setActiveField] = React.useState('Sold');
@@ -22,9 +23,9 @@ const Mydeals = ({navigation}) => {
   const [sold, setSold] = React.useState([]);
   const [Bought, setBought] = React.useState([]);
   const [Trade, setTrade] = React.useState([]);
-
+  const [loading, setloading] = React.useState(false);
   const MyData = useSelector(state => state.counter.data);
-
+  const [deleted, setDeleted] = useState(false);
   const SoldPost = async () => {
     let SOLDDATA = [];
     const currentUserId = auth().currentUser.uid;
@@ -76,38 +77,83 @@ const Mydeals = ({navigation}) => {
     setTrade(TradeD);
   };
   const deleteSold = async id => {
-    console.log(id);
-    await firestore()
+    setloading(true);
+    firestore()
       .collection('Sold')
-      .doc(id)
-      .delete()
-      .then(res => {
-        console.log(res);
-      })
-      .catch(error => {
-        console.error('Error removing document: ', error);
+      .where('ItemID', '==', id)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot?.docs[0]?.ref
+          .delete()
+          .then(res => {
+            setloading(false);
+            SoldPost();
+            Alert.alert('Delete successfully');
+          })
+          .catch(() => {
+            setloading(false);
+          });
       });
   };
   const deleteBought = id => {
+    setloading(true);
     firestore()
-      .collection('Trade')
-      .doc(id)
-      .delete()
-      .then(() => {})
-      .catch(error => {
-        console.error('Error removing document: ', error);
+      .collection('Bought')
+      .where('ItemID', '==', id)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot?.docs[0]?.ref
+          .delete()
+          .then(res => {
+            setloading(false);
+            BoughtData();
+            Alert.alert('Delete successfully');
+          })
+          .catch(() => {
+            setloading(false);
+          });
       });
   };
   const deleteTrade = id => {
+    setloading(true);
     firestore()
-      .collection('Bought')
-      .doc(id)
-      .delete()
-      .then(() => {})
-      .catch(error => {
-        console.error('Error removing document: ', error);
+      .collection('Trade')
+      .where('ItemID', '==', id)
+      .get()
+      .then(querySnapshot => {
+        querySnapshot?.docs[0]?.ref
+          .delete()
+          .then(res => {
+            setloading(false);
+            setDeleted(true);
+            TradeData();
+            Alert.alert('Delete successfully');
+          })
+          .catch(() => {
+            setloading(false);
+          });
       });
   };
+  const confirmationAlert = (type, id) =>
+    Alert.alert('Delete Post', 'Do you really want to delete?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          if (type === 'Traded') {
+            deleteTrade(id);
+          } else if (type === 'Sold') {
+            deleteSold(id);
+          } else {
+            deleteBought(id);
+          }
+        },
+      },
+    ]);
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       SoldPost();
@@ -116,7 +162,7 @@ const Mydeals = ({navigation}) => {
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, deleted]);
 
   return (
     <>
@@ -126,193 +172,189 @@ const Mydeals = ({navigation}) => {
           setShow(false);
         }}
       /> */}
-      <View style={styles.mainContainer}>
-        {/* header */}
-        <View style={styles.Header}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={styles.LeftContainer}>
-            {/* <Icon name="arrow-back-outline" size={30} color="#ffff" /> */}
-          </TouchableOpacity>
-          <View style={styles.MiddleContainer}>
-            <Text style={styles.FontWork}>History</Text>
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <View style={styles.mainContainer}>
+          {/* header */}
+          <View style={styles.Header}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+              style={styles.LeftContainer}>
+              {/* <Icon name="arrow-back-outline" size={30} color="#ffff" /> */}
+            </TouchableOpacity>
+            <View style={styles.MiddleContainer}>
+              <Text style={styles.FontWork}>History</Text>
+            </View>
           </View>
-        </View>
-        {/* header */}
+          {/* header */}
 
-        {/* button Containers */}
-        <View style={styles.BtnContainer}>
-          {activeField === 'Sold' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Sold');
-                SoldPost();
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Sold</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Sold');
-                SoldPost();
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Sold</Text>
-            </TouchableOpacity>
-          )}
-          <View style={styles.borderCC} />
-          {activeField === 'Bought' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Bought');
-                BoughtData();
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Bought</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Bought');
-                BoughtData();
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Bought</Text>
-            </TouchableOpacity>
-          )}
-          <View style={styles.borderCC} />
-          {activeField === 'Traded' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Traded');
-                TradeData();
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Traded</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('Traded');
-                TradeData();
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Traded</Text>
-            </TouchableOpacity>
-          )}
-          {/* <View style={styles.borderCC} /> */}
-          {/* {activeField === 'loved' ? (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('loved');
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>loved</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setActiveField('loved');
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>loved</Text>
-            </TouchableOpacity>
-          )} */}
-        </View>
-        {/* button Containers */}
+          {/* button Containers */}
+          <View style={styles.BtnContainer}>
+            {activeField === 'Sold' ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setActiveField('Sold');
+                  SoldPost();
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Sold</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setActiveField('Sold');
+                  SoldPost();
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Sold</Text>
+              </TouchableOpacity>
+            )}
+            <View style={styles.borderCC} />
+            {activeField === 'Bought' ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setActiveField('Bought');
+                  BoughtData();
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Bought</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setActiveField('Bought');
+                  BoughtData();
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Bought</Text>
+              </TouchableOpacity>
+            )}
+            <View style={styles.borderCC} />
+            {activeField === 'Traded' ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setActiveField('Traded');
+                  TradeData();
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Traded</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setActiveField('Traded');
+                  TradeData();
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Traded</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* button Containers */}
 
-        {activeField === 'Sold' && (
-          <>
-            {sold.length >= 1 ? (
-              <>
-                {sold.map(item => (
-                  <MydealItem
-                    onPress={() => {
-                      deleteSold(item?.ItemID);
-                    }}
-                    Property={'Sold'}
-                    data={item}
-                  />
-                ))}
-              </>
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text>NO DATA</Text>
-              </View>
-            )}
-          </>
-        )}
-        {activeField === 'Bought' && (
-          <>
-            {Bought.length >= 1 ? (
-              <>
-                {Bought.map(item => (
-                  <MydealItem
-                    onPress={() => {
-                      navigation.navigate('Review', {data: item});
-                    }}
-                    Property={'Bought'}
-                    iconName={'checkmark-circle'}
-                    iconColor={Colors.Primary}
-                    data={item}
-                  />
-                ))}
-              </>
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text>NO DATA</Text>
-              </View>
-            )}
-          </>
-        )}
-        {activeField === 'Traded' && (
-          <>
-            {Trade.length >= 1 ? (
-              <>
-                {Trade.map(item => (
-                  <MydealItem
-                    // onPress={() => {
-                    //   navigation.navigate('Review');
-                    // }}
-                    Property={'Traded'}
-                    iconName={'checkmark-circle'}
-                    iconColor={Colors.Primary}
-                    data={item}
-                  />
-                ))}
-              </>
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text>NO DATA</Text>
-              </View>
-            )}
-          </>
-        )}
-        {activeField === 'loved' && (
-          <>
-            <MydealItem iconName={'heart'} iconColor={'red'} />
-            <MydealItem iconName={'heart'} iconColor={'red'} />
-          </>
-        )}
-      </View>
+          {activeField === 'Sold' && (
+            <>
+              {sold.length >= 1 ? (
+                <>
+                  {sold.map(item => (
+                    <MydealItem
+                      onPressDelete={() => {
+                        confirmationAlert('Sold', item?.ItemID);
+                      }}
+                      Property={'Sold'}
+                      deleteIcon={'delete'}
+                      data={item}
+                    />
+                  ))}
+                </>
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text>NO DATA</Text>
+                </View>
+              )}
+            </>
+          )}
+          {activeField === 'Bought' && (
+            <>
+              {Bought.length >= 1 ? (
+                <>
+                  {Bought.map(item => (
+                    <MydealItem
+                      onPress={() => {
+                        navigation.navigate('Review', {data: item});
+                      }}
+                      onPressDelete={() => {
+                        confirmationAlert('Bought', item?.ItemID);
+                      }}
+                      Property={'Bought'}
+                      iconName={'checkmark-circle'}
+                      deleteIcon={'delete'}
+                      iconColor={Colors.Primary}
+                      data={item}
+                    />
+                  ))}
+                </>
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text>NO DATA</Text>
+                </View>
+              )}
+            </>
+          )}
+          {activeField === 'Traded' && (
+            <>
+              {Trade.length >= 1 ? (
+                <>
+                  {Trade.map(item => (
+                    <MydealItem
+                      onPress={() => {
+                        navigation.navigate('Review');
+                      }}
+                      onPressDelete={() => {
+                        confirmationAlert('Traded', item?.ItemID);
+                      }}
+                      Property={'Traded'}
+                      iconName={'checkmark-circle'}
+                      deleteIcon={'delete'}
+                      iconColor={Colors.Primary}
+                      deleteColor={Colors.black}
+                      data={item}
+                    />
+                  ))}
+                </>
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text>NO DATA</Text>
+                </View>
+              )}
+            </>
+          )}
+          {activeField === 'loved' && (
+            <>
+              <MydealItem iconName={'heart'} iconColor={'red'} />
+              <MydealItem iconName={'heart'} iconColor={'red'} />
+            </>
+          )}
+        </View>
+      )}
     </>
   );
 };

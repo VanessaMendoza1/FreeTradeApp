@@ -235,7 +235,11 @@ const Signup = ({navigation}) => {
               tintColors={{true: '#fff'}}
               onTintColor={'#fff'}
             />
-            <Text style={styles.RemebermeText}>
+            <Text
+              onPress={() => {
+                navigation.navigate('TermsAndConditions');
+              }}
+              style={styles.RemebermeText}>
               I accept Terms and Conditions
             </Text>
           </View>
