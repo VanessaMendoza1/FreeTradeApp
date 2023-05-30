@@ -234,6 +234,8 @@ const Inbox = ({navigation, route}) => {
                 resizeMode: 'cover',
                 borderRadius: 10,
                 marginBottom: 2,
+                borderRadius: h('4%'),
+                overflow: 'hidden',
               }}
               source={{
                 uri: itemOfDiscussionImage
@@ -282,23 +284,27 @@ const Inbox = ({navigation, route}) => {
 
             height: 70,
             flexDirection: 'row',
-            alignItems: 'center',
+            alignContent: 'center',
             // paddingVertical: 7,
             justifyContent: 'space-evenly',
+            marginBottom: 10,
           }}
           disabled={disabled}>
           <TextInput
             style={{
               backgroundColor: '#ffff',
               width: '75%',
-              height: 55,
-              paddingHorizontal: 15,
+              height: '75%',
+              borderRadius: 30,
+              padding: 15,
               color: '#000',
               fontSize: h('2%'),
               borderColor: Colors.Primary,
               // borderRadius: 10,
               borderWidth: h('0.2%'),
               alignSelf: 'center',
+              textAlignVertical: 'center',
+              paddingTop: 13,
               // marginTop: h('1%'),
             }}
             placeholder="Type a Message"
@@ -388,10 +394,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   BtnCCW: {
-    width: '20%',
-    height: 55,
+    width: 60,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.Primary,
+    borderRadius: 30,
   },
 });

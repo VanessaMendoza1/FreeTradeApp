@@ -25,6 +25,7 @@ const Notification = ({navigation}) => {
     console.log('Getting Notifications');
     NotificationData();
     NotificationData2();
+    console.log('Notii', Notii);
   };
 
   useFocusEffect(
@@ -43,6 +44,7 @@ const Notification = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
+          console.log('image', documentSnapshot?.data().sellerData);
           if (
             documentSnapshot.data() &&
             documentSnapshot.data().userID == currentUserId
@@ -69,7 +71,7 @@ const Notification = ({navigation}) => {
         let batch = firestore().batch();
         snapshot.docs.forEach(doc => {
           const ref = doc.ref;
-          batch.update(ref, { seen: true });
+          batch.update(ref, {seen: true});
         });
         return batch.commit();
       });
