@@ -619,6 +619,7 @@ const MakePost = ({navigation}) => {
                   style={styles.inputTxtC}
                   placeholder={'Price (Optional)'}
                   onChangeText={e => setPrice(e)}
+                  keyboardType="decimal-pad"
                   placeholderTextColor={Colors.Primary}
                   value={Price}
                 />

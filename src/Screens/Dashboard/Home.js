@@ -675,7 +675,7 @@ const Home = ({navigation}) => {
             // panGestureHandlerProps={{
             //   activeOffsetX: [-10, 10],
             // }}
-            onSnapToItem={index => console.log('current index:', index)}
+            onSnapToItem={index => {}}
             renderItem={({item, index}) => {
               return (
                 <Ads

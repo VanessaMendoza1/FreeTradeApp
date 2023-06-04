@@ -91,6 +91,7 @@ const Posted = ({navigation, route}) => {
         <Appbutton
           text={'Start Promotion'}
           onPress={() => {
+            console.log(oldData);
             navigation.navigate('PostPromotion', {data: oldData});
           }}
         />
