@@ -170,7 +170,6 @@ const LocationPage = ({navigation}) => {
                       })
                       .catch(err => {
                         setloading(false);
-                        console.warn(err);
                       });
 
                     await dispatch(DataInsert(userData[0]));
@@ -185,7 +184,6 @@ const LocationPage = ({navigation}) => {
                       navigation.navigate('TabNavigation');
                     } catch (e) {
                       // saving error
-                      console.warn(e);
                       setloading(false);
                       navigation.navigate('TabNavigation');
                     }

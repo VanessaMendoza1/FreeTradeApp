@@ -26,7 +26,6 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import database from '@react-native-firebase/database';
 
 const PostEdit = ({navigation, route}) => {
-  console.warn(route.params.data.PostType === 'Trading');
   const dispatch = useDispatch();
 
   const [toggleCheckBox, setToggleCheckBox] = React.useState(

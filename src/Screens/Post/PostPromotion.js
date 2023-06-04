@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Image,
   Modal,
-  ScrollView
+  ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -32,17 +32,13 @@ import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import LoadingScreen from '../../Components/LoadingScreen';
 import {getAdsPrices} from '../Dashboard/Postad';
 import axios from 'axios';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
+import {PostAdd} from '../../redux/postSlice';
 
 const PostPromotion = ({navigation, route}) => {
-  console.warn(route.params.data.title);
   const dispatch = useDispatch();
-  const [items, setItems] = React.useState([
-    // {label: '$1 (1 ad for 15 days)', value: 100},
-    // {label: '$5 (1 ad for 30 days)', value: 500},
-    // {label: '$8 (2 ad for 30 days)', value: 800},
-  ]);
+  const [items, setItems] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
@@ -52,7 +48,8 @@ const PostPromotion = ({navigation, route}) => {
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
   const [businessName, setBusinessName] = React.useState(MyData?.BusinessName);
-
+  const [type, setType] = useState(route?.params?.type);
+  const [postData, setpostData] = useState(route?.params?.postdata);
   useFocusEffect(
     React.useCallback(() => {
       console.log('Focussed PostPromotion.js, running getAdsPrices');
@@ -71,27 +68,54 @@ const PostPromotion = ({navigation, route}) => {
           UserID: MyData.UserID,
           ads: value,
           Adtype: 'Personal',
-          AdGraphicLink: route.params.data.images[0],
+          AdGraphicLink:
+            route.params.data.images.length > 0
+              ? route.params.data.images[0]
+              : '',
           TagLine: '',
           MediaType: 'Image',
         })
         .then(() => {
           setmodalVisble(true);
-          console.warn('Ad Posted');
           setloading(false);
         })
         .catch(err => {
           setloading(false);
-          console.warn(err);
         });
     } else {
       alert('You need to Agree to Terms and Condition');
     }
   };
+  const postAdd = async data => {
+    await firestore()
+      .collection('Post')
+      .doc(data?.DocId)
+      .set()
+      .then(async doc => {
+        let PostData = [];
+        await firestore()
+          .collection('Post')
+          .get()
+          .then(async querySnapshot => {
+            console.log('Total users: ', querySnapshot.size);
 
+            querySnapshot.forEach(documentSnapshot => {
+              PostData.push(documentSnapshot.data());
+            });
+            await dispatch(PostAdd(PostData));
+          })
+          .catch(err => {
+            console.log('Caught error while submitting post');
+            console.log(err);
+          });
+        setloading(false);
+      })
+      .catch(err => {
+        setloading(false);
+      });
+  };
   const PostAd = async () => {
     let currentUserId = auth().currentUser.uid;
-    // console.warn('HEHHE');
     const now = moment.utc();
     var end = moment().add(value === 100 ? 15 : 30, 'days');
     var days = now.diff(end, 'days');
@@ -109,7 +133,10 @@ const PostPromotion = ({navigation, route}) => {
             UserID: currentUserId,
             ads: value,
             Adtype: 'Personal',
-            AdGraphicLink: route.params.data.images[0],
+            AdGraphicLink:
+              route.params.data.images.length > 0
+                ? route.params.data.images[0]
+                : '',
             TagLine: '',
             MediaType: 'Image',
             title: route.params.data.Title,
@@ -122,15 +149,16 @@ const PostPromotion = ({navigation, route}) => {
                 : businessName,
           })
           .then(() => {
-            Allads();
+            if (type === 'post') {
+              postAdd(postData);
+            } else {
+              Allads();
+            }
             setmodalVisble(true);
-            console.warn('Ad Posted');
             setloading(false);
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
-            console.warn('ERROR');
           });
       } else {
         setloading(false);
@@ -187,14 +215,18 @@ const PostPromotion = ({navigation, route}) => {
               <Icon name="arrow-back-outline" size={30} color="#ffff" />
             </TouchableOpacity>
             <View style={styles.MiddleContainer}>
-              <Text style={styles.FontWork}>Promotion</Text>
+              <Text style={styles.FontWork}>
+                {type === 'post' ? 'Post' : 'Promotion'}
+              </Text>
             </View>
           </View>
           {/* header */}
 
           <View style={styles.MainPromtionContainer}>
             <Text style={styles.PromtionText}>
-              Sell or Trade Faster Promoting!
+              {type === 'post'
+                ? 'Start posting fater'
+                : 'Sell or Trade Faster Promoting!'}
             </Text>
             {/* img */}
             <View style={styles.ProfileContainer}>
@@ -202,9 +234,10 @@ const PostPromotion = ({navigation, route}) => {
                 <Image
                   style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                   source={{
-                    uri: route.params.data.images[0]
-                      ? route.params.data.images[0]
-                      : 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=465&q=80',
+                    uri:
+                      route.params.data?.images?.length > 0
+                        ? route.params.data.images[0]
+                        : 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=465&q=80',
                   }}
                 />
               </View>
@@ -215,7 +248,11 @@ const PostPromotion = ({navigation, route}) => {
             {/* dropdown */}
             <TextInput
               style={styles.inputContainercc}
-              placeholder={'Set Business name For Promotion'}
+              placeholder={
+                type === 'post'
+                  ? 'Subscribe to post your ad'
+                  : 'Set Business name For Promotion'
+              }
               placeholderTextColor={Colors.Primary}
               onChangeText={e => setBusinessName(e)}
               value={businessName}
@@ -254,6 +291,9 @@ const PostPromotion = ({navigation, route}) => {
               <Text style={styles.RemebermeText2}>
                 I Agree to{' '}
                 <Text
+                  onPress={() => {
+                    navigation.navigate('TermsAndConditions');
+                  }}
                   style={{
                     color: Colors.Primary,
                     fontWeight: 'bold',
@@ -301,7 +341,7 @@ const PostPromotion = ({navigation, route}) => {
             {/* sqbook */}
             <View style={{marginBottom: h('1%')}} />
             <Appbutton
-              text={'Start Promotion'}
+              text={type === 'post' ? 'Start Posting' : 'Start Promotion'}
               onPress={() => {
                 // adposted();
                 if (toggleCheckBox3) {
@@ -358,20 +398,14 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
   const [cardData, setCardData] = React.useState('');
 
   const _createToken = async Token => {
-    console.warn(cardData.number);
-    console.warn(email);
-    console.warn(amount);
-    console.warn(cardData.expiry);
-    console.warn(cardData.cvc);
-
     // setloading(false);
     axios
       .get(
         `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
-          cardData.number
+          cardData?.number
         }&email=${email}&amount=${
           amount * 100
-        }&description=Test one time payment&expiry=${cardData.expiry}&cvc=${
+        }&description=Test one time payment&expiry=${cardData?.expiry}&cvc=${
           cardData.cvc
         }`,
       )
@@ -390,7 +424,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
       <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
         <LiteCreditCardInput
           onChange={({values}) => {
-            // console.warn(values);
             setCardData(values);
           }}
         />
@@ -487,7 +520,7 @@ const styles = StyleSheet.create({
     fontSize: h('2%'),
     paddingLeft: h('1.5%'),
     marginTop: h('1%'),
-    marginBottom: 20
+    marginBottom: 20,
   },
   RemeberMebOx2: {
     width: '100%',

@@ -45,6 +45,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import moment from 'moment';
 import CreatePaymentIntent from '../../utils/stripe';
 import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const getAdsPrices = callback => {
   let adsPrices = [];
@@ -61,12 +62,16 @@ const getAdsPrices = callback => {
             let {charges, duration, numberOfAds} = tariffData;
             if (numberOfAds > 1) {
               adsPrices.push({
-                label: `$${charges} (${numberOfAds} ads for ${duration} days)`,
+                label: `${priceFormatter(
+                  charges,
+                )} (${numberOfAds} ads for ${duration} days)`,
                 value: charges,
               });
             } else {
               adsPrices.push({
-                label: `$${charges} (${numberOfAds} ad for ${duration} days)`,
+                label: `${priceFormatter(
+                  charges,
+                )} (${numberOfAds} ad for ${duration} days)`,
                 value: charges,
               });
             }
@@ -129,14 +134,10 @@ const Postad = ({navigation}) => {
 
   const MyData = useSelector(state => state.counter.data);
   const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(MyData);
 
   React.useEffect(() => {
     getAdsPrices(setItems);
   }, []);
-  // console.warn(subdata[0].plan === 'Business');
-  // console.warn(value);
-
   const openPhoto = () => {
     setloading(true);
     ImagePicker.openPicker({
@@ -158,7 +159,6 @@ const Postad = ({navigation}) => {
             var progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             if (progress == 100) {
-              // console.warn('DONE');
             }
           },
           error => {
@@ -178,7 +178,6 @@ const Postad = ({navigation}) => {
       })
       .catch(err => {
         setShowUploadBox(false);
-        console.warn(err);
         setloading(false);
         alert('Something went wrong');
       });
@@ -204,7 +203,6 @@ const Postad = ({navigation}) => {
             var progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             if (progress == 100) {
-              // console.warn('DONE');
             }
           },
           error => {
@@ -224,7 +222,6 @@ const Postad = ({navigation}) => {
       })
       .catch(err => {
         setShowUploadBox(false);
-        console.warn(err);
         setloading(false);
         alert('Something went wrong');
       });
@@ -248,7 +245,6 @@ const Postad = ({navigation}) => {
           var progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           if (progress == 100) {
-            // console.warn('DONE');
           }
         },
         error => {
@@ -259,7 +255,6 @@ const Postad = ({navigation}) => {
         () => {
           uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
             setVideoUrl(downloadURL);
-            console.warn(downloadURL);
             setloading(false);
           });
         },
@@ -270,12 +265,10 @@ const Postad = ({navigation}) => {
       // setResult([pickerResult]);
     } catch (e) {
       setloading(false);
-      console.warn(e);
     }
   };
 
   const PostAd = async () => {
-    console.warn('HEHHE');
     const now = moment.utc();
     var end = moment().add(value === 100 ? 15 : 30, 'days');
     var days = now.diff(end, 'days');
@@ -309,7 +302,6 @@ const Postad = ({navigation}) => {
           .then(() => {
             Allads();
             setmodalVisble(true);
-            console.warn('Ad Posted');
             setloading(false);
             setImgeUrl('');
             setVideoUrl('');
@@ -319,7 +311,6 @@ const Postad = ({navigation}) => {
           })
           .catch(err => {
             setloading(false);
-            console.warn(err);
           });
       } else {
         setloading(false);
@@ -348,8 +339,6 @@ const Postad = ({navigation}) => {
 
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
-
-    console.warn(ImageData);
   };
 
   const getvideo = () => {
@@ -359,14 +348,10 @@ const Postad = ({navigation}) => {
         mediaType: 'video',
       },
       response => {
-        // console.warn(response);
-        // alert(response);
         response.assets?.map(i => {
           console.log('response', i.uri);
           let d = i?.uri;
-          // setgetvideo(i?.uri);
           openVideo(d);
-          // setVideoUrl(i?.uri);
         });
         if (response.didCancel) {
           setloading(false);
@@ -545,13 +530,13 @@ const Postad = ({navigation}) => {
               {/* {subdata.length > 0 ? (
                 <>
                   {subdata[0].plan === 'Business' ? ( */}
-                    <TextInput
-                      style={styles.inputText}
-                      placeholder={'Tag line: 12 characters'}
-                      placeholderTextColor={Colors.Primary}
-                      onChangeText={e => setTagLine(e)}
-                    />
-                  {/* ) : null}
+              <TextInput
+                style={styles.inputText}
+                placeholder={'Tag line: 12 characters'}
+                placeholderTextColor={Colors.Primary}
+                onChangeText={e => setTagLine(e)}
+              />
+              {/* ) : null}
                 </>
               ) : null} */}
 
@@ -587,6 +572,9 @@ const Postad = ({navigation}) => {
                 <Text style={styles.RemebermeText2}>
                   I Agree to{' '}
                   <Text
+                    onPress={() => {
+                      navigation.navigate('TermsAndConditions');
+                    }}
                     style={{
                       color: Colors.Primary,
                       fontWeight: 'bold',
@@ -600,7 +588,6 @@ const Postad = ({navigation}) => {
               <View style={styles.Btncc}>
                 <Appbutton
                   onPress={() => {
-                    console.warn(value);
                     if (Title === '' || value === '') {
                       alert('Please Fill all fields');
                     } else {
@@ -650,7 +637,7 @@ const Postad = ({navigation}) => {
                 <Text style={styles.modalText}>Stripe</Text>
                 <PaymentScreen
                   amount={value}
-                  email={MyData.email}
+                  email={MyData?.email}
                   onLoading={() => {
                     setloading(true);
                   }}
@@ -681,13 +668,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
   const [cardData, setCardData] = React.useState('');
 
   const _createToken = async Token => {
-    // console.warn(cardData.number);
-    // console.warn(email);
-    // console.warn(amount);
-    // console.warn(cardData.expiry);
-    // console.warn(cardData.cvc);
-    // console.warn(cardData.number)
-
     axios
       .get(
         `https://umeraftabdev.com/FreeTradeApi/public/api/charge?card_number=${
@@ -740,94 +720,15 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
       <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
         <LiteCreditCardInput
           onChange={({values}) => {
-            // console.warn(values);
             setCardData(values);
           }}
         />
       </View>
-      {/* <CardField
-        postalCodeEnabled={false}
-        placeholders={{
-          number: '4242 4242 4242 4242',
-        }}
-        cardStyle={{
-          backgroundColor: '#FFFFFF',
-          textColor: '#000000',
-        }}
-        style={{
-          width: '100%',
-          height: 50,
-          marginVertical: 30,
-        }}
-        onCardChange={async card => {
-          setCardData(card);
-          // console.warn(cardDetails);
-        }}
-        onFocus={focusedField => {
-          console.log('focusField', focusedField);
-        }}
-      /> */}
-
-      {/* <TextInput
-        style={{
-          width: '95%',
-          height: '13%',
-          // backgroundColor: 'red',
-          marginTop: 10,
-          marginBottom: 10,
-          borderColor: Colors.Primary,
-          borderWidth: 2,
-          borderRadius: 2,
-        }}
-      />
-      <TextInput
-        style={{
-          width: '95%',
-          height: '13%',
-          // backgroundColor: 'red',
-          marginTop: 10,
-          marginBottom: 10,
-          borderColor: Colors.Primary,
-          borderWidth: 2,
-          borderRadius: 2,
-        }}
-      />
-      <TextInput
-        style={{
-          width: '95%',
-          height: '13%',
-          // backgroundColor: 'red',
-          marginTop: 10,
-          marginBottom: 10,
-          borderColor: Colors.Primary,
-          borderWidth: 2,
-          borderRadius: 2,
-        }}
-      /> */}
-
       <TouchableOpacity
         style={[styles.button, styles.buttonClose]}
         onPress={async () => {
           onLoading();
-
-          // console.warn(formatString(cardData.expiry))
           _createToken();
-          // let d1 = {
-          //   amount: amount,
-          // };
-          // try {
-          //   const res = await CreatePaymentIntent(d1);
-          //   console.warn(res.data.paymentIntent);
-          //   if (res?.data?.paymentIntent) {
-          //     let req = await confirmPayment(res?.data?.paymentIntent, {
-          //       paymentMethodType: 'Card',
-          //     });
-          //     console.warn(req);
-          //     await
-          //   }
-          // } catch (error) {
-          //   console.warn(error);
-          // }
         }}>
         <Text style={styles.textStyle}>Submit</Text>
       </TouchableOpacity>

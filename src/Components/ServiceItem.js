@@ -9,6 +9,7 @@ import {
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../utils/Colors';
+import {priceFormatter} from '../utils/helpers/helperFunctions';
 
 const ServiceItem = ({onPress, item}) => {
   return (
@@ -27,13 +28,13 @@ const ServiceItem = ({onPress, item}) => {
             {item.Discount !== 0 ? (
               <View style={styles.boxview}>
                 <Text style={styles.BPTag22}>
-                  {item.Price !== '' ? '$' + item.Price : null}
+                  {item.Price !== '' ? priceFormatter(item.Price) : null}
                 </Text>
-                <Text style={styles.BPTag3}>${item.Discount}</Text>
+                <Text style={styles.BPTag3}>{priceFormatter(item.Discount)}</Text>
               </View>
             ) : (
               <Text style={styles.BPTag2}>
-                {item.Price !== '' ? '$' + item.Price : null}
+                {item.Price !== '' ? priceFormatter(item.Price) : null}
               </Text>
             )}
           </View>
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   },
   BottomContainer: {
     width: '100%',
-    height: '30%',
+    height: '44%',
     // backgroundColor: 'red',
     paddingLeft: 5,
   },
@@ -112,14 +113,12 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: h('2%'),
     fontWeight: 'bold',
-    paddingLeft: 10,
   },
   boxview: {
     width: '80%',
     height: '40%',
     // backgroundColor: 'red',
-    flexDirection: 'row',
+    // flexDirection: 'row',
     // justifyContent: 'space-between',
-    alignItems: 'center',
   },
 });

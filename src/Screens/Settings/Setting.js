@@ -20,12 +20,14 @@ import Icons from '../../utils/icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {LoginManager} from 'react-native-fbsdk-next';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const Setting = ({navigation}) => {
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
+
   const [isBusinessAccount, setIsBusinessAccount] = React.useState(false);
   // const [ loading, setloading ] = React.useState(false)
   useFocusEffect(
@@ -35,33 +37,18 @@ const Setting = ({navigation}) => {
       );
       isUserHavingBussinessSubscription();
       return () => null;
-    }, []),
+    }, [isFocused]),
   );
 
   React.useEffect(() => {
     console.log({isBusinessAccount});
-  }, [isBusinessAccount]);
+  }, [isBusinessAccount, isFocused]);
 
-  const MyData = useSelector(state => state.counter.data);
-  console.warn(MyData.name);
-
-  const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(subdata[0].plan === 'Bussiness');
+  const MyData = useSelector(state => state?.counter?.data);
+  const subdata = useSelector(state => state?.sub?.subdata);
 
   const clearAll = async () => {
     try {
-      await LoginManager.logOut()
-        .then(async () => {
-          await AsyncStorage.clear();
-          navigation.replace('Login');
-        })
-        .catch(e => {});
-      await GoogleSignin.signOut()
-        .then(async () => {
-          await AsyncStorage.clear();
-          navigation.replace('Login');
-        })
-        .catch(e => {});
       auth()
         .signOut()
         .then(
@@ -69,12 +56,23 @@ const Setting = ({navigation}) => {
             console.log('Signed Out');
             await dispatch(DataInsert({}));
             await AsyncStorage.clear();
+            await LoginManager.logOut()
+              .then(async () => {})
+              .catch(e => {});
+            await GoogleSignin.signOut()
+              .then(async () => {
+                await AsyncStorage.clear();
+                navigation.replace('Login');
+              })
+              .catch(e => {});
             navigation.replace('Login');
           },
           function (error) {
             console.error('Sign Out Error', error);
           },
         );
+      await AsyncStorage.clear();
+      navigation.replace('Login');
     } catch (e) {
       // clear error
     }
@@ -86,28 +84,7 @@ const Setting = ({navigation}) => {
     if (subdata.length > 0 && subdata[0].plan === 'Bussiness') {
       setIsBusinessAccount(true);
     }
-    // let currentUserId = auth().currentUser.uid;
-    // firestore()
-    //   .collection('Users')
-    //   .doc(currentUserId)
-    //   .get()
-    //   .then(documentSnapshot => {
-    //     if (documentSnapshot.exists) {
-    //       let userData = documentSnapshot.data();
-    //       console.log({userData});
-    //       if (userData.AccountType == 'Bussiness') {
-    //         setIsBusinessAccount(true);
-    //       }
-    //     }
-    //   })
-    //   .catch(err => {
-    //     // setloading(false);
-    //     console.warn(err);
-    //   });
   };
-
-  // console.log({IMAGE: MyData.image})
-
   return (
     <ScrollView>
       <View style={styles.MainContainer}>
@@ -132,18 +109,18 @@ const Setting = ({navigation}) => {
             <Image
               style={{width: '100%', height: '100%', resizeMode: 'cover'}}
               source={{
-                uri: MyData.image
-                  ? MyData.image
+                uri: MyData?.image
+                  ? MyData?.image
                   : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
               }}
             />
           </View>
           <Text style={styles.nameText}>
             {subdata.length > 0
-              ? subdata[0].plan === 'Bussiness'
-                ? MyData.BusinessName
-                : MyData.name
-              : MyData.name}
+              ? subdata[0]?.plan === 'Bussiness'
+                ? MyData?.BusinessName
+                : MyData?.name
+              : MyData?.name}
           </Text>
         </View>
         {/* profile Containr */}

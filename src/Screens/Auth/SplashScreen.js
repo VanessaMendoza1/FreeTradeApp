@@ -26,7 +26,6 @@ const SplashScreen = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          console.warn(documentSnapshot.data());
           if (documentSnapshot.data().MediaType === 'Image') {
             ImageData.push(documentSnapshot.data());
           }
@@ -59,7 +58,6 @@ const SplashScreen = ({navigation}) => {
         }, 4000);
       }
     } catch (e) {
-      console.warn(e);
       // error reading value
     }
   };
@@ -75,11 +73,8 @@ const SplashScreen = ({navigation}) => {
           userData.push(documentSnapshot.data());
         }
       })
-      .catch(err => {
-        console.warn(err);
-      });
+      .catch(err => {});
 
-    console.warn(userData[0]);
     await dispatch(DataInsert(userData[0]));
 
     navigation.navigate('TabNavigation');

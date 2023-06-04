@@ -84,7 +84,6 @@ const Login = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          console.warn(documentSnapshot.data());
           if (documentSnapshot.data().MediaType === 'Image') {
             ImageData.push(documentSnapshot.data());
           }
@@ -96,7 +95,6 @@ const Login = ({navigation}) => {
 
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
-    console.warn(ImageData);
   };
 
   // const ABC = () => {
@@ -119,9 +117,7 @@ const Login = ({navigation}) => {
       .collection('booksList')
       .get()
       .then(async querySnapshot => {
-        querySnapshot.forEach(documentSnapshot => {
-          console.warn(documentSnapshot.data());
-        });
+        querySnapshot.forEach(documentSnapshot => {});
       });
   };
 
@@ -149,10 +145,8 @@ const Login = ({navigation}) => {
               })
               .catch(err => {
                 setloading(false);
-                console.warn(err);
               });
 
-            console.warn(userData[0]);
             await dispatch(DataInsert(userData[0]));
             if (toggleCheckBox) {
               await AsyncStorage.setItem(
@@ -166,17 +160,14 @@ const Login = ({navigation}) => {
               if (value !== null) {
                 // allmypost();
                 navigation.navigate('TabNavigation');
-                console.warn(value);
               } else {
                 navigation.navigate('TabNavigation');
 
                 // navigation.navigate('LocationPage');
-                console.warn(value);
                 setloading(false);
               }
             } catch (e) {
               setloading(false);
-              console.warn(e);
               // error reading value
             }
 
@@ -189,7 +180,6 @@ const Login = ({navigation}) => {
         .catch(error => {
           setloading(true);
           const errorMessage = error.code;
-          console.warn(error);
           if (errorMessage === 'auth/wrong-password') {
             alert('Wrong Password');
             setloading(false);
@@ -249,22 +239,18 @@ const Login = ({navigation}) => {
           if (value !== null) {
             // allmypost();
             navigation.navigate('TabNavigation');
-            console.warn(value);
           } else {
             navigation.navigate('TabNavigation');
 
             // navigation.navigate('LocationPage');
-            console.warn(value);
             setloading(false);
           }
         } catch (e) {
           setloading(false);
-          console.warn(e);
           // error reading value
         }
       })
       .catch(e => {
-        console.log(e, 'e');
         alert('Something went wrong');
       });
   }
@@ -276,12 +262,10 @@ const Login = ({navigation}) => {
 
       // Create a Google credential with the token
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      console.log('googleCredential', googleCredential);
       // Sign-in the user with the credential
       return auth()
         .signInWithCredential(googleCredential)
         .then(async res => {
-          console.log(res?.user?.uid, 'res?.user?.uid');
           await dispatch(DataInsert(res));
           if (toggleCheckBox) {
             await AsyncStorage.setItem(
@@ -295,23 +279,19 @@ const Login = ({navigation}) => {
             if (value !== null) {
               // allmypost();
               navigation.navigate('TabNavigation');
-              console.warn(value);
             } else {
               navigation.navigate('TabNavigation');
 
               // navigation.navigate('LocationPage');
-              console.warn(value);
               setloading(false);
             }
           } catch (e) {
             setloading(false);
-            console.warn(e);
             // error reading value
           }
         })
         .catch(e => {
           alert('Something went wrong');
-          console.log(e, 'e');
         });
       // Singup(user?.name, user?.email, '', '', 'gmail');
     } catch (error) {
@@ -378,22 +358,18 @@ const Login = ({navigation}) => {
           if (value !== null) {
             // allmypost();
             navigation.navigate('TabNavigation');
-            console.warn(value);
           } else {
             navigation.navigate('TabNavigation');
 
             // navigation.navigate('LocationPage');
-            console.warn(value);
             setloading(false);
           }
         } catch (e) {
           setloading(false);
-          console.warn(e);
           // error reading value
         }
       })
       .catch(e => {
-        console.log(e, 'e');
         alert('Something went wrong');
       });
 

@@ -1,10 +1,27 @@
-import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Delete from 'react-native-vector-icons/AntDesign';
 import Colors from '../utils/Colors';
 
-const MydealItem = ({iconName, iconColor, Property, onPress, data = ''}) => {
+const MydealItem = ({
+  iconName,
+  iconColor,
+  Property,
+  onPress,
+  data = '',
+  deleteIcon,
+  deleteColor,
+  onPressDelete,
+}) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.MainContainer}>
       <View style={styles.ProfileContainer}>
@@ -47,6 +64,9 @@ const MydealItem = ({iconName, iconColor, Property, onPress, data = ''}) => {
       </View>
       <View style={styles.RatingLastContianer}>
         <Icon name={iconName} size={30} color={iconColor} />
+        <TouchableOpacity onPress={onPressDelete}>
+          <Delete name={deleteIcon} size={25} color={deleteColor} />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -73,16 +93,13 @@ const styles = StyleSheet.create({
   ProfileCC: {
     width: 80,
     height: 80,
-    // borderRadius: 1000 / 2,
     backgroundColor: '#fff3',
     overflow: 'hidden',
   },
   RatingContianer: {
     width: '60%',
     height: '100%',
-
     justifyContent: 'center',
-    // backgroundColor: 'green',
     paddingLeft: h('1.4%'),
   },
   RatingLastContianer: {

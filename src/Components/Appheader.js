@@ -5,7 +5,6 @@ import Colors from '../utils/Colors';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const Appheader = ({isHavingNewMessages, setSearchValue, onSearch, onMessage, onNotification, noti, showCategoryAndSubCategory, setShowCategoryAndSubCategory, setShowItemsFromCategoryAndSubCategory}) => {
-
   return (
     <View style={styles.HeaderContainer}>
       <TouchableOpacity

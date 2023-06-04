@@ -27,18 +27,17 @@ import {SliderBox} from 'react-native-image-slider-box';
 import LoadingScreen from '../../Components/LoadingScreen';
 import {ImageSlider} from 'react-native-image-slider-banner';
 import {
-  toggleMarkFavourite, 
-  isItemLiked
-} from '../Profile/OtherUserPostDetails'
-import { areNotificationsHidden } from '../../utils/appConfigurations'
-import { useFocusEffect } from '@react-navigation/native';
+  toggleMarkFavourite,
+  isItemLiked,
+} from '../Profile/OtherUserPostDetails';
+import {areNotificationsHidden} from '../../utils/appConfigurations';
+import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import axios from 'axios';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const PostScreen = ({navigation, route}) => {
-  // console.warn(route.params.data.Condition);
   const [loading, setloading] = React.useState(false);
-  // console.warn(route.params.data.user);
   const [Sitem, setSitem] = React.useState([]);
   const [VideoAd, setVideoAd] = React.useState([]);
   const [RText, setRText] = React.useState('');
@@ -47,8 +46,6 @@ const PostScreen = ({navigation, route}) => {
   const AllPostData = useSelector(state => state.post.PostData);
   const VideoData = useSelector(state => state.ads.VideoData);
   const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(subdata.length > 0);
-
   const [heart, setheart] = React.useState(false);
   const [mode, setmode] = React.useState(false);
   const [imgeUrl, setimgeUrl] = React.useState(
@@ -62,35 +59,19 @@ const PostScreen = ({navigation, route}) => {
       ? route.params.data.Notification
       : 123123123,
   );
-  // console.warn(imgeUrl2);
-
   const data = route.params.data;
-
-  // React.useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     allImage();
-  //     isItemLiked(route.params.data.id, () => setheart(true));
-  //     getSimilarItems();
-  //   });
-
-  //   return unsubscribe;
-  // }, [navigation]);
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Focussed PostScreen.js, running allImage isItemLiked getSimilarItems")
+      console.log(
+        'Focussed PostScreen.js, running allImage isItemLiked getSimilarItems',
+      );
       allImage();
       isItemLiked(route.params.data.id, () => setheart(true));
       getSimilarItems();
       return () => null;
-    }, [])
+    }, []),
   );
-
-  // React.useEffect(() => {
-  //   allImage()
-  //   isItemLiked(route.params.data.id, () => setheart(true))
-  //   getSimilarItems()
-  // }, [])
 
   const allImage = () => {
     let data = [];
@@ -202,23 +183,15 @@ const PostScreen = ({navigation, route}) => {
     const arr = AllPostData.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
-    // console.warn(arr);
 
     setSitem(arr.slice(0, 3));
-    // console.warn(sample_without_duplicates);
   };
 
   const randomItem2 = () => {
-    // console.warn(AllPostData);
-
     const arr = VideoData.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
-
-    // console.warn(arr);
-
     setVideoAd(arr.slice(0, 1));
-    // console.warn(sample_without_duplicates);
   };
 
   const sendreport = () => {
@@ -244,7 +217,6 @@ const PostScreen = ({navigation, route}) => {
       })
       .catch(err => {
         setloading(false);
-        // console.warn(err);
       });
   };
 
@@ -291,11 +263,10 @@ const PostScreen = ({navigation, route}) => {
             alert('Trade Offer Sent');
           })
           .catch(function (error) {
-            // console.warn(error);
             alert('Trade Offer Sent');
           });
       })
-      .catch(err => console.warn(err));
+      .catch(err => {});
   };
 
   React.useEffect(() => {
@@ -311,7 +282,6 @@ const PostScreen = ({navigation, route}) => {
   //     scrollViewRef.current.scrollTo({y: 0, animated: true});
   //   }
   // };
-  console.log({VideoAd: VideoAd[0]});
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -423,17 +393,17 @@ const PostScreen = ({navigation, route}) => {
             {route.params.data.Discount !== 0 ? (
               <View style={styles.Discountbox}>
                 <Text style={styles.HeadingText33}>
-                  ${route.params.data.Discount}
+                  {priceFormatter(route.params.data.Discount)}
                 </Text>
                 <Text style={styles.HeadingText22}>
                   {route.params.data.Price !== '' &&
-                    '$' + route.params.data.Price}
+                    priceFormatter(route.params.data.Price)}
                 </Text>
               </View>
             ) : (
               <Text style={styles.HeadingText}>
                 {route.params.data.Price !== '' &&
-                  '$' + route.params.data.Price}
+                  priceFormatter(route.params.data.Price)}
               </Text>
             )}
           </View>
@@ -464,8 +434,6 @@ const PostScreen = ({navigation, route}) => {
                         data: item,
                         video: false,
                       });
-                      // console.warn(index);
-
                       setimgeUrl(item);
                     }}
                     style={styles.miniImg}>
@@ -673,9 +641,12 @@ const PostScreen = ({navigation, route}) => {
           <View>
             <VideoPlayer
               video={{
-                uri: VideoAd[0].AdGraphicLink
-                  ? VideoAd[0].AdGraphicLink
-                  : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                uri:
+                  VideoAd.length > 0
+                    ? VideoAd[0]?.AdGraphicLink
+                    : VideoAd.length > 0
+                    ? VideoAd[0]?.AdGraphicLink
+                    : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
               }}
               autoplay
               paused={false}
@@ -693,13 +664,19 @@ const PostScreen = ({navigation, route}) => {
               });
             }}>
             <View style={styles.overlay}>
-              <Text style={styles.videoShoesTag}>{VideoAd[0].title}</Text>
-              <Text style={styles.videoShoesTag2}>{VideoAd[0].TagLine}</Text>
+              <Text style={styles.videoShoesTag}>
+                {VideoAd.length > 0 ? VideoAd[0]?.title : ''}
+              </Text>
+              <Text style={styles.videoShoesTag2}>
+                {VideoAd.length > 0 ? VideoAd[0]?.TagLine : ''}
+              </Text>
 
-              <Text style={styles.MainText2}>{VideoAd[0].user.Address}</Text>
-              {VideoAd[0].user?.Phone !== undefined && (
+              <Text style={styles.MainText2}>
+                {VideoAd.length > 0 ? VideoAd[0]?.user?.Address : ''}
+              </Text>
+              {VideoAd.length > 0 && VideoAd[0].user?.Phone !== undefined && (
                 <Text style={styles.MainText2}>
-                  Call: {VideoAd[0].user.Phone}
+                  Call: {VideoAd.length > 0 ? VideoAd[0]?.user?.Phone : ''}
                 </Text>
               )}
             </View>
@@ -760,7 +737,6 @@ export const Preview = ({
   active,
   local,
 }) => {
-  // console.warn(item);
   return (
     <TouchableOpacity
       style={[styles.videoContainer]}

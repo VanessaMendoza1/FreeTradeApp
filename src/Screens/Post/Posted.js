@@ -6,7 +6,7 @@ import {
   Image,
   Share,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Colors from '../../utils/Colors';
 import {h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -14,7 +14,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Appbutton from '../../Components/Appbutton';
 
 const Posted = ({navigation, route}) => {
-  console.warn(route.params.condition);
   const [oldData, setoldData] = React.useState(route.params);
   const onShare = async () => {
     try {
@@ -34,7 +33,9 @@ const Posted = ({navigation, route}) => {
       alert(error.message);
     }
   };
-
+  useEffect(() => {
+    console.log('route.param', route.params);
+  }, []);
   return (
     <View style={styles.MainContainer}>
       {/* header */}
@@ -75,6 +76,9 @@ const Posted = ({navigation, route}) => {
             <View style={styles.HeadingTextContainer45}>
               <Text style={styles.HeadingText5}>{route.params.condition}</Text>
             </View>
+            <View style={styles.HeadingTextContainer45}>
+              <Text style={styles.HeadingText5}>{route.params.brand}</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -87,6 +91,7 @@ const Posted = ({navigation, route}) => {
         <Appbutton
           text={'Start Promotion'}
           onPress={() => {
+            console.log(oldData);
             navigation.navigate('PostPromotion', {data: oldData});
           }}
         />

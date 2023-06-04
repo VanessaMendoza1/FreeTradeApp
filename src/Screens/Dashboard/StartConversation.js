@@ -22,13 +22,13 @@ import uuid from 'react-native-uuid';
 import {useSelector, useDispatch} from 'react-redux';
 import firestore from '@react-native-firebase/firestore';
 import Appbutton from '../../Components/Appbutton';
-import { sendMsg } from './Inbox'
-import { all } from 'axios';
+import {sendMsg} from './Inbox';
+import {all} from 'axios';
 import auth from '@react-native-firebase/auth';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const StartConversation = ({navigation, route}) => {
-  //   console.warn(route.params.data.Notification !== '');
   const [loading, setloading] = React.useState(false);
   const [txt, settxt] = React.useState('');
   const userData = useSelector(state => state.counter.data);
@@ -41,7 +41,9 @@ const StartConversation = ({navigation, route}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Focussed StartConversation.js, running setItemOfDiscussionImage setItemOfDiscussionPrice setSellersImage")
+      console.log(
+        'Focussed StartConversation.js, running setItemOfDiscussionImage setItemOfDiscussionPrice setSellersImage',
+      );
       let {
         itemPrice,
         itemImage,
@@ -49,29 +51,29 @@ const StartConversation = ({navigation, route}) => {
         sellersImage: _sellersImage,
         roomId,
         id: otherUserId,
-      } = route.params.receiverData
-      setItemOfDiscussionImage(itemImage)
-      setItemOfDiscussionPrice(itemPrice)
-      setSellersImage(_sellersImage)
+      } = route.params.receiverData;
+      setItemOfDiscussionImage(itemImage);
+      setItemOfDiscussionPrice(itemPrice);
+      setSellersImage(_sellersImage);
       return () => null;
-    }, [])
+    }, []),
   );
 
   const createChatList = data => {
     setloading(true);
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     database()
       .ref('/chatlist/' + currentUserId + '/' + data.UserID)
       .once('value')
       .then(async snapshot => {
-        console.log({PREVIOUS_CHAT_NODE: snapshot.val()})
-        let roomId
+        console.log({PREVIOUS_CHAT_NODE: snapshot.val()});
+        let roomId;
         if (snapshot.val() == null) {
           roomId = uuid.v4();
         } else {
-          roomId = snapshot.val().roomId
+          roomId = snapshot.val().roomId;
         }
-        console.log({roomId})
+        console.log({roomId});
         let SendData = {
           roomId,
           id: data.UserID,
@@ -81,18 +83,22 @@ const StartConversation = ({navigation, route}) => {
           about: data.Bio,
           lastMsg: txt,
           Token: data.NotificationToken,
-          
+
           itemPrice: data.Price,
           itemImage: data.images[0],
           sellersName: data.user.name,
           sellersImage: data.user.image,
         };
-        sendMsg(txt, settxt, setloading, userData, SendData)
+        sendMsg(txt, settxt, setloading, userData, SendData);
         database()
           .ref('/chatlist/' + currentUserId + '/' + data.UserID)
           .once('value')
           .then(async snapshot => {
-            if ((snapshot.val() == null) || (snapshot.val().itemPrice == null && snapshot.val().itemImage == null)) {
+            if (
+              snapshot.val() == null ||
+              (snapshot.val().itemPrice == null &&
+                snapshot.val().itemImage == null)
+            ) {
               let myData = {
                 roomId,
                 id: currentUserId,
@@ -102,7 +108,7 @@ const StartConversation = ({navigation, route}) => {
                 about: userData.Bio,
                 lastMsg: txt,
                 Token: userData.NotificationToken,
-                
+
                 itemPrice: data.Price,
                 itemImage: data.images[0],
                 sellersName: data.user.name,
@@ -112,16 +118,16 @@ const StartConversation = ({navigation, route}) => {
                 .ref('/chatlist/' + data.UserID + '/' + currentUserId)
                 .update(myData)
                 .then(() => console.log('Data updated.'));
-    
+
               data.lastMsg = txt;
               data.roomId = roomId;
-    
+
               database()
                 .ref('/chatlist/' + currentUserId + '/' + data.UserID)
                 .update(SendData)
                 .then(() => {
-                  console.log('Data updated.')
-                  alert("Message Sent")
+                  console.log('Data updated.');
+                  alert('Message Sent');
                   navigation.goBack();
                 });
               // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
@@ -159,19 +165,19 @@ const StartConversation = ({navigation, route}) => {
                 .ref('/chatlist/' + data.UserID + '/' + currentUserId)
                 .update(myData)
                 .then(() => console.log('Data updated.'));
-    
+
               data.lastMsg = txt;
               data.roomId = roomId;
-    
+
               database()
                 .ref('/chatlist/' + currentUserId + '/' + data.UserID)
                 .update(SendData)
                 .then(() => {
-                  console.log('Data updated.')
-                  alert("Message Sent")
+                  console.log('Data updated.');
+                  alert('Message Sent');
                   navigation.goBack();
                 });
-              alert("Message Sent")
+              alert('Message Sent');
               navigation.goBack();
               // navigation.navigate('Inbox', {
               //   txt: txt,
@@ -186,9 +192,9 @@ const StartConversation = ({navigation, route}) => {
               setloading(false);
             }
           });
-      })
+      });
   };
-  console.log({sellersImage})
+  console.log({sellersImage});
 
   return (
     <View style={styles.MainContaiiner}>
@@ -207,10 +213,11 @@ const StartConversation = ({navigation, route}) => {
 
         <View style={styles.MiddleContainer}>
           {/* <View style={styles.ProfileContainer}> */}
-          <View style={{
-            display: 'flex',
-            flexDirection: "row"
-          }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}>
             <View style={styles.ProfileCC}>
               <Image
                 style={{width: '100%', height: '100%', resizeMode: 'cover'}}
@@ -225,21 +232,27 @@ const StartConversation = ({navigation, route}) => {
           <View style={styles.ProfileContainer2}>
             <Text style={styles.FontWork}>{receiverData.sellersName}</Text>
           </View>
-        
         </View>
-        
-        <View style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center"
-        }}>
+
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
           <Image
-            style={{width: 50, height: 50, resizeMode: 'stretch', borderRadius: 10, marginBottom: 2}}
+            style={{
+              width: 50,
+              height: 50,
+              resizeMode: 'stretch',
+              borderRadius: 10,
+              marginBottom: 2,
+            }}
             source={{uri: itemOfDiscussionImage}}
           />
-          <Text style={{textAlign: "center", color: "white"}}>
-            ${itemOfDiscussionPrice}
+          <Text style={{textAlign: 'center', color: 'white'}}>
+            {priceFormatter(itemOfDiscussionPrice)}
           </Text>
         </View>
       </View>
@@ -313,8 +326,8 @@ const styles = StyleSheet.create({
   MiddleContainer: {
     width: '60%',
     height: '100%',
-    display: "flex",
-    flexDirection: "row",
+    display: 'flex',
+    flexDirection: 'row',
     // backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
@@ -363,7 +376,7 @@ const styles = StyleSheet.create({
     paddingTop: h('1%'),
   },
   inputCC: {
-    alignSelf: "center",
+    alignSelf: 'center',
     width: '100%',
     height: h('7%'),
     // backgroundColor: Colors.Primary,

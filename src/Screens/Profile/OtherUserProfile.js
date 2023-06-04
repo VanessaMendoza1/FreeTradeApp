@@ -9,7 +9,7 @@ import {
   Linking,
   ScrollView,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 import React, {useEffect} from 'react';
 import Colors from '../../utils/Colors';
@@ -22,9 +22,8 @@ import firestore from '@react-native-firebase/firestore';
 import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {useSelector, useDispatch} from 'react-redux';
 import LoadingScreen from '../../Components/LoadingScreen';
-import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
+import {formatPhoneNumber} from '../../utils/phoneNumberFormatter';
 const OtherUserProfile = ({navigation, route}) => {
-  console.warn(route.params.data);
   const [activeField, setActiveField] = React.useState('Services');
 
   const [mode, setmode] = React.useState(false);
@@ -38,16 +37,13 @@ const OtherUserProfile = ({navigation, route}) => {
 
   const [loading, setloading] = React.useState(true);
   const [User, setUser] = React.useState([]);
-  // console.warn(User[0].BussinessDetails);
-
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed OtherUserProfile.js, running MyData, allmypost")
-			MyData();
+    React.useCallback(() => {
+      console.log('Focussed OtherUserProfile.js, running MyData, allmypost');
+      MyData();
       allmypost();
-		}, [])
-	);
-
+    }, []),
+  );
 
   // useEffect(() => {
   //   MyData();
@@ -64,7 +60,10 @@ const OtherUserProfile = ({navigation, route}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           if (documentSnapshot.data().UserID === route.params.data.UserID) {
-            let newDataObject = {...documentSnapshot.data(), id: documentSnapshot._data.DocId}
+            let newDataObject = {
+              ...documentSnapshot.data(),
+              id: documentSnapshot._data.DocId,
+            };
             if (documentSnapshot.data().PostType === 'Trading') {
               TradingData.push(newDataObject);
             }
@@ -95,12 +94,10 @@ const OtherUserProfile = ({navigation, route}) => {
           userData.push(documentSnapshot.data());
         }
         await setUser(userData);
-        console.warn(userData);
         setloading(false);
       })
       .catch(err => {
         setloading(false);
-        console.warn(err);
       });
   };
 
@@ -219,7 +216,9 @@ const OtherUserProfile = ({navigation, route}) => {
                   }}
                   style={styles.adminButton}>
                   <Icon name="call" size={25} color="#ffff" />
-                  <Text style={styles.numberadmin}>+{formatPhoneNumber(User[0].Phone)}</Text>
+                  <Text style={styles.numberadmin}>
+                    +{formatPhoneNumber(User[0].Phone)}
+                  </Text>
                 </TouchableOpacity>
                 {/* call button */}
 
@@ -339,7 +338,7 @@ const OtherUserProfile = ({navigation, route}) => {
                             }}
                           />
                         </View>
-                      )
+                      );
                     }}
                     keyExtractor={item => item.id}
                   />
@@ -358,7 +357,7 @@ const OtherUserProfile = ({navigation, route}) => {
                     contentContainerStyle={{paddingBottom: h('3%')}}
                     numColumns={3}
                     renderItem={({item}) => {
-                      console.log({ITEM: item})
+                      console.log({ITEM: item});
                       return (
                         <View
                           style={{
@@ -374,7 +373,7 @@ const OtherUserProfile = ({navigation, route}) => {
                             }}
                           />
                         </View>
-                      )
+                      );
                     }}
                     keyExtractor={item => item.id}
                   />

@@ -7,7 +7,7 @@ import {
   Image,
   ImageBackground,
   Modal,
-  TouchableHighlight
+  TouchableHighlight,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -32,6 +32,7 @@ import {
   CreditCardInput,
   LiteCreditCardInput,
 } from 'react-native-credit-card-input';
+import {priceFormatter} from '../../utils/helpers/helperFunctions';
 
 const getSubscriptionTarriff = (
   setIndividualSubscriptionPricing,
@@ -105,8 +106,6 @@ const SubscriptionPage = ({navigation}) => {
   }, []);
 
   const subdata = useSelector(state => state.sub.subdata);
-  console.warn(subdata.length > 0);
-
   let uploadSubscription = () => {
     firestore()
       .collection('sub')
@@ -122,7 +121,6 @@ const SubscriptionPage = ({navigation}) => {
         setloading(false);
         setModalVisible(!modalVisible);
         console.error('Error removing document: ', error);
-        console.warn(error);
       });
   };
 
@@ -170,13 +168,11 @@ const SubscriptionPage = ({navigation}) => {
                     `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData.email}`,
                   )
                   .then(res => {
-                    console.warn(res);
                     uploadSubscription();
                   })
                   .catch(err => {
                     setloading(false);
                     setModalVisible(!modalVisible);
-                    console.warn(err);
                     uploadSubscription();
                   });
               }}
@@ -200,7 +196,8 @@ const SubscriptionPage = ({navigation}) => {
                   setsub(!sub);
                 }}>
                 <Text style={styles.mainText123}>
-                  Personal Plan ${individualSubscriptionPricing}/Month
+                  Personal Plan {priceFormatter(individualSubscriptionPricing)}
+                  /Month
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -211,7 +208,8 @@ const SubscriptionPage = ({navigation}) => {
                 }}
                 style={styles.mainViewCC}>
                 <Text style={styles.mainText123}>
-                  Business Plan ${businessSubscriptionPricing}/Month
+                  Business Plan {priceFormatter(businessSubscriptionPricing)}
+                  /Month
                 </Text>
                 <Text style={styles.mainText1233}>
                   Let’s grow your business!
@@ -293,23 +291,14 @@ function PaymentScreen({
   const [cardData, setCardData] = React.useState('');
 
   const _createToken = async () => {
-    // console.warn(cardData.number);
-    // console.warn(email);
-    // console.warn(plan);
-    // console.warn(cardData.expiry);
-    // console.warn(cardData.cvc);
-
     setloading(false);
     axios
       .get(
         `https://umeraftabdev.com/FreeTradeApi/public/api/subscribe?card_number=${cardData.number}&email=${email}&sub_plan=${plan}&expiry=${cardData.expiry}&cvc=${cardData.cvc}`,
       )
       .then(res => {
-        console.warn(res);
         if (res.data.message === 'Subscription created successfully') {
-          // alert('ALL CLEAR');
           uploadSubscription();
-          // onDone();
         }
       })
       .catch(err => {
@@ -339,7 +328,6 @@ function PaymentScreen({
     const now = moment.utc();
     var end = moment().add(30, 'days');
     var days = now.diff(end, 'days');
-    // console.warn(days >= 0);
 
     firestore()
       .collection('sub')
@@ -357,7 +345,6 @@ function PaymentScreen({
       })
       .catch(err => {
         onDone2();
-        console.warn(err);
       });
   };
 
@@ -366,8 +353,6 @@ function PaymentScreen({
       <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
         <LiteCreditCardInput
           onChange={({values}) => {
-            // console.warn(values);
-            console.warn(values);
             setCardData(values);
           }}
         />

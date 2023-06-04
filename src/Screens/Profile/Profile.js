@@ -20,10 +20,10 @@ import ReportPopup from '../../Components/ReportPopup';
 import firestore from '@react-native-firebase/firestore';
 import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import {useSelector, useDispatch} from 'react-redux';
-import { formatPhoneNumber } from '../../utils/phoneNumberFormatter'
+import {formatPhoneNumber} from '../../utils/phoneNumberFormatter';
 import auth from '@react-native-firebase/auth';
 import {SubDataAdd} from '../../redux/subSlicer';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 import moment from 'moment';
 
@@ -31,18 +31,16 @@ const Profile = ({navigation}) => {
   const [activeField, setActiveField] = React.useState('Services');
   const [mode, setmode] = React.useState(false);
   const [admin, setadmin] = React.useState(true);
-  const MyData = useSelector(state => state.counter.data);
-  // console.warn(MyData.UserID);
+  const MyData = useSelector(state => state?.counter?.data);
   const dispatch = useDispatch();
   const ServiceAllData = useSelector(state => state.mypost.MyServiceData);
   const SellingAllData = useSelector(state => state.mypost.MySellingData);
   const TradingAllData = useSelector(state => state.mypost.MyTradingData);
 
   const subdata = useSelector(state => state.sub.subdata);
-  // console.warn(subdata[0].plan === 'Bussiness');
 
   const allmypost = async () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
@@ -74,7 +72,7 @@ const Profile = ({navigation}) => {
   };
 
   const MySubscriptionPackage = async () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     let data = [];
     await firestore()
       .collection('sub')
@@ -98,7 +96,7 @@ const Profile = ({navigation}) => {
   };
 
   const DeletePost = () => {
-    const currentUserId = auth().currentUser.uid
+    const currentUserId = auth().currentUser.uid;
     firestore()
       .collection('sub')
       .doc(currentUserId)
@@ -113,10 +111,10 @@ const Profile = ({navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Focussed Profile.js, running allmypost")
+      console.log('Focussed Profile.js, running allmypost');
       allmypost();
       return () => null;
-    }, [])
+    }, []),
   );
 
   return (
@@ -166,8 +164,8 @@ const Profile = ({navigation}) => {
                   <Image
                     style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                     source={{
-                      uri: MyData.image
-                        ? MyData.image
+                      uri: MyData?.image
+                        ? MyData?.image
                         : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                     }}
                   />
@@ -181,9 +179,9 @@ const Profile = ({navigation}) => {
                   <Text style={styles.NameC}>
                     {subdata.length > 0
                       ? subdata[0].plan === 'Bussiness'
-                        ? MyData.BusinessName
-                        : MyData.name
-                      : MyData.name}
+                        ? MyData?.BusinessName
+                        : MyData?.name
+                      : MyData?.name}
                     {/* {MyData.BussinessDetails === true
                       ? MyData.BusinessName
                       : MyData.name} */}
@@ -198,14 +196,22 @@ const Profile = ({navigation}) => {
                   </View>
                 </View>
                 <View style={styles.HeartContainer2}>
-                  <Text style={styles.NameC2}>{MyData.location}</Text>
+                  <Text style={styles.NameC2}>{MyData?.location}</Text>
                 </View>
 
                 <View style={styles.HeadingTextContainer45}>
                   <View style={styles.HeartContainer}>
-                    <Icon name="star" size={20} color="gold" />
+                    <Icon
+                      name="star"
+                      size={20}
+                      color={MyData?.reviews > 0 ? 'gold' : 'grey'}
+                    />
                   </View>
-                  <Text style={styles.HeadingText5}>{MyData.reviews}</Text>
+                  {MyData?.reviews > 0 ? (
+                    <Text style={styles.HeadingText5}>{MyData?.reviews}</Text>
+                  ) : (
+                    <Text style={styles.HeadingText5}>Not ratted yet</Text>
+                  )}
                 </View>
 
                 <View style={styles.BtoomTobCC}>
@@ -247,20 +253,20 @@ const Profile = ({navigation}) => {
           <View style={styles.linebar} />
 
           {subdata.length < 0 && subdata[0].plan === 'Bussiness' && (
-          // {true && (
+            // {true && (
             <>
               <View style={styles.adminMode}>
                 {/* call button */}
                 <TouchableOpacity
                   onPress={() => {
-                    let phoneNumber = +MyData.Phone ? MyData.Phone : 10000;
+                    let phoneNumber = +MyData?.Phone ? MyData?.Phone : 10000;
                     Linking.openURL(`tel:${phoneNumber}`);
                   }}
                   style={styles.adminButton}>
                   <Icon name="call" size={25} color="#ffff" />
                   <Text style={styles.numberadmin}>
-                    {MyData.Phone
-                      ? formatPhoneNumber(MyData.Phone)
+                    {MyData?.Phone
+                      ? formatPhoneNumber(MyData?.Phone)
                       : 'Add All Details from Setting'}
                   </Text>
                 </TouchableOpacity>
@@ -268,14 +274,16 @@ const Profile = ({navigation}) => {
                 {/* call button */}
 
                 {/* iconLocation CC */}
-                {MyData.Address ? (
+                {MyData?.Address ? (
                   <View style={styles.MainCCor}>
                     <View style={styles.IconCCR}>
                       <Icon name="location" size={25} color={Colors.Primary} />
                     </View>
                     <View style={styles.IconCCR2}>
                       <Text style={styles.IIICTxt}>
-                        {MyData.Address ? MyData.Address : 'Add from Settings'}
+                        {MyData?.Address
+                          ? MyData?.Address
+                          : 'Add from Settings'}
                       </Text>
                     </View>
                   </View>
@@ -283,33 +291,34 @@ const Profile = ({navigation}) => {
 
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
-                {MyData.Website ? (
+                {MyData?.Website ? (
                   <View style={{...styles.MainCCor, marginTop: 20}}>
                     <View style={styles.IconCCR}>
                       <Icon name="globe" size={25} color={Colors.Primary} />
                     </View>
                     <View style={styles.IconCCR2}>
-                      {MyData.Website ? (
+                      {MyData?.Website ? (
                         <TouchableOpacity
                           style={styles.adminButton}
                           onPress={() => {
-                            Linking.canOpenURL("https://" + MyData.Website).then(supported => {
+                            Linking.canOpenURL(
+                              'https://' + MyData?.Website,
+                            ).then(supported => {
                               if (supported) {
-                                Linking.openURL("https://" + MyData.Website);
+                                Linking.openURL('https://' + MyData?.Website);
                               } else {
-                                alert("The url shown can't be opened as its not supported by the browser")
+                                alert(
+                                  "The url shown can't be opened as its not supported by the browser",
+                                );
                               }
                             });
-                          }}
-                        >
+                          }}>
                           <Text style={styles.numberadmin}>
-                            {MyData.Website}
+                            {MyData?.Website}
                           </Text>
                         </TouchableOpacity>
                       ) : (
-                        <Text style={styles.IIICTxt}>
-                          'Add from Setting'
-                        </Text>
+                        <Text style={styles.IIICTxt}>'Add from Setting'</Text>
                       )}
                     </View>
                   </View>
@@ -318,34 +327,34 @@ const Profile = ({navigation}) => {
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
 
-                {MyData.bussinessHoursFrom &&
-                MyData.bussinessHoursto &&
-                MyData.bussinessdaysFrom &&
-                MyData.bussinessdaysto ? (
+                {MyData?.bussinessHoursFrom &&
+                MyData?.bussinessHoursto &&
+                MyData?.bussinessdaysFrom &&
+                MyData?.bussinessdaysto ? (
                   <View style={{...styles.MainCCor, height: h('12%')}}>
                     <View style={{...styles.IconCCR, paddingBottom: 15}}>
                       <Icon name="calendar" size={25} color={Colors.Primary} />
                     </View>
                     <View style={styles.IconCCR2}>
                       <Text style={styles.IIICTxt}>
-                        {MyData.bussinessHoursFrom
-                          ? MyData.bussinessHoursFrom
+                        {MyData?.bussinessHoursFrom
+                          ? MyData?.bussinessHoursFrom
                           : 'Add from Seeting'}
                         -{' '}
-                        {MyData.bussinessHoursto
-                          ? MyData.bussinessHoursto
+                        {MyData?.bussinessHoursto
+                          ? MyData?.bussinessHoursto
                           : 'Add from Seeting'}{' '}
                         {'\n'}
-                        {MyData.bussinessdaysFrom
-                          ? MyData.bussinessdaysFrom
+                        {MyData?.bussinessdaysFrom
+                          ? MyData?.bussinessdaysFrom
                           : 'Add from Seeting'}{' '}
                         -{' '}
-                        {MyData.bussinessdaysto
-                          ? MyData.bussinessdaysto
+                        {MyData?.bussinessdaysto
+                          ? MyData?.bussinessdaysto
                           : 'Add from Seeting'}{' '}
                         {'\n'}
-                        {MyData.closedDays
-                          ? 'Closed: ' + MyData.closedDays
+                        {MyData?.closedDays
+                          ? 'Closed: ' + MyData?.closedDays
                           : 'Add from Seeting'}{' '}
                       </Text>
                     </View>
@@ -625,7 +634,7 @@ const styles = StyleSheet.create({
     marginRight: h('0.5%'),
   },
   HeadingTextContainer45: {
-    width: '18%',
+    width: '50%',
     // backgroundColor: 'orange',
     height: h('2.5%'),
     flexDirection: 'row',
@@ -666,7 +675,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: h('0.1%'),
     borderColor: '#0002',
-    paddingBottom: 10
+    paddingBottom: 10,
   },
   BtnContainer: {
     // backgroundColor: 'red',
@@ -757,4 +766,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  HeadingText5: {marginHorizontal: 5, width: '100%'},
 });

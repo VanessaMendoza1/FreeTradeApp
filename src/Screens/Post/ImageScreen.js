@@ -26,9 +26,6 @@ import {SliderBox} from 'react-native-image-slider-box';
 import ImageViewer from 'react-native-image-zoom-viewer';
 
 const ImageScreen = ({navigation, route}) => {
-  // console.warn(route.params.data);
-  console.warn(route.params.video);
-
   const images = [
     {
       url: route.params.data,

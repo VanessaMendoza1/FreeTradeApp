@@ -36,8 +36,8 @@ const LocationScreen = ({navigation}) => {
   const [Cods, setCods] = React.useState([]);
   const [latitude, setlatitude] = React.useState([]);
   const [longitude, setlongitude] = React.useState([]);
-  const [distance, setDistance] = React.useState(10)
-  const [currentDistance, setCurrentDistance] = React.useState("")
+  const [distance, setDistance] = React.useState(10);
+  const [currentDistance, setCurrentDistance] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
 
   const [slider, setSlider] = React.useState(0.2);
@@ -76,10 +76,10 @@ const LocationScreen = ({navigation}) => {
           }
         });
       })
-      .catch((err) => {
-        console.log("BAD DATA")
-        console.log(err)
-      })
+      .catch(err => {
+        console.log('BAD DATA');
+        console.log(err);
+      });
 
     await dispatch(SellingAdd(SellingData));
     await dispatch(TradingAdd(TradingData));
@@ -87,32 +87,30 @@ const LocationScreen = ({navigation}) => {
     navigation.navigate('TabNavigation');
   };
 
-
   React.useEffect(() => {
-    try{
+    try {
       firestore()
-      .collection('Users')
-      .doc(MyData.UserID)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot.exists) {
-          let userData = documentSnapshot.data();
-          let currentLocationFilter = userData.LocationFilter
-          setCurrentLocation(currentLocationFilter.location)
-          setCurrentDistance(currentLocationFilter.LocalDistance)
-          setlatitude(currentLocationFilter.latitude)
-          setlongitude(currentLocationFilter.longitude)
-        }
-        setloading(false)
-      })
-      .catch(err => {
-        setloading(false);
-        console.warn(err);
-      })
-    } catch (_err){
-      console.log(_err)
+        .collection('Users')
+        .doc(MyData.UserID)
+        .get()
+        .then(documentSnapshot => {
+          if (documentSnapshot.exists) {
+            let userData = documentSnapshot.data();
+            let currentLocationFilter = userData.LocationFilter;
+            setCurrentLocation(currentLocationFilter.location);
+            setCurrentDistance(currentLocationFilter.LocalDistance);
+            setlatitude(currentLocationFilter.latitude);
+            setlongitude(currentLocationFilter.longitude);
+          }
+          setloading(false);
+        })
+        .catch(err => {
+          setloading(false);
+        });
+    } catch (_err) {
+      console.log(_err);
     }
-  }, [])
+  }, []);
 
   // React.useEffect(() => {
   //   // allmypost();
@@ -140,22 +138,24 @@ const LocationScreen = ({navigation}) => {
           </View>
           {/* header */}
           {/* location */}
-          
-          <Text style={{
-            marginTop: 20,
-            textAlign: "center",
-            fontSize: 15,
-          }}>
+
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: 'center',
+              fontSize: 15,
+            }}>
             Current Distance: {currentDistance} miles
           </Text>
-          <Text style={{
-            marginTop: 20,
-            textAlign: "center",
-            fontSize: 15,
-          }}>
+          <Text
+            style={{
+              marginTop: 20,
+              textAlign: 'center',
+              fontSize: 15,
+            }}>
             Current Location: {currentLocation}
           </Text>
-          
+
           {/* <Text style={{
             marginTop: 40,
             textAlign: "center",
@@ -164,21 +164,22 @@ const LocationScreen = ({navigation}) => {
           }}>
             Set New Location And Distance
           </Text> */}
-          <Text style={{
-            marginTop: 40,
-            textAlign: "center",
-            fontSize: 15,
-          }}>
+          <Text
+            style={{
+              marginTop: 40,
+              textAlign: 'center',
+              fontSize: 15,
+            }}>
             New Distance: {distance} miles
           </Text>
           <Slider
-            style={{width: "94%", height: 100, alignSelf: "center"}}
+            style={{width: '94%', height: 100, alignSelf: 'center'}}
             step={1}
             minimumValue={10}
             maximumValue={200}
             minimumTrackTintColor={Colors.Primary}
             maximumTrackTintColor={Colors.Primary}
-            onValueChange={(value) => setDistance(value)}
+            onValueChange={value => setDistance(value)}
           />
 
           <GooglePlacesAutocomplete
@@ -200,7 +201,7 @@ const LocationScreen = ({navigation}) => {
                 borderBottomWidth: h('0.2%'),
                 backgroundColor: 'white',
                 marginTop: h('2%'),
-                
+
                 borderBottomColor: Colors.Primary,
               },
               textInput: {
@@ -230,47 +231,46 @@ const LocationScreen = ({navigation}) => {
             <Appbutton
               onPress={async () => {
                 setloading(true);
-                try{
+                try {
                   firestore()
-                  .collection('Users')
-                  .doc(MyData.UserID)
-                  .update({
-                    LocationFilter:{
-                      LocalDistance: distance, 
-                      location: Location == "" ? currentLocation : Location,
-                      latitude: latitude,
-                      longitude: longitude,
-                    }
-                  })
-                  .then(async () => {
-                    let userData = [];
-                    await firestore()
-                      .collection('Users')
-                      .doc(MyData.UserID)
-                      .get()
-                      .then(documentSnapshot => {
-                        if (documentSnapshot.exists) {
-                          userData.push(documentSnapshot.data());
-                        }
-                      })
-                      .catch(err => {
-                        setloading(false);
-                        console.warn(err);
-                      });
+                    .collection('Users')
+                    .doc(MyData.UserID)
+                    .update({
+                      LocationFilter: {
+                        LocalDistance: distance,
+                        location: Location == '' ? currentLocation : Location,
+                        latitude: latitude,
+                        longitude: longitude,
+                      },
+                    })
+                    .then(async () => {
+                      let userData = [];
+                      await firestore()
+                        .collection('Users')
+                        .doc(MyData.UserID)
+                        .get()
+                        .then(documentSnapshot => {
+                          if (documentSnapshot.exists) {
+                            userData.push(documentSnapshot.data());
+                          }
+                        })
+                        .catch(err => {
+                          setloading(false);
+                        });
 
-                    await dispatch(DataInsert(userData[0]));
+                      await dispatch(DataInsert(userData[0]));
 
-                    allmypost();
-                    setloading(false)
-                  })
-                  .catch(err => {
-                    setloading(false);
-                    console.log("ERROR")
-                    console.log(err);
-                  });
-                } catch (ERROR){
-                  console.log("ERROR1")
-                  console.log(ERROR)
+                      allmypost();
+                      setloading(false);
+                    })
+                    .catch(err => {
+                      setloading(false);
+                      console.log('ERROR');
+                      console.log(err);
+                    });
+                } catch (ERROR) {
+                  console.log('ERROR1');
+                  console.log(ERROR);
                 }
               }}
               text={'Submit'}

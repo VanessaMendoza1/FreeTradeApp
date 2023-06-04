@@ -16,7 +16,7 @@ const sas = (email, password) => {
               userData.push(documentSnapshot.data());
             }
           })
-          .catch(err => console.warn(err));
+          .catch(err => {});
 
         return userData[0];
       } else {
@@ -53,7 +53,7 @@ const OnLogin = (email, password) => {
                 userData.push(documentSnapshot.data());
               }
             })
-            .catch(err => console.warn(err));
+            .catch(err => {});
 
           resolve(userData[0]);
         } else {
