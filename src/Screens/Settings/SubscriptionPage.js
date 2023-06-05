@@ -297,11 +297,14 @@ function PaymentScreen({
         `https://umeraftabdev.com/FreeTradeApi/public/api/subscribe?card_number=${cardData.number}&email=${email}&sub_plan=${plan}&expiry=${cardData.expiry}&cvc=${cardData.cvc}`,
       )
       .then(res => {
-        if (res.data.message === 'Subscription created successfully') {
+        if (res?.data?.message === 'Subscription created successfully') {
           uploadSubscription();
+        } else {
+          onDone2();
         }
       })
       .catch(err => {
+        console.log('err', err);
         setloading(false);
         onDone2();
         alert('Please re-check your Card & try again');
@@ -328,7 +331,7 @@ function PaymentScreen({
     const now = moment.utc();
     var end = moment().add(30, 'days');
     var days = now.diff(end, 'days');
-
+    console.log(MyData?.UserID);
     firestore()
       .collection('sub')
       .doc(MyData?.UserID)
@@ -340,7 +343,8 @@ function PaymentScreen({
           plan === 'price_1N64c3KAtBxeYOh2sxd0LP36' ? 'Personal' : 'Bussiness',
         price: amount === 999 ? '9.99$' : '1.99',
       })
-      .then(() => {
+      .then(res => {
+        console.log(res, 'res');
         MySubscriptionPackage();
       })
       .catch(err => {
