@@ -13,6 +13,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Appbutton from '../../Components/Appbutton';
 import LoadingScreen from '../../Components/LoadingScreen';
+import moment from 'moment';
+import auth from '@react-native-firebase/auth';
 
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import Distance from '../Dashboard/Distence';
@@ -184,6 +186,33 @@ const PostSubmitDetails = ({navigation, route}) => {
       });
     setloading(false);
   };
+  const MySubscriptionPackage = async (POstId, userID) => {
+    const currentUserId = auth().currentUser.uid;
+    let data = [];
+    await firestore()
+      .collection('sub')
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          if (documentSnapshot.data().userid === currentUserId) {
+            const now = moment.utc();
+            var end = JSON.parse(documentSnapshot.data().endDate);
+            var days = now.diff(end, 'days');
+
+            if (days >= 1) {
+              setloading(false);
+              postAdd(postAdd(POstId, userID, trialSize));
+              // DeletePost();
+            } else {
+              setloading(false);
+              checkFreeCount(POstId, MyData.UserID);
+              // data.push(documentSnapshot.data());
+            }
+          }
+        });
+      });
+    setloading(false);
+  };
   const onSubmit = () => {
     let POstId = uuid.v4();
     setloading(true);
@@ -193,18 +222,19 @@ const PostSubmitDetails = ({navigation, route}) => {
       navigation.navigate('Setting');
       return;
     }
-    checkFreeCount(POstId, MyData.UserID);
+    postAdd(POstId, MyData?.UserID);
+    // MySubscriptionPackage(POstId, MyData.UserID);
   };
-  const postAdd = async (POstId, userID, count) => {
+  const postAdd = async (POstId, userID) => {
     await firestore()
       .collection('Post')
       .doc(POstId)
       .set({
         UserID: userID,
-        images: route.params.images,
-        Title: route.params.Title,
-        PostType: route.params.Type,
-        Price: route.params.Price,
+        images: route.params?.images,
+        Title: route.params?.Title,
+        PostType: route.params?.Type,
+        Price: route.params?.Price,
         Category: value,
         SubCategory: value2,
         Condition: value3,
@@ -214,15 +244,17 @@ const PostSubmitDetails = ({navigation, route}) => {
         DocId: POstId,
         Discount: 0,
         status: false,
-        latitude: MyData.latitude ? MyData.latitude : 'No Location Set By User',
-        longitude: MyData.longitude
-          ? MyData.longitude
+        latitude: MyData.latitude
+          ? MyData?.latitude
           : 'No Location Set By User',
-        Notification: MyData.NotificationToken,
-        videUrl: route.params.VideoUrl,
+        longitude: MyData?.longitude
+          ? MyData?.longitude
+          : 'No Location Set By User',
+        Notification: MyData?.NotificationToken,
+        videUrl: route.params?.VideoUrl,
       })
       .then(async doc => {
-        addFreePostsCount(MyData.UserID, count);
+        // addFreePostsCount(MyData.UserID, count);
 
         let PostData = [];
         await firestore()

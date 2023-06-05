@@ -415,6 +415,7 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
         }
       })
       .catch(err => {
+        setmodalVisble(false);
         alert('something went wrong');
       });
   };

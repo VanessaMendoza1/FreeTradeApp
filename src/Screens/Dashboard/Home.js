@@ -74,39 +74,10 @@ const inAppPerview = () => {
   // trigger UI InAppreview
   InAppReview.RequestInAppReview()
     .then(hasFlowFinishedSuccessfully => {
-      // when return true in android it means user finished or close review flow
-      console.log('InAppReview in android', hasFlowFinishedSuccessfully);
-
-      // when return true in ios it means review flow lanuched to user.
-      console.log(
-        'InAppReview in ios has launched successfully',
-        hasFlowFinishedSuccessfully,
-      );
-
-      // 1- you have option to do something ex: (navigate Home page) (in android).
-      // 2- you have option to do something,
-      // ex: (save date today to lanuch InAppReview after 15 days) (in android and ios).
-
-      // 3- another option:
       if (hasFlowFinishedSuccessfully) {
-        // do something for ios
-        // do something for android
       }
-
-      // for android:
-      // The flow has finished. The API does not indicate whether the user
-      // reviewed or not, or even whether the review dialog was shown. Thus, no
-      // matter the result, we continue our app flow.
-
-      // for ios
-      // the flow lanuched successfully, The API does not indicate whether the user
-      // reviewed or not, or he/she closed flow yet as android, Thus, no
-      // matter the result, we continue our app flow.
     })
     .catch(error => {
-      //we continue our app flow.
-      // we have some error could happen while lanuching InAppReview,
-      // Check table for errors and code number that can return in catch.
       console.log(error);
     });
 };
@@ -126,7 +97,6 @@ const getItemsFromCategoryAndSubCategory = (
 
   let callbackAfterGettingData = querySnapshot => {
     if (querySnapshot.empty) {
-      // console.log('NO ITEMS FOUND');
       return;
     }
     let filteredItemsThroughCategoryAndSubCategory = [];
@@ -136,9 +106,6 @@ const getItemsFromCategoryAndSubCategory = (
         id: doc.id,
       });
     });
-
-    // console.log({filteredItemsThroughCategoryAndSubCategory});
-
     callback(filteredItemsThroughCategoryAndSubCategory);
   };
 
@@ -216,9 +183,10 @@ const Home = ({navigation}) => {
   const [filteredDataService, setFilteredDataService] = useState([]);
   const [filteredDataSelling, setFilteredDataSelling] = useState([]);
   const [filteredDataTrade, setFilteredDataTrade] = useState([]);
-  useEffect(() => {
-    console.log('SellingData', SellingData);
+  const [AdsData, setAdsData] = useState([]);
+  const [subscribedUsersData, setSubscribedUsersData] = useState([]);
 
+  useEffect(() => {
     // customSearch(searchTextt);
   }, [searchTextt]);
   useFocusEffect(
@@ -242,7 +210,6 @@ const Home = ({navigation}) => {
     setTradingData,
     searchText,
   ) => {
-    // console.log({UserData});
     let tradingData = [];
     let sellingData = [];
     let serviceData = [];
@@ -252,7 +219,6 @@ const Home = ({navigation}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           let postData = {...documentSnapshot.data(), id: documentSnapshot.id};
-          // console.log({postData})
           let {
             latitude: sellerLatitude,
             longitude: sellerLongitude,
@@ -335,7 +301,6 @@ const Home = ({navigation}) => {
       .doc(UserData.UserID)
       .delete()
       .then(async () => {
-        // console.log('Document successfully deleted!');
         await dispatch(SubDataAdd([]));
       })
       .catch(error => {
@@ -344,7 +309,6 @@ const Home = ({navigation}) => {
   };
 
   React.useEffect(() => {
-    // console.log({activeField});
     showItemsThroughLocationFilterWithoutSearchText(
       activeField,
       setServiceData,
@@ -422,7 +386,36 @@ const Home = ({navigation}) => {
     await dispatch(SubDataAdd(data));
     setloading(false);
   };
+  const subscribedUsers = async () => {
+    const currentUserId = auth().currentUser.uid;
+    let data = [];
+    let adsData = [];
+    let subscribedUsers = [];
+    await firestore()
+      .collection('sub')
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          // if (documentSnapshot.data().userid === currentUserId) {
+          const now = moment.utc();
+          var end = JSON.parse(documentSnapshot.data().endDate);
+          var days = now.diff(end, 'days');
 
+          if (days >= 1) {
+            setloading(false);
+            DeletePost();
+          } else {
+            setloading(false);
+            subscribedUsers?.push(documentSnapshot.data().userid);
+            data.push(documentSnapshot.data());
+            console.log(subscribedUsers, subscribedUsers.length + 'length');
+          }
+        });
+      });
+    setSubscribedUsersData(subscribedUsers);
+    // await dispatch(SubDataAdd(data));
+    setloading(false);
+  };
   const DeletePost = () => {
     const currentUserId = auth().currentUser.uid;
     firestore()
@@ -438,56 +431,6 @@ const Home = ({navigation}) => {
   };
 
   const dispatch = useDispatch();
-
-  // useInterval(() => {
-  //   if (active < Number(ImageAds?.length) - 1) {
-  //     setActive(active + 1);
-  //   } else {
-  //     setActive(0);
-  //   }
-  // }, 5000);
-
-  // useEffect(() => {
-  //   ImageAds.length >= 1
-  //     ? imageRef.current.scrollToIndex({index: active, animated: true})
-  //     : null;
-  // }, [active]);
-
-  // const onViewableItemsChangedHandler = useCallback(
-  //   ({viewableItems, changed}) => {
-  //     if (active != 0) {
-  //       setActive(viewableItems[0].index);
-  //     }
-  //   },
-  //   [],
-  // );
-
-  // const UserDataPost = async () => {
-  //   let SellingData = [];
-  //   let TradingData = [];
-  //   let ServiceData = [];
-  //   await firestore()
-  //     .collection('Post')
-  //     .get()
-  //     .then(async querySnapshot => {
-  //       querySnapshot.forEach(documentSnapshot => {
-  //         if (documentSnapshot.data().PostType === 'Trading') {
-  //           TradingData.push(documentSnapshot.data());
-  //         }
-  //         if (documentSnapshot.data().PostType === 'Selling') {
-  //           SellingData.push(documentSnapshot.data());
-  //         }
-  //         if (documentSnapshot.data().PostType === 'Service') {
-  //           ServiceData.push(documentSnapshot.data());
-  //         }
-  //       });
-  //     });
-
-  //   await dispatch(MyTradingAdd(TradingData));
-  //   await dispatch(MySellingAdd(SellingData));
-  //   await dispatch(MyServiceAdd(ServiceData));
-  // };
-
   const Allads = async () => {
     let ImageData = [];
     let VideoData = [];
@@ -528,12 +471,6 @@ const Home = ({navigation}) => {
             const distanceInKm = Distance(lat1, lon1, lat2, lon2);
 
             if (documentSnapshot.data().status === false) {
-              // console.log(
-              //   'DISTANCE FOUND IS ' +
-              //     distanceInKm +
-              //     ' WHEREAS USER HAS SET DISTANCE TO ' +
-              //     UserData?.LocationFilter?.LocalDistance,
-              // );
               if (
                 Math.ceil(distanceInKm) <=
                 UserData?.LocationFilter?.LocalDistance
@@ -570,7 +507,16 @@ const Home = ({navigation}) => {
   useEffect(() => {
     allpost();
     NotificationData();
+    subscribedUsers().then(res => {
+      console.log(res, 'res');
+    });
   }, []);
+  useEffect(() => {
+    let adsData = ImageAds?.filter(element =>
+      subscribedUsersData?.includes(element.UserID),
+    );
+    setAdsData(adsData);
+  }, [subscribedUsersData]);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
     if (focus == true) {
@@ -670,7 +616,7 @@ const Home = ({navigation}) => {
             height={'45%'}
             autoPlay={true}
             windowSize={100}
-            data={ImageAds}
+            data={AdsData}
             scrollAnimationDuration={1500}
             // panGestureHandlerProps={{
             //   activeOffsetX: [-10, 10],

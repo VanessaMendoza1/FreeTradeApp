@@ -109,7 +109,7 @@ const SubscriptionPage = ({navigation}) => {
   let uploadSubscription = () => {
     firestore()
       .collection('sub')
-      .doc(MyData.UserID)
+      .doc(MyData?.UserID)
       .delete()
       .then(async () => {
         console.log('Document successfully deleted!');
@@ -165,7 +165,7 @@ const SubscriptionPage = ({navigation}) => {
                 setloading(true);
                 axios
                   .get(
-                    `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData.email}`,
+                    `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData?.email}`,
                   )
                   .then(res => {
                     uploadSubscription();
@@ -238,7 +238,7 @@ const SubscriptionPage = ({navigation}) => {
                   : businessSubscriptionPricing
               }
               plan={plan}
-              email={MyData.email}
+              email={MyData?.email}
               onLoading={() => {
                 setloading(true);
                 setModalVisible(!modalVisible);
@@ -286,7 +286,7 @@ function PaymentScreen({
 }) {
   const dispatch = useDispatch();
   const {confirmPayment} = useStripe();
-  const MyData = useSelector(state => state.counter.data);
+  const MyData = useSelector(state => state.counter?.data);
   const [loading, setloading] = React.useState(false);
   const [cardData, setCardData] = React.useState('');
 
@@ -315,7 +315,7 @@ function PaymentScreen({
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().userid === MyData.UserID) {
+          if (documentSnapshot.data()?.userid === MyData?.UserID) {
             data.push(documentSnapshot.data());
           }
         });
@@ -331,9 +331,9 @@ function PaymentScreen({
 
     firestore()
       .collection('sub')
-      .doc(MyData.UserID)
+      .doc(MyData?.UserID)
       .set({
-        userid: MyData.UserID,
+        userid: MyData?.UserID,
         startDate: JSON.stringify(now),
         endDate: JSON.stringify(end),
         plan:
