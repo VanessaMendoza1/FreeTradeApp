@@ -709,6 +709,7 @@ const MakePost = ({navigation}) => {
                 ) : (
                   <Appbutton
                     onPress={() => {
+                      // return console.log(MyData);
                       alert('Please Subscribe to Make more Post');
                       navigation.navigate('SubscriptionPage');
                     }}

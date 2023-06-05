@@ -17,7 +17,7 @@ import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-
 import LoadingScreen from '../../Components/LoadingScreen';
 import {DataInsert} from '../../redux/counterSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 const LocationPage = ({navigation}) => {
   const dispatch = useDispatch();
@@ -61,12 +61,12 @@ const LocationPage = ({navigation}) => {
   };
 
   useFocusEffect(
-		React.useCallback(() => {
-			console.log("Focussed LocationPage.js, running allmypost")
-			allmypost();
-			return () => null;
-		}, [])
-	);
+    React.useCallback(() => {
+      console.log('Focussed LocationPage.js, running allmypost');
+      allmypost();
+      return () => null;
+    }, []),
+  );
 
   return (
     <>
@@ -78,8 +78,10 @@ const LocationPage = ({navigation}) => {
           <View style={styles.Header}>
             <TouchableOpacity
               onPress={async () => {
-                await dispatch(DataInsert({...MyData, LocationFilter: {location:Location}}))
-                navigation.goBack()
+                await dispatch(
+                  DataInsert({...MyData, LocationFilter: {location: Location}}),
+                );
+                navigation.goBack();
               }}
               style={styles.LeftContainer}>
               <Icon name="arrow-back-outline" size={30} color="#ffff" />
@@ -206,7 +208,7 @@ export default LocationPage;
 
 const styles = StyleSheet.create({
   mainContainer: {
-        flex: 1,
+    flex: 1,
     height: h('95%'),
     backgroundColor: '#fff7',
   },

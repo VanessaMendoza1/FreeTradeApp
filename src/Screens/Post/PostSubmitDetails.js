@@ -63,7 +63,7 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [Description, setDescription] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
   const [isUserHavingLocation, setIsUserHavingLocation] = React.useState(
-    MyData.latitude && MyData.longitude ? true : false,
+    MyData?.latitude && MyData?.longitude ? true : false,
   );
   const [
     entireCategoryAndSubCategoryData,
@@ -146,14 +146,14 @@ const PostSubmitDetails = ({navigation, route}) => {
                 DocId: POstId,
                 Discount: 0,
                 status: false,
-                latitude: MyData.latitude
-                  ? MyData.latitude
+                latitude: MyData?.latitude
+                  ? MyData?.latitude
                   : 'No Location Set By User',
-                longitude: MyData.longitude
-                  ? MyData.longitude
+                longitude: MyData?.longitude
+                  ? MyData?.longitude
                   : 'No Location Set By User',
-                Notification: MyData.NotificationToken,
-                videUrl: route.params.VideoUrl,
+                Notification: MyData?.NotificationToken,
+                videUrl: route?.params?.VideoUrl,
               },
             });
           }
@@ -205,7 +205,7 @@ const PostSubmitDetails = ({navigation, route}) => {
               // DeletePost();
             } else {
               setloading(false);
-              checkFreeCount(POstId, MyData.UserID);
+              checkFreeCount(POstId, MyData?.UserID);
               // data.push(documentSnapshot.data());
             }
           }
@@ -244,7 +244,7 @@ const PostSubmitDetails = ({navigation, route}) => {
         DocId: POstId,
         Discount: 0,
         status: false,
-        latitude: MyData.latitude
+        latitude: MyData?.latitude
           ? MyData?.latitude
           : 'No Location Set By User',
         longitude: MyData?.longitude
@@ -284,8 +284,8 @@ const PostSubmitDetails = ({navigation, route}) => {
     let TradingData = [];
     let ServiceData = [];
 
-    const lat1 = MyData.latitude; // Latitude of first coordinate
-    const lon1 = MyData.longitude; // Longitude of first coordinate
+    const lat1 = MyData?.latitude; // Latitude of first coordinate
+    const lon1 = MyData?.longitude; // Longitude of first coordinate
 
     await firestore()
       .collection('Post')
@@ -334,7 +334,7 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().UserID === MyData.UserID) {
+          if (documentSnapshot.data().UserID === MyData?.UserID) {
             if (documentSnapshot.data().PostType === 'Trading') {
               TradingData.push(documentSnapshot.data());
             }
@@ -358,15 +358,15 @@ const PostSubmitDetails = ({navigation, route}) => {
     setloading(true);
     firestore()
       .collection('Users')
-      .doc(MyData.UserID)
+      .doc(MyData?.UserID)
       .update({
-        Post: MyData.Post + 1,
+        Post: MyData?.Post + 1,
       })
       .then(async () => {
         let userData = [];
         await firestore()
           .collection('Users')
-          .doc(MyData.UserID)
+          .doc(MyData?.UserID)
           .get()
           .then(documentSnapshot => {
             if (documentSnapshot.exists) {
