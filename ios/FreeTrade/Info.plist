@@ -81,7 +81,7 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This is tho show Products with in 100 miles of users</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>location of user</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Access to pick a photo</string>
 	<key>UIAppFonts</key>

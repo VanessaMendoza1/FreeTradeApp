@@ -59,6 +59,7 @@ target 'FreeTrade' do
   #   )
   #   __apply_Xcode_12_5_M1_post_install_workaround(installer)
   # end
+  
   post_install do |installer|
     PLIST_BUDDY_PATH = '/usr/libexec/PlistBuddy'
     installer.pods_project.targets.each do |target|
