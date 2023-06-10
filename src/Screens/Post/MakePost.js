@@ -106,7 +106,7 @@ const MakePost = ({navigation}) => {
             alert('Something went wrong');
           },
           () => {
-            uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            uploadTask?.snapshot?.ref?.getDownloadURL()?.then(downloadURL => {
               setloading(false);
 
               if (ImageBoxNumber === 1) {
@@ -274,11 +274,13 @@ const MakePost = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().userid === currentUserId) {
+          // console.log('days', documentSnapshot.data().userid);
+          if (documentSnapshot.data()?.userid === MyData.UserID) {
+            // console.log('days', 'days');
             const now = moment.utc();
-            var end = JSON.parse(documentSnapshot.data().endDate);
+            var end = documentSnapshot.data().endDate;
             var days = now.diff(end, 'days');
-
+            console.log('days', end);
             if (days >= 1) {
               setloading(false);
               setIsSubscribed(true);
@@ -738,7 +740,7 @@ const MakePost = ({navigation}) => {
                 ) : (
                   <Appbutton
                     onPress={() => {
-                      // return console.log(MyData);
+                      // return console.log(subdata);
                       alert('Please Subscribe to Make more Post');
                       navigation.navigate('SubscriptionPage');
                     }}

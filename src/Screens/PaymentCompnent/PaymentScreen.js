@@ -10,12 +10,13 @@ import {
 import {w, h} from 'react-native-responsiveness';
 import Colors from '../../utils/Colors';
 const PaymentScreen = ({
-  navigation,
   amount,
-  onDone,
-  onLoading,
+  plan,
   email,
+  onLoading,
   data,
+  onDone,
+  onDone2,
 }) => {
   const {confirmPayment} = useStripe();
   const {createToken} = useStripe();

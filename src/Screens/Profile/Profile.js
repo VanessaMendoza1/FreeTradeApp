@@ -210,7 +210,7 @@ const Profile = ({navigation}) => {
                   {MyData?.reviews > 0 ? (
                     <Text style={styles.HeadingText5}>{MyData?.reviews}</Text>
                   ) : (
-                    <Text style={styles.HeadingText5}>Not ratted yet</Text>
+                    <Text style={styles.HeadingText5}>Not rated yet</Text>
                   )}
                 </View>
 

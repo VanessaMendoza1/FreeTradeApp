@@ -1213,7 +1213,7 @@ PODS:
     - Firebase/Storage (= 10.7.0)
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.10.2):
+  - RNGestureHandler (2.11.0):
     - React-Core
   - RNGoogleSignin (9.1.0):
     - GoogleSignIn (~> 6.2)
@@ -1636,7 +1636,7 @@ SPEC CHECKSUMS:
   RNFBFirestore: 4edfb28f95cb461ef8423c6ae4354dfe98186586
   RNFBMessaging: 216693dd5ba4f18ba65fb39fc73a44a23c26190f
   RNFBStorage: b9daf1fcc51e6de5ed3781d36a2a795e90a9489d
-  RNGestureHandler: f75d81410b40aaa99e71ae8f8bb7a88620c95042
+  RNGestureHandler: 026038a97d4c8649ce397a22e162ca58b4e6c230
   RNGoogleSignin: c15bdaa7e8a9e190b6169d9c96a4e8380a740f22
   RNImageCropPicker: 14fe1c29298fb4018f3186f455c475ab107da332
   RNLocalize: d4b8af4e442d4bcca54e68fc687a2129b4d71a81
@@ -1655,6 +1655,6 @@ SPEC CHECKSUMS:
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 5ed1699acbba8863755998a4245daa200ff3817b
 
-PODFILE CHECKSUM: 3a474607113123a1a4cde6e067bf3f52b2fd7d45
+PODFILE CHECKSUM: 5e032212e2f09f03bd90348d0bb3333e9448d0b0
 
 COCOAPODS: 1.12.0
