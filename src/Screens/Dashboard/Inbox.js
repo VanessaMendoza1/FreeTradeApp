@@ -322,8 +322,8 @@ const Inbox = ({navigation, route}) => {
               Keyboard.dismiss();
               sendMsg(msg, setMsg, setdisabled, userData, receiverData);
             }}>
-            <Icon name="chatbubbles" size={25} color={'#fff'} />
-            <Text style={{color: '#fff', fontSize: 18}}>Send</Text>
+            <Icon name="send" size={25} color={'#fff'} />
+            {/* <Text style={{color: '#fff', fontSize: 18}}>Send</Text> */}
           </TouchableOpacity>
         </View>
       </View>

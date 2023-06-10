@@ -450,7 +450,7 @@ const PostScreen = ({navigation, route}) => {
                 ) : null}
               </>
             ))}
-            {route.params.data.images.length > !0 && (
+            {route?.params?.data?.images?.length < 1 && (
               <>
                 <Text>No image available</Text>
               </>
@@ -458,7 +458,7 @@ const PostScreen = ({navigation, route}) => {
           </View>
           {/* imges */}
 
-          {route.params.data.videUrl && (
+          {route?.params?.data?.videUrl && (
             <>
               <View style={styles.HeadingTextContainer22232}>
                 <Text>Video</Text>
