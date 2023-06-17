@@ -12,6 +12,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import {DataInsert} from '../../redux/counterSlice';
+import {localNotificationService} from '../../Fcm/LocalNotificationService';
+import {fcmService} from '../../Fcm/FCMService';
 
 const SplashScreen = ({navigation}) => {
   const [progress, setProgress] = useState(0);
@@ -43,8 +45,60 @@ const SplashScreen = ({navigation}) => {
     CheckRemeberME();
 
     Allads();
+
+    fcmService.register(onRegister, onNotification, onOpenNotification);
+    localNotificationService.configure(onOpenNotification);
+    return () => {
+      console.log('[App] unRegister');
+      fcmService.unRegister();
+      localNotificationService.unregister();
+      console.log('[App ] idun :', 'data');
+
+      //__updateOnlineStatus('No');
+    };
   }, []);
 
+  const onRegister = token => {
+    console.log('[App] onRegister :', token);
+    AsyncStorage.setItem('fcm_token', token);
+
+    // __updateOnlineStatus('Yes');
+  };
+  const onNotification = (notify, remoteMessage) => {
+    console.log('[App] remote :', notify);
+    const options = {
+      soundName: 'default',
+      playSound: true,
+    };
+    localNotificationService.showNotification(
+      0,
+      notify?.doctor_name,
+      notify?.body,
+      notify,
+      options,
+    );
+  };
+
+  const onOpenNotification = notify => {
+    //     var numberPattern = /\d+/g;
+    let id = notify?.doctor_id;
+    // let id=notify.sender.match( numberPattern )
+    // alert(JSON.stringify(notify));
+
+    navigation.navigate('chat', {
+      userData: {id: notify?.doctor_id, pro_name: notify?.doctor_name},
+
+      uid: notify?.user_id,
+      uname: notify?.title,
+      doctor_id: notify?.doctor_id,
+      user_id: notify?.user_id,
+      type: 'assis',
+      // userData: notify,
+      //days: item?.days,
+    });
+    console.log('[App] onNotification :', notify);
+    // alert('open notification: ', notify.body);
+  };
   const CheckRemeberME = async () => {
     try {
       const value = await AsyncStorage.getItem('@userData2');

@@ -274,9 +274,9 @@ const MakePost = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          // console.log('days', documentSnapshot.data().userid);
+          console.log('days', currentUserId);
           if (documentSnapshot.data()?.userid === MyData.UserID) {
-            // console.log('days', 'days');
+            console.log('days', 'days');
             const now = moment.utc();
             var end = documentSnapshot.data().endDate;
             var days = now.diff(end, 'days');

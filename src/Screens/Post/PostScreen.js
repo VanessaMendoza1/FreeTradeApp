@@ -224,9 +224,9 @@ const PostScreen = ({navigation, route}) => {
     firestore()
       .collection('Notification')
       .doc()
-      .set({
+      .push({
         seen: false,
-        userID: route.params.data.user.UserID,
+        userID: route?.params?.data?.user?.UserID,
         text:
           userData.name +
           '  would like to trade with you, click to see profile!',
