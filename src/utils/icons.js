@@ -8,7 +8,7 @@ import home from '../../assets/bt/home.png';
 import dollar from '../../assets/bt/dollar.png';
 import profile from '../../assets/bt/profile.png';
 import cam from '../../assets/bt/cam.png';
-import deals from '../../assets/bt/hand.png';
+import deals from '../../assets/bt/handshake.png';
 import report from '../../assets/bt/repot.png';
 import eyeIcon from '../../assets/bt/eye.png';
 import doubleTickIcon from '../../assets/bt/double-tick.png';
@@ -28,6 +28,7 @@ import locationIcon from '../../assets/locationBG.png';
 import heartIcon from '../../assets/setting/heart.png';
 import contactUs from '../../assets/setting/contact-us.png';
 import cancelSubscriptionIcon from '../../assets/setting/cancel-icon.png';
+import HandShake from 'react-native-vector-icons/FontAwesome5';
 // import Colors from './colors';
 
 const Icons = {
@@ -41,6 +42,7 @@ const Icons = {
     <Image source={cam} style={{...styles.defaultStyle, ...style}} />
   ),
   Mydeals: (style = {}) => (
+    // <HandShake name="handshake" />
     <Image source={deals} style={{...styles.defaultStyle, ...style}} />
   ),
   Profile: (style = {}) => (

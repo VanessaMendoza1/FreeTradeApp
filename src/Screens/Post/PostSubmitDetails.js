@@ -28,6 +28,7 @@ import {PostAdd} from '../../redux/postSlice';
 import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
 import {getCategoriesAndSubCategories} from '../Dashboard/Home';
+import axios from 'axios';
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
     {label: 'Baby Care', value: 'Baby Care'},
@@ -69,7 +70,16 @@ const PostSubmitDetails = ({navigation, route}) => {
     entireCategoryAndSubCategoryData,
     setEntireCategoryAndSubCategoryData,
   ] = React.useState({});
-
+  const [favouriteSellingItems, setFavouriteSellingItems] = React.useState([]);
+  const [favouriteServicesItems, setFavouriteServicesItems] = React.useState(
+    [],
+  );
+  const [Notii, setNotii] = React.useState(
+    route.params.data.Notification !== ''
+      ? route.params.data.Notification
+      : 123123123,
+  );
+  const [favouriteTradingItems, setFavouriteTradingItems] = React.useState([]);
   // React.useEffect(() => {
   //   if (value == "Services"){
   //     setItems3([
@@ -93,6 +103,7 @@ const PostSubmitDetails = ({navigation, route}) => {
       });
       setItems2(subCategories);
     }
+    fetchFavorites();
   }, [value]);
 
   const flattenCategoriesForDropDown = data => {
@@ -225,6 +236,49 @@ const PostSubmitDetails = ({navigation, route}) => {
     postAdd(POstId, MyData?.UserID);
     // MySubscriptionPackage(POstId, MyData.UserID);
   };
+  const remove_duplicates = arr => {
+    var obj = {};
+    var ret_arr = [];
+    for (var i = 0; i < arr.length; i++) {
+      obj[arr[i]] = true;
+    }
+    for (var key in obj) {
+      ret_arr.push(key);
+      fetchUsersTokenHavingFavoritesItems(key);
+    }
+    console.log(ret_arr);
+    return ret_arr;
+  };
+  const fetchFavorites = async () => {
+    let currentUserId = auth().currentUser.uid;
+    let _favouriteSellingItems = [];
+    let _favouriteServicesItems = [];
+    let _favouriteTradingItems = [];
+    let promises = [];
+    let users = [];
+    await firestore()
+      .collection('Favourite')
+      .where('users', 'array-contains-any', [currentUserId])
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(async documentSnapshot => {
+          users.push(documentSnapshot?.data?.users);
+        });
+        remove_duplicates(users);
+        return promises;
+      })
+      .catch(overallError => {
+        console.log('OVERALL ERROR CAUGHT');
+        setloading(false);
+      })
+      .then(async _promises => {
+        await Promise.all(_promises);
+        setFavouriteServicesItems(_favouriteServicesItems);
+        setFavouriteSellingItems(_favouriteSellingItems);
+        setFavouriteTradingItems(_favouriteTradingItems);
+        setloading(false);
+      });
+  };
   const postAdd = async (POstId, userID) => {
     await firestore()
       .collection('Post')
@@ -324,7 +378,86 @@ const PostSubmitDetails = ({navigation, route}) => {
 
     UserDataPost();
   };
+  const areNotificationsHidden = (callback, currentUserId = null) => {
+    if (currentUserId == null) currentUserId = auth().currentUser.uid;
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          if (
+            documentSnapshot.data().hideNotifications &&
+            documentSnapshot.data().hideNotifications == true
+          ) {
+            callback(true);
+          }
+        }
+      })
+      .catch(err => {});
+  };
+  const NotificationSystem = async token => {
+    firestore()
+      .collection('Notification')
+      .doc()
+      .push({
+        seen: false,
+        userID: MyData.UserID,
+        text: MyData.name + '  has posted an item from your favorites!',
+      })
+      .then(async () => {
+        var data = JSON.stringify({
+          data: {},
+          notification: {
+            body: MyData.name + 'has posted Item',
+            title: MyData.name + '  has posted an item from your favorites!',
+          },
+          to: JSON.parse(token),
+        });
+        var config = {
+          method: 'post',
+          url: 'https://fcm.googleapis.com/fcm/send',
+          headers: {
+            Authorization:
+              'key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls',
+            'Content-Type': 'application/json',
+          },
+          data: data,
+        };
+        let callBackIfNotificationsNotHidden = axios(config)
+          .then(function (response) {
+            console.log(JSON.stringify(response.data));
+            areNotificationsHidden(
+              callBackIfNotificationsNotHidden,
+              MyData.UserID,
+            );
+            // navigation.goBack();
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      })
+      .catch(err => {});
+  };
 
+  const fetchUsersTokenHavingFavoritesItems = async userId => {
+    await firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          console.log(documentSnapshot?.data()?.Notification, 'Notification');
+          // tokens.push(documentSnapshot?.data()?.Notification);
+          if (documentSnapshot?.data()?.Notification !== '') {
+            NotificationSystem(documentSnapshot?.data()?.Notification);
+          }
+        }
+      })
+      .catch(err => {
+        setloading(false);
+      });
+  };
   const UserDataPost = async () => {
     let SellingData = [];
     let TradingData = [];

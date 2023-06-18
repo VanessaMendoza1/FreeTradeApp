@@ -23,6 +23,7 @@ import * as ImagePickers from 'react-native-image-picker';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {SubDataAdd} from '../../redux/subSlicer';
+import axios from 'axios';
 
 const MakePost = ({navigation}) => {
   const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
@@ -76,6 +77,7 @@ const MakePost = ({navigation}) => {
   };
   useEffect(() => {
     MySubscriptionPackage();
+    fetchUsersTokenHavingFavoritesItems(MyData.UserID);
   }, []);
   const openCamera = () => {
     setloading(true);

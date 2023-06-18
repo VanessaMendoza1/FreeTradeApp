@@ -35,22 +35,21 @@ const FavouriteItemsScreen = ({navigation}) => {
       return () => null;
     }, []),
   );
-
   const getFavourites = async () => {
     let currentUserId = auth().currentUser.uid;
     let _favouriteSellingItems = [];
     let _favouriteServicesItems = [];
     let _favouriteTradingItems = [];
     let promises = [];
-
+    let users = [];
     await firestore()
       .collection('Favourite')
       .where('users', 'array-contains-any', [currentUserId])
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(async documentSnapshot => {
+          users.push(documentSnapshot?.data()?.users);
           let favouriteItemId = documentSnapshot.data().productId;
-
           promises.push(
             firestore()
               .collection('Post')
@@ -75,7 +74,6 @@ const FavouriteItemsScreen = ({navigation}) => {
               }),
           );
         });
-
         return promises;
       })
       .catch(overallError => {
