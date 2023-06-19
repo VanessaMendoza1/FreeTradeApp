@@ -221,6 +221,7 @@ const Login = ({navigation}) => {
     const deviceRemote = await messaging().registerDeviceForRemoteMessages();
     try {
       const token = await messaging().getToken();
+      setNotificationToken(token);
     } catch (error) {
       console.log(error);
     }

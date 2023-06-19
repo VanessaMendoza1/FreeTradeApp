@@ -38,6 +38,7 @@ const PostSubmitDetails = ({navigation, route}) => {
   ]);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
+  const [usersHavingFav, setUserHavingFav] = React.useState([]);
 
   const [items2, setItems2] = React.useState([
     {label: 'Athletic Shoes', value: 'Athletic Shoes'},
@@ -74,21 +75,7 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [favouriteServicesItems, setFavouriteServicesItems] = React.useState(
     [],
   );
-  const [Notii, setNotii] = React.useState(
-    route.params.data.Notification !== ''
-      ? route.params.data.Notification
-      : 123123123,
-  );
   const [favouriteTradingItems, setFavouriteTradingItems] = React.useState([]);
-  // React.useEffect(() => {
-  //   if (value == "Services"){
-  //     setItems3([
-  //       {label: 'Good', value: 'Good'},
-  //       {label: 'excellent', value: 'excellent'},
-  //     ])
-  //   }
-  // }, [value])
-
   React.useEffect(() => {
     setValue2({});
     setValue3({});
@@ -103,7 +90,6 @@ const PostSubmitDetails = ({navigation, route}) => {
       });
       setItems2(subCategories);
     }
-    fetchFavorites();
   }, [value]);
 
   const flattenCategoriesForDropDown = data => {
@@ -262,9 +248,19 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(async documentSnapshot => {
-          users.push(documentSnapshot?.data?.users);
+          console.log(documentSnapshot?.data(), 'daattt');
+          console.log(value, value2);
+          if (
+            value === documentSnapshot?.data()?.category &&
+            value2 === documentSnapshot?.data()?.subCategory
+          ) {
+            users?.push(documentSnapshot?.data()?.users);
+          }
         });
-        remove_duplicates(users);
+        setUserHavingFav(users);
+        if (users.length > 0) {
+          remove_duplicates(users);
+        }
         return promises;
       })
       .catch(overallError => {
@@ -345,6 +341,7 @@ const PostSubmitDetails = ({navigation, route}) => {
       .collection('Post')
       .get()
       .then(async querySnapshot => {
+        fetchFavorites();
         querySnapshot.forEach(documentSnapshot => {
           try {
             let lat2;
@@ -400,7 +397,7 @@ const PostSubmitDetails = ({navigation, route}) => {
     firestore()
       .collection('Notification')
       .doc()
-      .push({
+      .set({
         seen: false,
         userID: MyData.UserID,
         text: MyData.name + '  has posted an item from your favorites!',
@@ -449,8 +446,10 @@ const PostSubmitDetails = ({navigation, route}) => {
         if (documentSnapshot?.exists) {
           console.log(documentSnapshot?.data()?.Notification, 'Notification');
           // tokens.push(documentSnapshot?.data()?.Notification);
-          if (documentSnapshot?.data()?.Notification !== '') {
-            NotificationSystem(documentSnapshot?.data()?.Notification);
+          if (documentSnapshot?.data().users !== auth()?.currentUser?.uid) {
+            if (documentSnapshot?.data()?.Notification !== '') {
+              NotificationSystem(documentSnapshot?.data()?.Notification);
+            }
           }
         }
       })

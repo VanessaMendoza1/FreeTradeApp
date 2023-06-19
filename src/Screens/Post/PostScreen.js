@@ -224,7 +224,7 @@ const PostScreen = ({navigation, route}) => {
     firestore()
       .collection('Notification')
       .doc()
-      .push({
+      .set({
         seen: false,
         userID: route?.params?.data?.user?.UserID,
         text:
@@ -270,6 +270,7 @@ const PostScreen = ({navigation, route}) => {
   };
 
   React.useEffect(() => {
+    console.log(data.Category, data.SubCategory);
     randomItem();
     randomItem2();
     allImage();
@@ -617,10 +618,12 @@ const PostScreen = ({navigation, route}) => {
                 // TEMPORARILY ADDED
                 // NotificationSystem();
                 if (subdata.length > 0) {
-                  if (route.params.data.PostType === 'Trading') {
+                  if (route?.params?.data?.PostType === 'Trading') {
                     NotificationSystem();
                   } else {
-                    navigation.navigate('SendOffer', {data: route.params.data});
+                    navigation.navigate('SendOffer', {
+                      data: route?.params?.data,
+                    });
                   }
                 } else {
                   // alert('You need to buy Subscription');
@@ -629,9 +632,9 @@ const PostScreen = ({navigation, route}) => {
               }}
               style={styles.AskButton2}>
               <Text style={styles.FontCOlor2}>
-                {route.params.data.PostType === 'Trading'
+                {route?.params?.data?.PostType === 'Trading'
                   ? 'Let’s Trade'
-                  : 'Send offer'}{' '}
+                  : 'Send offer'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -644,7 +647,7 @@ const PostScreen = ({navigation, route}) => {
                 uri:
                   VideoAd.length > 0
                     ? VideoAd[0]?.AdGraphicLink
-                    : VideoAd.length > 0
+                    : VideoAd?.length > 0
                     ? VideoAd[0]?.AdGraphicLink
                     : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
               }}
@@ -660,23 +663,23 @@ const PostScreen = ({navigation, route}) => {
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('OtherUserProfile', {
-                data: VideoAd[0].user,
+                data: VideoAd[0]?.user,
               });
             }}>
             <View style={styles.overlay}>
               <Text style={styles.videoShoesTag}>
-                {VideoAd.length > 0 ? VideoAd[0]?.title : ''}
+                {VideoAd?.length > 0 ? VideoAd[0]?.title : ''}
               </Text>
               <Text style={styles.videoShoesTag2}>
-                {VideoAd.length > 0 ? VideoAd[0]?.TagLine : ''}
+                {VideoAd?.length > 0 ? VideoAd[0]?.TagLine : ''}
               </Text>
 
               <Text style={styles.MainText2}>
-                {VideoAd.length > 0 ? VideoAd[0]?.user?.Address : ''}
+                {VideoAd?.length > 0 ? VideoAd[0]?.user?.Address : ''}
               </Text>
-              {VideoAd.length > 0 && VideoAd[0].user?.Phone !== undefined && (
+              {VideoAd?.length > 0 && VideoAd[0]?.user?.Phone !== undefined && (
                 <Text style={styles.MainText2}>
-                  Call: {VideoAd.length > 0 ? VideoAd[0]?.user?.Phone : ''}
+                  Call: {VideoAd?.length > 0 ? VideoAd[0]?.user?.Phone : ''}
                 </Text>
               )}
             </View>
@@ -703,13 +706,13 @@ const PostScreen = ({navigation, route}) => {
                         <ImageBackground
                           style={styles.img}
                           source={{
-                            uri: item.images[0]
-                              ? item.images[0]
+                            uri: item?.images[0]
+                              ? item?.images[0]
                               : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
                           }}>
                           <View style={styles.imgCC2}>
                             <View style={styles.BottomContainer}>
-                              <Text style={styles.BPTag}>{item.Title}</Text>
+                              <Text style={styles.BPTag}>{item?.Title}</Text>
                             </View>
                           </View>
                         </ImageBackground>

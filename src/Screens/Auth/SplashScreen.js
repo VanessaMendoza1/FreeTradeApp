@@ -36,7 +36,6 @@ const SplashScreen = ({navigation}) => {
           }
         });
       });
-
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
   };

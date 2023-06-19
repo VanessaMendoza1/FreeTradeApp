@@ -335,11 +335,11 @@ const Home = ({navigation}) => {
   //   return () => _stopAutoPlay()
   // }, [])
 
-  const ImageAds = useSelector(state => state.ads.ImageData);
+  const ImageAds = useSelector(state => state?.ads?.ImageData);
   const subdata = useSelector(state => state.sub.subdata);
 
   const NotificationData = async () => {
-    const currentUserId = auth().currentUser.uid;
+    const currentUserId = auth()?.currentUser?.uid;
     let NotificationData = [];
     await firestore()
       .collection('Notification')
@@ -440,10 +440,10 @@ const Home = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().MediaType === 'Image') {
+          if (documentSnapshot?.data()?.MediaType === 'Image') {
             ImageData.push(documentSnapshot.data());
           }
-          if (documentSnapshot.data().MediaType === 'Videos') {
+          if (documentSnapshot?.data()?.MediaType === 'Videos') {
             VideoData.push(documentSnapshot.data());
           }
         });
@@ -512,11 +512,12 @@ const Home = ({navigation}) => {
     });
   }, []);
   useEffect(() => {
-    let adsData = ImageAds?.filter(element =>
-      subscribedUsersData?.includes(element.UserID),
-    );
+    let adsData = ImageAds?.filter(element => {
+      console.log(adsData);
+      return subscribedUsersData?.includes(element.UserID);
+    });
     setAdsData(adsData);
-  }, [subscribedUsersData]);
+  }, []);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
     if (focus == true) {

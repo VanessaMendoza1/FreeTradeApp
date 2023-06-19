@@ -77,7 +77,6 @@ const MakePost = ({navigation}) => {
   };
   useEffect(() => {
     MySubscriptionPackage();
-    fetchUsersTokenHavingFavoritesItems(MyData.UserID);
   }, []);
   const openCamera = () => {
     setloading(true);
