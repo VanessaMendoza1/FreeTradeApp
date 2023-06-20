@@ -125,11 +125,11 @@ const Notification = ({navigation}) => {
                   ) {
                     await firestore()
                       .collection('Users')
-                      .doc(item.userID)
+                      .doc(item?.userID)
                       .get()
                       .then(async documentSnapshot => {
                         if (documentSnapshot.exists) {
-                          let userData = documentSnapshot.data();
+                          let userData = documentSnapshot?.data();
                           navigation.navigate('OtherUserProfile', {
                             data: {
                               UserID: item.userID,

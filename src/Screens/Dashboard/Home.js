@@ -336,6 +336,7 @@ const Home = ({navigation}) => {
   // }, [])
 
   const ImageAds = useSelector(state => state?.ads?.ImageData);
+  const VideoAds = useSelector(state => state?.ads?.VideoData);
   const subdata = useSelector(state => state.sub.subdata);
 
   const NotificationData = async () => {

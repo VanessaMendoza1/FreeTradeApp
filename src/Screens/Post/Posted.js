@@ -92,7 +92,11 @@ const Posted = ({navigation, route}) => {
           text={'Start Promotion'}
           onPress={() => {
             console.log(oldData);
-            navigation.navigate('PostPromotion', {data: oldData});
+            navigation.navigate('PostPromotion', {
+              data: oldData,
+              postData: route?.params?.postData,
+              type: route?.params?.type,
+            });
           }}
         />
         <TouchableOpacity onPress={onShare} style={styles.ShareButton}>

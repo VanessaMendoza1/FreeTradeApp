@@ -55,11 +55,11 @@ const NotificationHead = ({data, onPress, notifications, setNotifications}) => {
             color={Colors.Primary}
             style={{marginLeft: 10}}
           />
-          <Text style={styles.nameText}>{data.text}</Text>
+          <Text style={styles.nameText}>{data?.text}</Text>
         </View>
         <TouchableOpacity
           style={styles.delete}
-          onPress={() => deleteConfirmation(data.id)}>
+          onPress={() => deleteConfirmation(data?.id)}>
           {Icons.CancelIcon({
             tintColor: 'red',
             width: 20,

@@ -27,14 +27,10 @@ import auth from '@react-native-firebase/auth';
 import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
 import axios from 'axios';
-import BottomSheet from '@gorhom/bottom-sheet';
 
-import {
-  CreditCardInput,
-  LiteCreditCardInput,
-} from 'react-native-credit-card-input';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import PaymentBottomSheet from '../../Components/BottomSheet';
 
 const getSubscriptionTarriff = (
   setIndividualSubscriptionPricing,
@@ -85,14 +81,12 @@ const getSubscriptionDetails = async setIsSubscriptionValid => {
 };
 
 const SubscriptionPage = ({navigation}) => {
-  const dispatch = useDispatch();
   const [sub, setsub] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [modall, setModal] = useState(false);
+  const [modall, setModal] = React.useState(false);
   const [plan, setplan] = React.useState('Personal');
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
-  const [indexSnap, setIndexSnap] = useState(0);
   const {confirmPayment} = useStripe();
   const [cardData, setCardData] = React.useState('');
   const [businessSubscriptionPricing, setBusinessSubscriptionPricing] =
@@ -106,18 +100,6 @@ const SubscriptionPage = ({navigation}) => {
       setIndividualSubscriptionPricing,
       setBusinessSubscriptionPricing,
     );
-  }, []);
-  const bottomSheetRef = useRef();
-
-  // variables
-  const snapPoints = useMemo(() => ['60%', '100%'], []);
-
-  // callbacks
-  const handleSheetChanges = useCallback(index => {
-    console.log('handleSheetChanges', index);
-  }, []);
-  const handleIndex = useCallback(index => {
-    return setIndexSnap(index);
   }, []);
 
   const subdata = useSelector(state => state.sub.subdata);
@@ -140,71 +122,6 @@ const SubscriptionPage = ({navigation}) => {
   // };
   // const paymentScreen = (amount, plan, email) => {
 
-  const _createToken = async (amount, plan, email) => {
-    setloading(false);
-    axios
-      .get(
-        `https://umeraftabdev.com/FreeTradeApi/public/api/subscribe?card_number=${cardData.number}&email=${email}&sub_plan=${plan}&expiry=${cardData.expiry}&cvc=${cardData.cvc}`,
-      )
-      .then(res => {
-        alert('Successfully Subscribed');
-        // if (res?.data?.message === 'Subscription created successfully') {
-        //   setModalVisible(false);
-        uploadSubscription(amount);
-        // } else {
-        //   setloading(false);
-        //   setModal(false);
-        // }
-      })
-      .catch(err => {
-        setloading(false);
-        setModal(false);
-        alert('Please re-check your Card & try again');
-      });
-  };
-
-  const MySubscriptionPackage = async () => {
-    let data = [];
-    await firestore()
-      .collection('sub')
-      .get()
-      .then(async querySnapshot => {
-        querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data()?.userid === MyData?.UserID) {
-            data.push(documentSnapshot.data());
-          }
-        });
-      });
-    await dispatch(SubDataAdd(data));
-    setloading(false);
-    setModalVisible(false);
-  };
-
-  const uploadSubscription = amount => {
-    const now = moment.utc();
-    var end = moment().add(30, 'days');
-    var days = now.diff(end, 'days');
-    console.log(MyData?.UserID);
-    firestore()
-      .collection('sub')
-      .doc(MyData?.UserID)
-      .set({
-        userid: MyData?.UserID,
-        startDate: JSON.stringify(now),
-        endDate: JSON.stringify(end),
-        plan:
-          plan === 'price_1N64c3KAtBxeYOh2sxd0LP36' ? 'Personal' : 'Bussiness',
-        price: amount === 999 ? '9.99$' : '1.99',
-      })
-      .then(res => {
-        setModalVisible(false);
-        MySubscriptionPackage();
-      })
-      .catch(err => {
-        setModalVisible(false);
-        setloading(false);
-      });
-  };
   return (
     <>
       {loading ? <LoadingScreen /> : null}
@@ -311,67 +228,15 @@ const SubscriptionPage = ({navigation}) => {
             </View>
           </View>
         )}
-        {modall && (
-          <GestureHandlerRootView style={styles.container}>
-            <BottomSheet
-              ref={bottomSheetRef}
-              index={1}
-              snapPoints={snapPoints}
-              onChange={handleSheetChanges}>
-              <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                  <Text style={styles.modalText}>Stripe</Text>
-                  <LiteCreditCardInput
-                    onChange={({values}) => {
-                      setCardData(values);
-                    }}
-                  />
-                  {/* <> */}
-                  {/* <View
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      justifyContent: 'center',
-                    }}>
-                    <LiteCreditCardInput
-                      onChange={({values}) => {
-                        setCardData(values);
-                      }}
-                    />
-                  </View> */}
-
-                  <TouchableOpacity
-                    style={[styles.button, styles.buttonClose]}
-                    onPress={async () => {
-                      // onLoading();
-                      setModal(false);
-                      setModalVisible(false);
-                      _createToken(
-                        plan === '1.99$'
-                          ? individualSubscriptionPricing
-                          : businessSubscriptionPricing,
-                        plan,
-                        MyData?.email,
-                      );
-                      setModal(false);
-                      // await uploadSubscription();
-                    }}>
-                    <Text style={styles.textStyle}>Submit</Text>
-                  </TouchableOpacity>
-                  {/* </> */}
-                  <TouchableOpacity
-                    style={[styles.button, styles.buttonClose]}
-                    onPress={() => {
-                      // handleClosePress();
-                      setModal(false);
-                    }}>
-                    <Text style={styles.textStyle}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </BottomSheet>
-          </GestureHandlerRootView>
-        )}
+        <PaymentBottomSheet
+          modall={modall}
+          setModal={setModal}
+          setloading={setloading}
+          businessSubscriptionPricing={businessSubscriptionPricing}
+          individualSubscriptionPricing={individualSubscriptionPricing}
+          plan={plan}
+          MyData={MyData}
+        />
       </ImageBackground>
     </>
   );

@@ -29,6 +29,7 @@ import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
 import {getCategoriesAndSubCategories} from '../Dashboard/Home';
 import axios from 'axios';
+
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
     {label: 'Baby Care', value: 'Baby Care'},
@@ -39,7 +40,7 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
   const [usersHavingFav, setUserHavingFav] = React.useState([]);
-
+  const [postId, setPostId] = useState('');
   const [items2, setItems2] = React.useState([
     {label: 'Athletic Shoes', value: 'Athletic Shoes'},
     {label: 'Boat shoes', value: 'Boat shoes'},
@@ -212,6 +213,7 @@ const PostSubmitDetails = ({navigation, route}) => {
   };
   const onSubmit = () => {
     let POstId = uuid.v4();
+    setPostId(postId);
     setloading(true);
     if (!isUserHavingLocation) {
       alert('Please set your location in settings first');
@@ -229,10 +231,9 @@ const PostSubmitDetails = ({navigation, route}) => {
       obj[arr[i]] = true;
     }
     for (var key in obj) {
-      ret_arr.push(key);
+      ret_arr?.push(key);
       fetchUsersTokenHavingFavoritesItems(key);
     }
-    console.log(ret_arr);
     return ret_arr;
   };
   const fetchFavorites = async () => {
@@ -248,17 +249,14 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(async documentSnapshot => {
-          console.log(documentSnapshot?.data(), 'daattt');
+          console.log(documentSnapshot?.data().users[0], 'daattt');
           console.log(value, value2);
-          if (
-            value === documentSnapshot?.data()?.category &&
-            value2 === documentSnapshot?.data()?.subCategory
-          ) {
-            users?.push(documentSnapshot?.data()?.users);
+          if (value === documentSnapshot?.data()?.category) {
+            users?.push(documentSnapshot?.data()?.users[0]);
           }
         });
         setUserHavingFav(users);
-        if (users.length > 0) {
+        if (users?.length > 0) {
           remove_duplicates(users);
         }
         return promises;
@@ -399,21 +397,25 @@ const PostSubmitDetails = ({navigation, route}) => {
       .doc()
       .set({
         seen: false,
-        userID: MyData.UserID,
-        text: MyData.name + '  has posted an item from your favorites!',
+        userID: MyData?.UserID,
+        text: MyData?.name + '  has posted an item from your favorites!',
       })
       .then(async () => {
         var data = JSON.stringify({
-          data: {},
-          notification: {
-            body: MyData.name + 'has posted Item',
-            title: MyData.name + '  has posted an item from your favorites!',
+          data: {
+            body: MyData?.name + 'has posted Item',
+            title: MyData?.name + '  has posted an item from your favorites!',
           },
-          to: JSON.parse(token),
+          notification: {
+            body: MyData?.name + 'has posted Item',
+            title: MyData?.name + '  has posted an item from your favorites!',
+          },
+          to: JSON.stringify(token),
         });
         var config = {
           method: 'post',
           url: 'https://fcm.googleapis.com/fcm/send',
+          // 'https://fcm.googleapis.com/fcm/send',
           headers: {
             Authorization:
               'key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls',
@@ -423,15 +425,15 @@ const PostSubmitDetails = ({navigation, route}) => {
         };
         let callBackIfNotificationsNotHidden = axios(config)
           .then(function (response) {
-            console.log(JSON.stringify(response.data));
+            console.log('success', JSON.stringify(response.data));
             areNotificationsHidden(
               callBackIfNotificationsNotHidden,
-              MyData.UserID,
+              MyData?.UserID,
             );
             // navigation.goBack();
           })
           .catch(function (error) {
-            console.log(error);
+            console.log('errr', error);
           });
       })
       .catch(err => {});
@@ -444,7 +446,6 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(documentSnapshot => {
         if (documentSnapshot?.exists) {
-          console.log(documentSnapshot?.data()?.Notification, 'Notification');
           // tokens.push(documentSnapshot?.data()?.Notification);
           if (documentSnapshot?.data().users !== auth()?.currentUser?.uid) {
             if (documentSnapshot?.data()?.Notification !== '') {
@@ -516,6 +517,37 @@ const PostSubmitDetails = ({navigation, route}) => {
           images: route.params.images,
           condition: value3,
           brand: brand,
+          data: {
+            title: route.params.Title,
+            images: route.params.images,
+            condition: value3,
+            brand: brand,
+          },
+          type: 'post',
+          postData: {
+            UserID: MyData?.UserID,
+            images: route.params.images,
+            Title: route.params.Title,
+            PostType: route.params.Type,
+            Price: route.params.Price,
+            Category: value,
+            SubCategory: value2,
+            Condition: value3,
+            Brand: brand,
+            Description: Description,
+            user: MyData,
+            DocId: postId,
+            Discount: 0,
+            status: false,
+            latitude: MyData?.latitude
+              ? MyData?.latitude
+              : 'No Location Set By User',
+            longitude: MyData?.longitude
+              ? MyData?.longitude
+              : 'No Location Set By User',
+            Notification: MyData?.NotificationToken,
+            videUrl: route?.params?.VideoUrl,
+          },
         });
 
         setloading(false);
@@ -638,6 +670,7 @@ const PostSubmitDetails = ({navigation, route}) => {
                   {Description ? (
                     <Appbutton
                       onPress={() => {
+                        // fetchFavorites();
                         onSubmit();
                       }}
                       text={'Submit'}
