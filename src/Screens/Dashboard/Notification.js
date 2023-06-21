@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -111,7 +112,7 @@ const Notification = ({navigation}) => {
                       .doc(item.newlyAddedItemId)
                       .get()
                       .then(async documentSnapshot => {
-                        if (documentSnapshot.exists) {
+                        if (documentSnapshot?.exists) {
                           let newlyAddedItemData = documentSnapshot.data();
                           navigation.navigate('PostScreen', {
                             data: newlyAddedItemData,
@@ -130,7 +131,7 @@ const Notification = ({navigation}) => {
                       .then(async documentSnapshot => {
                         if (documentSnapshot.exists) {
                           let userData = documentSnapshot?.data();
-                          navigation.navigate('OtherUserProfile', {
+                          navigation?.navigate('OtherUserProfile', {
                             data: {
                               UserID: item.userID,
                               image: userData.image,
@@ -143,8 +144,10 @@ const Notification = ({navigation}) => {
                       'just rated her experience, click to rate yours.',
                     )
                   ) {
+                    Alert.alert('3');
+
                     navigation.navigate('Review', {
-                      data: item.sellerData,
+                      data: item?.sellerData,
                     });
                   }
                 }}

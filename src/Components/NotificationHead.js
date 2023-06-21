@@ -14,6 +14,7 @@ import Icons from '../utils/icons';
 import firestore from '@react-native-firebase/firestore';
 
 const NotificationHead = ({data, onPress, notifications, setNotifications}) => {
+  console.log(data);
   const deleteNotification = notificationId => {
     firestore()
       .collection('Notification')

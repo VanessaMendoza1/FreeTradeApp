@@ -212,7 +212,7 @@ const PostSubmitDetails = ({navigation, route}) => {
     setloading(false);
   };
   const onSubmit = () => {
-    let POstId = uuid.v4();
+    const POstId = uuid.v4();
     setPostId(postId);
     setloading(true);
     if (!isUserHavingLocation) {
@@ -398,17 +398,23 @@ const PostSubmitDetails = ({navigation, route}) => {
       .set({
         seen: false,
         userID: MyData?.UserID,
-        text: MyData?.name + '  has posted an item from your favorites!',
+        text:
+          MyData?.name +
+          'an item from your favorites just posted. Click to view.',
       })
       .then(async () => {
         var data = JSON.stringify({
           data: {
             body: MyData?.name + 'has posted Item',
-            title: MyData?.name + '  has posted an item from your favorites!',
+            title:
+              MyData?.name +
+              'an item from your favorites just posted. Click to view.',
           },
           notification: {
             body: MyData?.name + 'has posted Item',
-            title: MyData?.name + '  has posted an item from your favorites!',
+            title:
+              MyData?.name +
+              'an item from your favorites just posted. Click to view.',
           },
           to: JSON.stringify(token),
         });
@@ -448,8 +454,8 @@ const PostSubmitDetails = ({navigation, route}) => {
         if (documentSnapshot?.exists) {
           // tokens.push(documentSnapshot?.data()?.Notification);
           if (documentSnapshot?.data().users !== auth()?.currentUser?.uid) {
-            if (documentSnapshot?.data()?.Notification !== '') {
-              NotificationSystem(documentSnapshot?.data()?.Notification);
+            if (documentSnapshot?.data()?.NotificationToken !== '') {
+              NotificationSystem(documentSnapshot?.data()?.NotificationToken);
             }
           }
         }

@@ -376,7 +376,7 @@ const Home = ({navigation}) => {
 
             if (days >= 1) {
               setloading(false);
-              DeletePost();
+              // DeletePost();
             } else {
               setloading(false);
               data.push(documentSnapshot.data());
@@ -404,12 +404,12 @@ const Home = ({navigation}) => {
 
           if (days >= 1) {
             setloading(false);
-            DeletePost();
+            // DeletePost();
           } else {
             setloading(false);
             subscribedUsers?.push(documentSnapshot.data().userid);
             data.push(documentSnapshot.data());
-            console.log(subscribedUsers, subscribedUsers.length + 'length');
+            console.log(subscribedUsers, subscribedUsers.length + 'lengthy');
           }
         });
       });
@@ -449,7 +449,7 @@ const Home = ({navigation}) => {
           }
         });
       });
-
+    console.log('imagedata', ImageData);
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
   };
@@ -514,11 +514,10 @@ const Home = ({navigation}) => {
   }, []);
   useEffect(() => {
     let adsData = ImageAds?.filter(element => {
-      console.log(adsData);
-      return subscribedUsersData?.includes(element.UserID);
+      return subscribedUsersData?.includes(element?.UserID);
     });
     setAdsData(adsData);
-  }, []);
+  }, [subscribedUsersData]);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
     if (focus == true) {

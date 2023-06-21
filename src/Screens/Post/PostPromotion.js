@@ -61,7 +61,7 @@ const PostPromotion = ({navigation, route}) => {
     }, []),
   );
   useEffect(() => {
-    console.log(postData, 'ppppppp');
+    console.log(type, 'ppppppp');
   }, []);
   const adposted = () => {
     setloading(true);
@@ -367,7 +367,11 @@ const PostPromotion = ({navigation, route}) => {
           toggleCheckBox3={toggleCheckBox3}
           value={value}
           images={route?.params?.data?.images}
-          Title={route?.params?.data?.Title}
+          Title={
+            route?.params?.data?.Title === undefined
+              ? route?.params?.data?.Title
+              : ''
+          }
           setValue={setValue}
           setToggleCheckBox3={setToggleCheckBox3}
           from="Promotion"

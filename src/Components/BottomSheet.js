@@ -13,6 +13,7 @@ import moment from 'moment';
 import {AddImageAds, AddVideoAds} from '../redux/adsSlicer';
 import {PostAdd} from '../redux/postSlice';
 import auth from '@react-native-firebase/auth';
+import {useNavigation} from '@react-navigation/native';
 const PaymentBottomSheet = ({
   modall,
   setModal,
@@ -44,12 +45,14 @@ const PaymentBottomSheet = ({
   const bottomSheetRef = useRef();
   const [indexSnap, setIndexSnap] = useState(0);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   // variables
   const snapPoints = useMemo(() => ['60%', '100%'], []);
   // callbacks
   const handleSheetChanges = useCallback(index => {
     console.log('handleSheetChanges', index);
   }, []);
+
   const uploadSubscription = amount => {
     const now = moment.utc();
     var end = moment().add(30, 'days');
@@ -110,8 +113,6 @@ const PaymentBottomSheet = ({
       });
   };
   const _createTokenPromotion = async amount => {
-    console.log(postData, images, type, 'hikohik');
-
     // setloading(false);
     axios
       .get(
@@ -124,9 +125,9 @@ const PaymentBottomSheet = ({
         }`,
       )
       .then(res => {
-        if (res.data.message === 'Payment successfull.') {
-          PostAd();
-        }
+        // if (res.data.message === 'Payment successfull.') {
+        PostAd();
+        // }
       })
       .catch(err => {
         alert('something went wrong');
@@ -159,12 +160,23 @@ const PaymentBottomSheet = ({
     const now = moment.utc();
     var end = moment().add(value === 100 ? 15 : 30, 'days');
     var days = now.diff(end, 'days');
-
     setloading(true);
     if (value === '') {
       alert('select The Ads Tier');
       setloading(false);
     } else {
+      console.log(
+        currentUserId,
+        value,
+        images,
+        Title,
+        MyData,
+        businessName,
+        now,
+        end,
+        'hikohik12',
+      );
+
       if (toggleCheckBox3) {
         firestore()
           .collection('Ads')
@@ -173,10 +185,10 @@ const PaymentBottomSheet = ({
             UserID: currentUserId,
             ads: value,
             Adtype: 'Personal',
-            AdGraphicLink: images.length > 0 ? images[0] : '',
+            AdGraphicLink: images?.length > 0 ? images[0] : '',
             TagLine: '',
             MediaType: 'Image',
-            title: Title,
+            title: Title === undefined ? '' : Title,
             user: MyData,
             startDate: JSON.stringify(now),
             endDate: JSON.stringify(end),
@@ -185,7 +197,7 @@ const PaymentBottomSheet = ({
                 ? MyData?.BusinessName
                 : businessName,
           })
-          .then(() => {
+          .then(res => {
             if (type === 'post') {
               postAdd(postData);
             } else {
@@ -194,6 +206,8 @@ const PaymentBottomSheet = ({
             setloading(false);
           })
           .catch(err => {
+            console.log('check', err);
+
             setloading(false);
           });
       } else {
@@ -206,7 +220,7 @@ const PaymentBottomSheet = ({
     await firestore()
       .collection('Post')
       .doc(data?.DocId)
-      .set()
+      .get()
       .then(async doc => {
         let PostData = [];
         await firestore()
@@ -216,8 +230,10 @@ const PaymentBottomSheet = ({
             console.log('Total users: ', querySnapshot.size);
 
             querySnapshot.forEach(documentSnapshot => {
-              PostData.push(documentSnapshot.data());
+              PostData.push(documentSnapshot?.data());
             });
+            alert('Posted successfully');
+            navigation.goBack();
             await dispatch(PostAdd(PostData));
           })
           .catch(err => {
@@ -277,7 +293,7 @@ const PaymentBottomSheet = ({
             AdGraphicLink: ImageUrl !== '' ? ImageUrl : VideoUrl,
             TagLine: TagLine !== '' ? TagLine : '',
             MediaType: ImageUrl && VideoUrl === '' ? 'Image' : 'Videos',
-            title: Title,
+            title: Title === undefined ? '' : Title,
             user: MyData,
             startDate: JSON.stringify(now),
             endDate: JSON.stringify(end),
@@ -291,6 +307,7 @@ const PaymentBottomSheet = ({
             setTagLine('');
             setValue('');
             setToggleCheckBox3(false);
+            alert('Ad posted successfully!');
           })
           .catch(err => {
             setloading(false);
