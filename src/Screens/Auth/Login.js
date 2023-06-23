@@ -19,7 +19,8 @@ import LoadingScreen from '../../Components/LoadingScreen';
 
 import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
-
+import {localNotificationService} from '../../Fcm/LocalNotificationService';
+import {fcmService} from '../../Fcm/FCMService';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
@@ -201,53 +202,95 @@ const Login = ({navigation}) => {
     }
   };
   //  notifications gathering
-  const tt = async () => {
-    try {
-      if (Platform.OS === 'ios') {
-        await messaging().registerDeviceForRemoteMessages();
-        await messaging().setAutoInitEnabled(true);
-      }
+  // const tt = async () => {
+  //   try {
+  //     if (Platform.OS === 'ios') {
+  //       await messaging().registerDeviceForRemoteMessages();
+  //       await messaging().setAutoInitEnabled(true);
+  //     }
 
-      const token = await messaging().getToken();
+  //     const token = await messaging().getToken();
 
-      const jsonValue = JSON.stringify(token);
-      await AsyncStorage.setItem('TokensStore', jsonValue);
-      setNotificationToken(jsonValue);
-    } catch (error) {
-      console.log(error);
-    }
+  //     const jsonValue = JSON.stringify(token);
+  //     await AsyncStorage.setItem('TokensStore', jsonValue);
+  //     setNotificationToken(jsonValue);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // const checkPermission = async () => {
+  //   const deviceRemote = await messaging().registerDeviceForRemoteMessages();
+  //   try {
+  //     const token = await messaging().getToken();
+  //     setNotificationToken(token);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   const authStatus = await messaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  //   if (enabled) {
+  //     messaging()
+  //       .hasPermission()
+  //       .then(enabled => {
+  //         if (enabled) {
+  //           // User has permission
+  //           getData();
+  //         } else {
+  //           // User doesn't have permission
+  //           this.requestPermission();
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.log(error);
+  //         //  console.log('@@@ FCM SERVICE PERMISSION REJECT ERROR ===========', error);
+  //       });
+  //   } else {
+  //     alert('Permission denied');
+  //   }
+  // };
+  const onRegister = token => {
+    console.log('[App] onRegister :', token);
+    AsyncStorage.setItem('fcm_token', token);
+    setNotificationToken(token);
+
+    // __updateOnlineStatus('Yes');
   };
-  const checkPermission = async () => {
-    const deviceRemote = await messaging().registerDeviceForRemoteMessages();
-    try {
-      const token = await messaging().getToken();
-      setNotificationToken(token);
-    } catch (error) {
-      console.log(error);
-    }
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-    if (enabled) {
-      messaging()
-        .hasPermission()
-        .then(enabled => {
-          if (enabled) {
-            // User has permission
-            getData();
-          } else {
-            // User doesn't have permission
-            this.requestPermission();
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          //  console.log('@@@ FCM SERVICE PERMISSION REJECT ERROR ===========', error);
-        });
-    } else {
-      alert('Permission denied');
-    }
+  const onNotification = (notify, remoteMessage) => {
+    console.log('[App] remote :', notify);
+    const options = {
+      soundName: 'default',
+      playSound: true,
+    };
+    localNotificationService.showNotification(
+      0,
+      notify?.doctor_name,
+      notify?.body,
+      notify,
+      options,
+    );
+  };
+
+  const onOpenNotification = notify => {
+    //     var numberPattern = /\d+/g;
+    let id = notify?.doctor_id;
+    // let id=notify.sender.match( numberPattern )
+    // alert(JSON.stringify(notify));
+
+    navigation.navigate('chat', {
+      userData: {id: notify?.doctor_id, pro_name: notify?.doctor_name},
+
+      uid: notify?.user_id,
+      uname: notify?.title,
+      doctor_id: notify?.doctor_id,
+      user_id: notify?.user_id,
+      type: 'assis',
+      // userData: notify,
+      //days: item?.days,
+    });
+    console.log('[App] onNotification :', notify);
+    // alert('open notification: ', notify.body);
   };
   const getData = async () => {
     try {
@@ -505,12 +548,21 @@ const Login = ({navigation}) => {
       });
   };
   React.useEffect(() => {
-    checkPermission();
+    // checkPermission();
     GoogleSignin.configure({
       webClientId:
         '836632075133-icfofnqj20u7f3n2c9986eamlfobveg3.apps.googleusercontent.com',
     });
+
     Allads();
+    fcmService.register(onRegister, onNotification, onOpenNotification);
+    localNotificationService.configure(onOpenNotification);
+    return () => {
+      console.log('[App] unRegister');
+      fcmService.unRegister();
+      localNotificationService.unregister();
+      console.log('[App ] idun :', 'data');
+    };
   }, []);
 
   return (

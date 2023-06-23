@@ -303,14 +303,12 @@ const PostSubmitDetails = ({navigation, route}) => {
       })
       .then(async doc => {
         // addFreePostsCount(MyData.UserID, count);
-
+        console.log(doc);
         let PostData = [];
         await firestore()
           .collection('Post')
           .get()
           .then(async querySnapshot => {
-            console.log('Total users: ', querySnapshot.size);
-
             querySnapshot.forEach(documentSnapshot => {
               PostData.push(documentSnapshot.data());
             });
@@ -400,23 +398,23 @@ const PostSubmitDetails = ({navigation, route}) => {
         userID: MyData?.UserID,
         text:
           MyData?.name +
-          'an item from your favorites just posted. Click to view.',
+          ' an item from your favorites just posted. Click to view.',
       })
       .then(async () => {
         var data = JSON.stringify({
           data: {
-            body: MyData?.name + 'has posted Item',
+            body: MyData?.name + ' has posted Item',
             title:
               MyData?.name +
-              'an item from your favorites just posted. Click to view.',
+              ' an item from your favorites just posted. Click to view.',
           },
           notification: {
-            body: MyData?.name + 'has posted Item',
+            body: MyData?.name + ' has posted Item',
             title:
               MyData?.name +
-              'an item from your favorites just posted. Click to view.',
+              ' an item from your favorites just posted. Click to view.',
           },
-          to: JSON.stringify(token),
+          to: token,
         });
         var config = {
           method: 'post',
