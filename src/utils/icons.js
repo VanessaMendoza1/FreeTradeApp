@@ -33,7 +33,7 @@ import HandShake from 'react-native-vector-icons/FontAwesome5';
 
 const Icons = {
   Home: (style = {}) => (
-    <Image source={home} style={{...styles.defaultStyle, ...style}} />
+    <Image source={home} style={[{...styles.defaultStyle, ...style}]} />
   ),
   PostAds: (style = {}) => (
     <Image source={dollar} style={{...styles.defaultStyle, ...style}} />
@@ -43,7 +43,13 @@ const Icons = {
   ),
   Mydeals: (style = {}) => (
     // <HandShake name="handshake" />
-    <Image source={deals} style={{...styles.defaultStyle, ...style}} />
+    <Image
+      source={deals}
+      style={[
+        {...styles.defaultStyle, ...style},
+        {width: 38, height: 38},
+      ]}
+    />
   ),
   Profile: (style = {}) => (
     <Image source={profile} style={{...styles.defaultStyle, ...style}} />

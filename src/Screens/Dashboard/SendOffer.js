@@ -120,114 +120,100 @@ const SendOffer = ({navigation, route}) => {
       <View style={styles.AppBtn}>
         <Appbutton
           onPress={() => {
-            // NotificationSystem();
+            if (offer === '' || offer === 'undefined' || offer === null) {
+              return alert('Please enter some amount');
+            } else {
+              database()
+                .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
+                .once('value')
+                .then(async snapshot => {
+                  let roomId;
+                  if (snapshot.val() == null) {
+                    roomId = uuid.v4();
+                  } else {
+                    roomId = snapshot.val().roomId;
+                  }
+                  console.log({roomId});
+                  let SendData = {
+                    roomId,
+                    id: data.UserID,
+                    name: data.name,
+                    img: data.image,
+                    emailId: data.email,
+                    about: data.Bio,
+                    lastMsg: offer,
+                    Token: data.NotificationToken,
 
-            // navigation.navigate('StartConversation', {
-            //   data: route.params.data,
-            //   receiverData: {
-            //     // roomId,
-            //     // lastMsg: txt,
-            //     // route.params.data.user.image
-            //     id: route.params.data.UserID,
-            //     name: route.params.data.name,
-            //     img: route.params.data.image,
-            //     emailId: route.params.data.email,
-            //     about: route.params.data.Bio,
-            //     Token: route.params.data.NotificationToken,
+                    itemPrice: data.Price,
+                    itemImage: data.images[0],
+                    sellersName: data.user.name,
+                    sellersImage: data.user.image,
+                  };
+                  sendMsg(offer, setoffer, setloading, UserData, SendData);
+                  database()
+                    .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
+                    .once('value')
+                    .then(async snapshot => {
+                      if (
+                        snapshot.val() == null ||
+                        (snapshot.val().itemPrice == null &&
+                          snapshot.val().itemImage == null)
+                      ) {
+                        let myData = {
+                          roomId,
+                          id: UserData.UserID,
+                          name: UserData.name,
+                          img: UserData.image,
+                          emailId: UserData.emails,
+                          about: UserData.Bio,
+                          lastMsg: offer,
+                          Token: UserData.NotificationToken,
 
-            //     itemPrice: route.params.data.Price,
-            //     itemImage: route.params.data.images[0],
-            //     sellersName: route.params.data.user.name,
-            //     sellersImage: route.params.data.user.image,
-            //   }
-            // });
+                          itemPrice: data.Price,
+                          itemImage: data.images[0],
+                          sellersName: data.user.name,
+                          sellersImage: data.user.image,
+                        };
+                        database()
+                          .ref(
+                            '/chatlist/' + data.UserID + '/' + UserData.UserID,
+                          )
+                          .update(myData)
+                          .then(() => console.log('Data updated.'));
 
-            database()
-              .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
-              .once('value')
-              .then(async snapshot => {
-                let roomId;
-                if (snapshot.val() == null) {
-                  roomId = uuid.v4();
-                } else {
-                  roomId = snapshot.val().roomId;
-                }
-                console.log({roomId});
-                let SendData = {
-                  roomId,
-                  id: data.UserID,
-                  name: data.name,
-                  img: data.image,
-                  emailId: data.email,
-                  about: data.Bio,
-                  lastMsg: offer,
-                  Token: data.NotificationToken,
+                        data.lastMsg = offer;
+                        data.roomId = roomId;
 
-                  itemPrice: data.Price,
-                  itemImage: data.images[0],
-                  sellersName: data.user.name,
-                  sellersImage: data.user.image,
-                };
-                sendMsg(offer, setoffer, setloading, UserData, SendData);
-                database()
-                  .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
-                  .once('value')
-                  .then(async snapshot => {
-                    if (
-                      snapshot.val() == null ||
-                      (snapshot.val().itemPrice == null &&
-                        snapshot.val().itemImage == null)
-                    ) {
-                      let myData = {
-                        roomId,
-                        id: UserData.UserID,
-                        name: UserData.name,
-                        img: UserData.image,
-                        emailId: UserData.emails,
-                        about: UserData.Bio,
-                        lastMsg: offer,
-                        Token: UserData.NotificationToken,
-
-                        itemPrice: data.Price,
-                        itemImage: data.images[0],
-                        sellersName: data.user.name,
-                        sellersImage: data.user.image,
-                      };
-                      database()
-                        .ref('/chatlist/' + data.UserID + '/' + UserData.UserID)
-                        .update(myData)
-                        .then(() => console.log('Data updated.'));
-
-                      data.lastMsg = offer;
-                      data.roomId = roomId;
-
-                      database()
-                        .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
-                        .update(SendData)
-                        .then(() => {
-                          console.log('Data updated.');
-                          alert('Offer Sent');
-                          navigation.goBack();
-                        });
-                      // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
-                      setloading(false);
-                    } else {
-                      alert('Offer Sent');
-                      navigation.goBack();
-                      // navigation.navigate('Inbox', {
-                      //   txt: txt,
-                      //   receiverData: {
-                      //     ...snapshot.val(),
-                      //     itemPrice: data.Price,
-                      //     itemImage: data.images[0],
-                      //     sellersName: data.user.name,
-                      //     sellersImage: data.user.image,
-                      //   }
-                      // });
-                      setloading(false);
-                    }
-                  });
-              });
+                        database()
+                          .ref(
+                            '/chatlist/' + UserData.UserID + '/' + data.UserID,
+                          )
+                          .update(SendData)
+                          .then(() => {
+                            console.log('Data updated.');
+                            alert('Offer Sent');
+                            navigation.goBack();
+                          });
+                        // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
+                        setloading(false);
+                      } else {
+                        alert('Offer Sent');
+                        navigation.goBack();
+                        // navigation.navigate('Inbox', {
+                        //   txt: txt,
+                        //   receiverData: {
+                        //     ...snapshot.val(),
+                        //     itemPrice: data.Price,
+                        //     itemImage: data.images[0],
+                        //     sellersName: data.user.name,
+                        //     sellersImage: data.user.image,
+                        //   }
+                        // });
+                        setloading(false);
+                      }
+                    });
+                });
+            }
           }}
           text={'Make offer'}
         />

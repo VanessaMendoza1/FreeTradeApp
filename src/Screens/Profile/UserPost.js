@@ -416,9 +416,8 @@ const UserPost = ({navigation, route}) => {
               <View style={styles.Btncc}>
                 <Appbutton
                   onPress={() => {
-                    return alert('j');
                     navigation.navigate('PostPromotion', {
-                      data: route.params.data,
+                      data: route?.params?.data,
                     });
                   }}
                   text={'Promote'}

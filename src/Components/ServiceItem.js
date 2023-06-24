@@ -30,7 +30,9 @@ const ServiceItem = ({onPress, item}) => {
                 <Text style={styles.BPTag22}>
                   {item.Price !== '' ? priceFormatter(item.Price) : null}
                 </Text>
-                <Text style={styles.BPTag3}>{priceFormatter(item.Discount)}</Text>
+                <Text style={styles.BPTag3}>
+                  {priceFormatter(item.Discount)}
+                </Text>
               </View>
             ) : (
               <Text style={styles.BPTag2}>
@@ -96,7 +98,7 @@ const styles = StyleSheet.create({
   },
   BPTag: {
     color: '#fff',
-    fontSize: h('2%'),
+    fontSize: h('1.5%'),
     fontWeight: 'bold',
   },
   BPTag2: {
