@@ -48,7 +48,7 @@ const Notification = ({navigation}) => {
           console.log('image', documentSnapshot?.data().sellerData);
           if (
             documentSnapshot.data() &&
-            documentSnapshot.data().userID == currentUserId
+            documentSnapshot.data().receiverId === currentUserId
           ) {
             // if (documentSnapshot.data().seen == false) {
             NotificationData.push({
@@ -133,8 +133,8 @@ const Notification = ({navigation}) => {
                           let userData = documentSnapshot?.data();
                           navigation?.navigate('OtherUserProfile', {
                             data: {
-                              UserID: item.userID,
-                              image: userData.image,
+                              UserID: item?.userID,
+                              image: userData?.image,
                             },
                           });
                         }

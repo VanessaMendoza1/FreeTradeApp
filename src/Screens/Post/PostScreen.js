@@ -226,10 +226,12 @@ const PostScreen = ({navigation, route}) => {
       .doc()
       .set({
         seen: false,
-        userID: route?.params?.data?.user?.UserID,
+        userID: userData.UserID,
+        receiverId: route?.params?.data?.user?.UserID,
         text:
           userData.name +
           '  would like to trade with you, click to see profile!',
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({

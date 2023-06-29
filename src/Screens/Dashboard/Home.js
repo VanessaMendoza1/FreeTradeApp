@@ -155,6 +155,7 @@ const Home = ({navigation}) => {
   const ServiceAllData = useSelector(state => state.post.ServiceData);
   const SellingAllData = useSelector(state => state.post.SellingData);
   const TradingAllData = useSelector(state => state.post.TradingData);
+  const [filterLocationBased, setFilterLocationBased] = useState([]);
   const [Notii, setNotii] = React.useState('');
   // console.log({SellingAllData});
   const [searchValue, setSearchValue] = React.useState('');
@@ -409,7 +410,7 @@ const Home = ({navigation}) => {
             setloading(false);
             subscribedUsers?.push(documentSnapshot.data().userid);
             data.push(documentSnapshot.data());
-            console.log(subscribedUsers, subscribedUsers.length + 'lengthy');
+            // console.log(subscribedUsers, subscribedUsers.length + 'lengthy');
           }
         });
       });
@@ -449,7 +450,6 @@ const Home = ({navigation}) => {
           }
         });
       });
-    console.log('imagedata', ImageData);
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
   };
@@ -509,11 +509,16 @@ const Home = ({navigation}) => {
     allpost();
     NotificationData();
     subscribedUsers().then(res => {
-      console.log(res, 'res');
+      // console.log(res, 'res');
     });
   }, []);
   useEffect(() => {
-    let adsData = ImageAds?.filter(element => {
+    ImageAds.filter(item => {
+      if (UserData?.LocationFilter?.location === item.user?.location) {
+        filterLocationBased.push(item);
+      }
+    });
+    let adsData = filterLocationBased?.filter(element => {
       return subscribedUsersData?.includes(element?.UserID);
     });
     setAdsData(adsData);
@@ -629,7 +634,7 @@ const Home = ({navigation}) => {
                   onPress={() => {
                     // await alert('It will take to User Screen');
                     navigation.navigate('OtherUserProfile', {
-                      data: item.user,
+                      data: item?.user,
                     });
                   }}
                   data={item}
