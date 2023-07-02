@@ -5,13 +5,16 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Appbutton from '../../Components/Appbutton';
-
+import reactotron from 'reactotron-react-native';
+import firestore from '@react-native-firebase/firestore';
+import {useIsFocused} from '@react-navigation/native';
 const Review = ({navigation, route}) => {
   const [currentValue, setCurrentValue] = React.useState(0);
   const stars = Array(5).fill(0);
@@ -20,11 +23,30 @@ const Review = ({navigation, route}) => {
   const [Ontime, setOntime] = React.useState(false);
   const [Communicative, setCommunicative] = React.useState(false);
   const [Good, setGood] = React.useState(false);
+  const [user, setUser] = useState([]);
+  const focused = useIsFocused();
   //   const [activeField, setActiveField] = React.useState(false);
   //   const [activeField, setActiveField] = React.useState(false);
   useEffect(() => {
     console.log('data', route?.params?.data);
-  }, []);
+    fetchBuyerDetails();
+  }, [focused]);
+  const fetchBuyerDetails = async () => {
+    const userData = [];
+    await firestore()
+      .collection('Users')
+      .doc(route?.params?.data)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          setUser(documentSnapshot.data());
+          userData.push(documentSnapshot.data());
+        }
+      })
+      .catch(err => {
+        console.log('err', err);
+      });
+  };
   const handleClick = value => {
     setCurrentValue(value);
   };
@@ -51,8 +73,8 @@ const Review = ({navigation, route}) => {
           <Image
             style={{width: '100%', height: '100%', resizeMode: 'cover'}}
             source={{
-              uri: route?.params?.data?.BuyerImage
-                ? route?.params?.data?.BuyerImage
+              uri: user?.image
+                ? user?.image
                 : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
             }}
           />

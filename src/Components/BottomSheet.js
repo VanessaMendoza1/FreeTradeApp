@@ -151,7 +151,6 @@ const PaymentBottomSheet = ({
         }
       })
       .catch(err => {
-        setmodalVisble(false);
         alert('something went wrong');
       });
   };
@@ -165,18 +164,6 @@ const PaymentBottomSheet = ({
       alert('select The Ads Tier');
       setloading(false);
     } else {
-      console.log(
-        currentUserId,
-        value,
-        images,
-        Title,
-        MyData,
-        businessName,
-        now,
-        end,
-        'hikohik12',
-      );
-
       if (toggleCheckBox3) {
         firestore()
           .collection('Ads')
@@ -196,6 +183,7 @@ const PaymentBottomSheet = ({
               MyData?.AccountType === 'Bussiness'
                 ? MyData?.BusinessName
                 : businessName,
+            promoted: true,
           })
           .then(res => {
             if (type === 'post') {
@@ -297,6 +285,7 @@ const PaymentBottomSheet = ({
             user: MyData,
             startDate: JSON.stringify(now),
             endDate: JSON.stringify(end),
+            promoted: true,
           })
           .then(() => {
             Allads();

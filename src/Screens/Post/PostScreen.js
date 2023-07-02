@@ -638,7 +638,7 @@ const PostScreen = ({navigation, route}) => {
               autoplay
               paused={false}
               controls={true}
-              resizeMode={'contain'}
+              resizeMode={'cover'}
               thumbnail={{
                 uri: 'https://i.picsum.photos/id/866/1600/900.jpg',
               }}

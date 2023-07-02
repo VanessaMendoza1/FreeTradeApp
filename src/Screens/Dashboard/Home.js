@@ -33,6 +33,7 @@ import axios from 'axios';
 import Carousel from 'react-native-reanimated-carousel';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import InAppReview from 'react-native-in-app-review';
+import reactotron from 'reactotron-react-native';
 
 const getCategoriesAndSubCategories = callback => {
   let categoryAlongSubCategories = {};
@@ -397,7 +398,7 @@ const Home = ({navigation}) => {
           var end = JSON.parse(documentSnapshot.data().endDate);
           var days = now.diff(end, 'days');
 
-          if (days >= 1) {
+          if (days <= 1) {
             setloading(false);
             // DeletePost();
           } else {
@@ -519,14 +520,14 @@ const Home = ({navigation}) => {
   }, [subscribedUsersData, focus]);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
-    if (focus == true) {
-      // if condition required here because it will call the function even when you are not focused in the screen as well, because we passed it as a dependencies to useEffect hook
-      allpost();
-      // UserDataPost();
-      Allads();
-      MySubscriptionPackage();
-      NotificationData();
-    }
+    // if (focus === true) {
+    // if condition required here because it will call the function even when you are not focused in the screen as well, because we passed it as a dependencies to useEffect hook
+    allpost();
+    // UserDataPost();
+    Allads();
+    MySubscriptionPackage();
+    NotificationData();
+    // }
   }, [focus]);
 
   // console.log({SellingAllData1: SellingAllData});

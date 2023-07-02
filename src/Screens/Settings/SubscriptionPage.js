@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Modal,
   TouchableHighlight,
+  Alert,
 } from 'react-native';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
 import Colors from '../../utils/Colors';
@@ -86,6 +87,7 @@ const SubscriptionPage = ({navigation}) => {
   const [modall, setModal] = React.useState(false);
   const [plan, setplan] = React.useState('Personal');
   const MyData = useSelector(state => state.counter.data);
+  const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
   const {confirmPayment} = useStripe();
   const [cardData, setCardData] = React.useState('');
@@ -101,7 +103,18 @@ const SubscriptionPage = ({navigation}) => {
       setBusinessSubscriptionPricing,
     );
   }, []);
-
+  let uploadSubscription = () => {
+    firestore()
+      .collection('sub')
+      .doc(MyData.UserID)
+      .delete()
+      .then(async () => {
+        await dispatch(SubDataAdd([]));
+      })
+      .catch(error => {
+        console.error('Error removing document: ', error);
+      });
+  };
   const subdata = useSelector(state => state.sub.subdata);
   // let uploadSubscription = () => {
   //   firestore()
@@ -166,9 +179,10 @@ const SubscriptionPage = ({navigation}) => {
                     `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData?.email}`,
                   )
                   .then(res => {
-                    console.log(res);
+                    console.log(res?.data);
                     setloading(false);
-                    // uploadSubscription();
+                    Alert.alert('Subscription cancelled successfully!');
+                    uploadSubscription();
                   })
                   .catch(err => {
                     console.log(err);

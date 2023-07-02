@@ -73,6 +73,7 @@ const LocationScreen = ({navigation}) => {
                 ServiceData.push(documentSnapshot.data());
               }
             }
+            navigation.replace('SplashScreen');
           }
         });
       })
@@ -189,10 +190,10 @@ const LocationScreen = ({navigation}) => {
             onPress={(data, details = null) => {
               const l = data.description;
               setLocation(l);
-              const Locationss = details.geometry.location;
+              const Locationss = details?.geometry?.location;
 
-              setlatitude(Locationss.lat);
-              setlongitude(Locationss.lng);
+              setlatitude(Locationss?.lat);
+              setlongitude(Locationss?.lng);
             }}
             styles={{
               textInputContainer: {

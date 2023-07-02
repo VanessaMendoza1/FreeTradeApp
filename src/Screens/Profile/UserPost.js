@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -263,7 +264,7 @@ const UserPost = ({navigation, route}) => {
           .then(function (response) {
             console.log(JSON.stringify(response.data));
             areNotificationsHidden(callBackIfNotificationsNotHidden, id);
-            navigation.navigate('Review');
+            navigation.navigate('Review', {data: id});
           })
           .catch(function (error) {});
       })

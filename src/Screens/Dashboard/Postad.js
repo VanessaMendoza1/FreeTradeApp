@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Modal,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
@@ -284,7 +285,7 @@ const Postad = ({navigation}) => {
           .collection('Ads')
           .doc()
           .set({
-            UserID: MyData.UserID,
+            UserID: MyData?.UserID,
             ads: value,
             Adtype:
               subdata.length > 0
@@ -535,7 +536,9 @@ const Postad = ({navigation}) => {
                 style={styles.inputText}
                 placeholder={'Tag line: 12 characters'}
                 placeholderTextColor={Colors.Primary}
-                onChangeText={e => setTagLine(e)}
+                onChangeText={e => {
+                  setTagLine(e);
+                }}
               />
               {/* ) : null}
                 </>
@@ -643,6 +646,7 @@ const Postad = ({navigation}) => {
             setVideoUrl={setVideoUrl}
             setTagLine={setTagLine}
             setValue={setValue}
+            Title={Title}
           />
           {/* <Modal
             animationType="slide"
@@ -705,7 +709,6 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
         }
       })
       .catch(err => {
-        setmodalVisble(false);
         alert('something went wrong');
       });
   };
