@@ -9,6 +9,7 @@ import {
   Share,
   FlatList,
   Platform,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -35,6 +36,8 @@ import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
+import Reactotron from 'reactotron-react-native';
+import reactotron from 'reactotron-react-native';
 
 const PostScreen = ({navigation, route}) => {
   const [loading, setloading] = React.useState(false);
@@ -49,8 +52,8 @@ const PostScreen = ({navigation, route}) => {
   const [heart, setheart] = React.useState(false);
   const [mode, setmode] = React.useState(false);
   const [imgeUrl, setimgeUrl] = React.useState(
-    route.params.data.images[0]
-      ? route.params.data.images[0]
+    route.params?.data?.images?.length > 0 && route.params?.data?.images[0]
+      ? route.params?.data?.images[0]
       : 'https://images.unsplash.com/photo-1595341888016-a392ef81b7de?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=879&q=80',
   );
   const [imgeUrl2, setimgeUrl2] = React.useState([]);
@@ -59,15 +62,12 @@ const PostScreen = ({navigation, route}) => {
       ? route.params.data.Notification
       : 123123123,
   );
-  const data = route.params.data;
+  const data = route.params?.data;
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log(
-        'Focussed PostScreen.js, running allImage isItemLiked getSimilarItems',
-      );
       allImage();
-      isItemLiked(route.params.data.id, () => setheart(true));
+      isItemLiked(route?.params?.data?.id, () => setheart(true));
       getSimilarItems();
       return () => null;
     }, []),
@@ -75,7 +75,7 @@ const PostScreen = ({navigation, route}) => {
 
   const allImage = () => {
     let data = [];
-    route.params.data.images.map(item => {
+    route?.params?.data?.images?.map(item => {
       if (item !== '') {
         data.push(item);
       }
@@ -165,8 +165,8 @@ const PostScreen = ({navigation, route}) => {
     let similarItems = [];
     await firestore()
       .collection('Post')
-      .where('Category', '==', data.Category)
-      .where('SubCategory', '==', data.SubCategory)
+      .where('Category', '==', route?.params?.data?.Category)
+      .where('SubCategory', '==', route?.params?.data?.SubCategory)
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
@@ -180,18 +180,18 @@ const PostScreen = ({navigation, route}) => {
   };
 
   const randomItem = () => {
-    const arr = AllPostData.map(a => ({sort: 3, value: a}))
+    const arr = AllPostData?.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
 
-    setSitem(arr.slice(0, 3));
+    setSitem(arr?.slice(0, 3));
   };
 
   const randomItem2 = () => {
-    const arr = VideoData.map(a => ({sort: 3, value: a}))
+    const arr = VideoData?.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
-    setVideoAd(arr.slice(0, 1));
+    setVideoAd(arr?.slice(0, 1));
   };
 
   const sendreport = () => {
@@ -200,15 +200,18 @@ const PostScreen = ({navigation, route}) => {
       .collection('Reports')
       .doc()
       .set({
-        UserName: userData.name,
-        UserID: userData.UserID,
+        UserName: userData?.name,
+        UserID: userData?.UserID,
         ReportText: RText !== '' ? RText : 'No Text added',
         Date: new Date().toLocaleDateString(),
-        PostName: route.params.data.Title,
-        PostId: route.params.data.DocId,
-        PostImage: route.params.data.images,
-        PostOwner: route.params.data.user.name,
-        PostOwnerEmail: route.params.data.user.email,
+        PostName: route?.params?.data?.Title,
+        PostId: route?.params?.data?.DocId,
+        PostImage:
+          route?.params?.data?.images.length > 0
+            ? route?.params?.data?.images
+            : [],
+        PostOwner: route?.params?.data?.user?.name,
+        PostOwnerEmail: route?.params?.data?.user?.email,
       })
       .then(async () => {
         setmode(false);
@@ -259,7 +262,7 @@ const PostScreen = ({navigation, route}) => {
             console.log(JSON.stringify(response.data));
             areNotificationsHidden(
               callBackIfNotificationsNotHidden,
-              route.params.data.user.UserID,
+              route?.params?.data?.user?.UserID,
             );
             navigation.goBack();
             alert('Trade Offer Sent');
@@ -272,7 +275,7 @@ const PostScreen = ({navigation, route}) => {
   };
 
   React.useEffect(() => {
-    console.log(data.Category, data.SubCategory);
+    reactotron.log(route?.params?.data.Price);
     randomItem();
     randomItem2();
     allImage();
@@ -337,17 +340,17 @@ const PostScreen = ({navigation, route}) => {
                 onPress={async () => {
                   if (!heart) {
                     await toggleMarkFavourite(
-                      route.params.data.id,
-                      route.params.data.Category,
-                      route.params.data.SubCategory,
+                      route.params?.data?.id,
+                      route.params?.data?.Category,
+                      route.params?.data?.SubCategory,
                     );
                     setheart(true);
                   } else {
                     let isForRemovingFromFavourites = true;
                     await toggleMarkFavourite(
-                      route.params.data.id,
-                      route.params.data.Category,
-                      route.params.data.SubCategory,
+                      route.params?.data?.id,
+                      route.params?.data?.Category,
+                      route.params?.data?.SubCategory,
                       isForRemovingFromFavourites,
                     );
                     setheart(false);
@@ -396,7 +399,7 @@ const PostScreen = ({navigation, route}) => {
             {route.params.data.Discount !== 0 ? (
               <View style={styles.Discountbox}>
                 <Text style={styles.HeadingText33}>
-                  {priceFormatter(route.params.data.Discount)}
+                  {priceFormatter(route?.params?.data?.Discount)}
                 </Text>
                 <Text style={styles.HeadingText22}>
                   {route.params.data.Price !== '' &&
@@ -406,13 +409,13 @@ const PostScreen = ({navigation, route}) => {
             ) : (
               <Text style={styles.HeadingText}>
                 {route.params.data.Price !== '' &&
-                  priceFormatter(route.params.data.Price)}
+                  priceFormatter(route?.params?.data?.Price)}
               </Text>
             )}
           </View>
           <View style={styles.HeadingTextContainer2}>
             <Text style={styles.HeadingText2}>
-              {route.params.data.user.location}
+              {route?.params?.data?.user?.location}
             </Text>
           </View>
           <View style={styles.HeadingTextContainer2}>
@@ -422,13 +425,13 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer2222}>
             <Text style={styles.HeadingText3}>Condition: </Text>
             <Text style={styles.HeadingText2}>
-              {route.params.data.Condition}
+              {route?.params?.data?.Condition}
             </Text>
           </View>
 
           {/* imges */}
           <View style={styles.ImgesContainer}>
-            {route.params.data.images.map((item, index) => (
+            {route?.params?.data?.images?.map((item, index) => (
               <>
                 {item !== '' ? (
                   <TouchableOpacity
@@ -491,7 +494,7 @@ const PostScreen = ({navigation, route}) => {
 
           <View style={styles.HeadingTextContainer3}>
             <Text style={styles.HeadingText4}>
-              {route.params.data.Description}
+              {route?.params?.data?.Description}
             </Text>
           </View>
 
@@ -504,8 +507,8 @@ const PostScreen = ({navigation, route}) => {
                 <Image
                   style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                   source={{
-                    uri: route.params.data.user.image
-                      ? route.params.data.user.image
+                    uri: route?.params?.data?.user?.image
+                      ? route?.params?.data?.user?.image
                       : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                   }}
                 />
@@ -514,12 +517,14 @@ const PostScreen = ({navigation, route}) => {
             {/* img */}
             {/* rating */}
             <View style={styles.RatingContianer}>
-              <Text style={styles.NameC}>{route.params.data.user.name}</Text>
               <Text style={styles.NameC}>
-                {route.params.data.user.location}
+                {route?.params?.data?.user?.name}
+              </Text>
+              <Text style={styles.NameC}>
+                {route?.params?.data?.user?.location}
               </Text>
 
-              {route.params.data.user.reviews.length > 0 && (
+              {route?.params?.data?.user?.reviews?.length > 0 && (
                 <View style={styles.HeadingTextContainer45}>
                   <View style={styles.HeartContainer}>
                     <Icon name="star" size={20} color="gold" />
@@ -533,7 +538,7 @@ const PostScreen = ({navigation, route}) => {
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('OtherUserProfile', {
-                  data: route.params.data.user,
+                  data: route?.params?.data?.user,
                 });
               }}
               style={styles.RatingContianer2}>
@@ -550,53 +555,30 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer5}>
             <TouchableOpacity
               onPress={() => {
-                const currentUserId = auth().currentUser.uid;
-                if (route.params.data.UserID == currentUserId) {
+                const currentUserId = auth()?.currentUser?.uid;
+                if (route?.params?.data?.UserID === currentUserId) {
                   alert("You are the owner of this item, can't send message !");
                   return;
                 }
-                // TEMPORARILY ADDED
-                // navigation.navigate('StartConversation', {
-                //   data: route.params.data,
-                //   receiverData: {
-                //     // roomId,
-                //     // lastMsg: txt,
-                //     // route.params.data.user.image
-                //     id: route.params.data.UserID,
-                //     name: route.params.data.name,
-                //     img: route.params.data.image,
-                //     emailId: route.params.data.email,
-                //     about: route.params.data.Bio,
-                //     Token: route.params.data.NotificationToken,
-
-                //     itemPrice: route.params.data.Price,
-                //     itemImage: route.params.data.images[0],
-                //     sellersName: route.params.data.user.name,
-                //     sellersImage: route.params.data.user.image,
-                //   },
-                // });
                 console.log({subdata});
                 if (subdata.length > 0) {
-                  // createChatList(route.params.data.user);
-                  // console.log({ID1: route.params.data.UserID, ID2: currentUserId,})
-
                   navigation.navigate('StartConversation', {
-                    data: route.params.data,
+                    data: route.params?.data,
                     receiverData: {
-                      // roomId,
-                      // lastMsg: txt,
-                      // route.params.data.user.image
-                      id: route.params.data.UserID,
-                      name: route.params.data.name,
-                      img: route.params.data.image,
-                      emailId: route.params.data.email,
-                      about: route.params.data.Bio,
-                      Token: route.params.data.NotificationToken,
+                      id: route?.params?.data?.UserID,
+                      name: route?.params?.data?.name,
+                      img: route?.params?.data?.image,
+                      emailId: route?.params?.data?.email,
+                      about: route?.params?.data?.Bio,
+                      Token: route?.params?.data?.NotificationToken,
 
-                      itemPrice: route.params.data.Price,
-                      itemImage: route.params.data.images[0],
-                      sellersName: route.params.data.user.name,
-                      sellersImage: route.params.data.user.image,
+                      itemPrice: route?.params?.data?.Price,
+                      itemImage:
+                        route?.params?.data?.images?.length > 0
+                          ? route?.params?.data?.images[0]
+                          : '',
+                      sellersName: route?.params?.data?.name,
+                      sellersImage: route?.params?.data?.image,
                     },
                   });
                 } else {
@@ -613,7 +595,7 @@ const PostScreen = ({navigation, route}) => {
               onPress={() => {
                 const currentUserId = auth().currentUser.uid;
                 console.log({THIS: route.params.data.UserID, currentUserId});
-                if (route.params.data.UserID == currentUserId) {
+                if (route?.params?.data?.UserID == currentUserId) {
                   alert("You are the owner of this item, can't send message !");
                   return;
                 }

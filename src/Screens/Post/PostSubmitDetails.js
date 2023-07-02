@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
@@ -29,6 +30,8 @@ import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
 import {getCategoriesAndSubCategories} from '../Dashboard/Home';
 import axios from 'axios';
+import Reactotron from 'reactotron-react-native';
+import reactotron from 'reactotron-react-native';
 
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
@@ -224,7 +227,7 @@ const PostSubmitDetails = ({navigation, route}) => {
     postAdd(POstId, MyData?.UserID);
     // MySubscriptionPackage(POstId, MyData.UserID);
   };
-  const remove_duplicates = arr => {
+  const remove_duplicates = (arr, POstId) => {
     var obj = {};
     var ret_arr = [];
     for (var i = 0; i < arr.length; i++) {
@@ -232,11 +235,11 @@ const PostSubmitDetails = ({navigation, route}) => {
     }
     for (var key in obj) {
       ret_arr?.push(key);
-      fetchUsersTokenHavingFavoritesItems(key);
+      fetchUsersTokenHavingFavoritesItems(key, POstId);
     }
     return ret_arr;
   };
-  const fetchFavorites = async () => {
+  const fetchFavorites = async POstId => {
     let currentUserId = auth().currentUser.uid;
     let _favouriteSellingItems = [];
     let _favouriteServicesItems = [];
@@ -249,15 +252,13 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(async documentSnapshot => {
-          console.log(documentSnapshot?.data().users[0], 'daattt');
-          console.log(value, value2);
           if (value === documentSnapshot?.data()?.category) {
             users?.push(documentSnapshot?.data()?.users[0]);
           }
         });
         setUserHavingFav(users);
         if (users?.length > 0) {
-          remove_duplicates(users);
+          remove_duplicates(users, POstId);
         }
         return promises;
       })
@@ -302,8 +303,33 @@ const PostSubmitDetails = ({navigation, route}) => {
         videUrl: route.params?.VideoUrl,
       })
       .then(async doc => {
+        let data = {
+          UserID: userID,
+          images: route.params?.images,
+          Title: route.params?.Title,
+          PostType: route.params?.Type,
+          Price: route.params?.Price,
+          Category: value,
+          SubCategory: value2,
+          Condition: value3,
+          Brand: brand,
+          Description: Description,
+          user: MyData,
+          DocId: POstId,
+          Discount: 0,
+          status: false,
+          latitude: MyData?.latitude
+            ? MyData?.latitude
+            : 'No Location Set By User',
+          longitude: MyData?.longitude
+            ? MyData?.longitude
+            : 'No Location Set By User',
+          Notification: MyData?.NotificationToken,
+          videUrl: route.params?.VideoUrl,
+        };
+        reactotron.log(data);
         // addFreePostsCount(MyData.UserID, count);
-        console.log(doc);
+        reactotron.log(doc);
         let PostData = [];
         await firestore()
           .collection('Post')
@@ -312,7 +338,7 @@ const PostSubmitDetails = ({navigation, route}) => {
             querySnapshot.forEach(documentSnapshot => {
               PostData.push(documentSnapshot.data());
             });
-            allmypost();
+            allmypost(POstId);
             await dispatch(PostAdd(PostData));
           })
           .catch(err => {
@@ -325,7 +351,7 @@ const PostSubmitDetails = ({navigation, route}) => {
         setloading(false);
       });
   };
-  const allmypost = async () => {
+  const allmypost = async POstId => {
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
@@ -337,7 +363,7 @@ const PostSubmitDetails = ({navigation, route}) => {
       .collection('Post')
       .get()
       .then(async querySnapshot => {
-        fetchFavorites();
+        fetchFavorites(POstId);
         querySnapshot.forEach(documentSnapshot => {
           try {
             let lat2;
@@ -381,7 +407,7 @@ const PostSubmitDetails = ({navigation, route}) => {
         if (documentSnapshot.exists) {
           if (
             documentSnapshot.data().hideNotifications &&
-            documentSnapshot.data().hideNotifications == true
+            documentSnapshot.data().hideNotifications === true
           ) {
             callback(true);
           }
@@ -389,13 +415,38 @@ const PostSubmitDetails = ({navigation, route}) => {
       })
       .catch(err => {});
   };
-  const NotificationSystem = async token => {
+
+  const fetchUsersTokenHavingFavoritesItems = async (userId, POstId) => {
+    await firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          // tokens.push(documentSnapshot?.data()?.Notification);
+          if (userId !== auth()?.currentUser?.uid) {
+            // if (documentSnapshot?.data()?.NotificationToken !== '') {
+            NotificationSystem(
+              documentSnapshot?.data()?.NotificationToken,
+              POstId,
+              userId,
+            );
+            // }
+          }
+        }
+      })
+      .catch(err => {
+        setloading(false);
+      });
+  };
+  const NotificationSystem = async (token, POstId, userId) => {
     firestore()
       .collection('Notification')
       .doc()
       .set({
         seen: false,
-        userID: MyData?.UserID,
+        userID: userId,
+        postId: POstId,
         text:
           MyData?.name +
           ' an item from your favorites just posted. Click to view.',
@@ -441,26 +492,6 @@ const PostSubmitDetails = ({navigation, route}) => {
           });
       })
       .catch(err => {});
-  };
-
-  const fetchUsersTokenHavingFavoritesItems = async userId => {
-    await firestore()
-      .collection('Users')
-      .doc(userId)
-      .get()
-      .then(documentSnapshot => {
-        if (documentSnapshot?.exists) {
-          // tokens.push(documentSnapshot?.data()?.Notification);
-          if (documentSnapshot?.data().users !== auth()?.currentUser?.uid) {
-            if (documentSnapshot?.data()?.NotificationToken !== '') {
-              NotificationSystem(documentSnapshot?.data()?.NotificationToken);
-            }
-          }
-        }
-      })
-      .catch(err => {
-        setloading(false);
-      });
   };
   const UserDataPost = async () => {
     let SellingData = [];

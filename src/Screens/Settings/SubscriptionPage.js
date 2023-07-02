@@ -167,6 +167,7 @@ const SubscriptionPage = ({navigation}) => {
                   )
                   .then(res => {
                     console.log(res);
+                    setloading(false);
                     // uploadSubscription();
                   })
                   .catch(err => {

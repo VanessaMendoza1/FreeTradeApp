@@ -17,21 +17,19 @@ import {useSelector, useDispatch} from 'react-redux';
 import {areNotificationsHidden} from '../../utils/appConfigurations';
 import auth from '@react-native-firebase/auth';
 import {useFocusEffect} from '@react-navigation/native';
+import reactotron from 'reactotron-react-native';
 
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
   const userData = useSelector(state => state.counter.data);
 
   const getNotification = () => {
-    console.log('Getting Notifications');
     NotificationData();
     NotificationData2();
-    console.log('Notii', Notii);
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Focussed Notification.js, running getNotification');
       getNotification();
       return () => null;
     }, []),
@@ -45,10 +43,10 @@ const Notification = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          console.log('image', documentSnapshot?.data().sellerData);
           if (
-            documentSnapshot.data() &&
-            documentSnapshot.data().receiverId === currentUserId
+            documentSnapshot.data() && documentSnapshot.data().receiverId
+              ? documentSnapshot.data()?.receiverId === currentUserId
+              : documentSnapshot.data()?.userID === currentUserId
           ) {
             // if (documentSnapshot.data().seen == false) {
             NotificationData.push({
@@ -101,7 +99,6 @@ const Notification = ({navigation}) => {
             return (
               <NotificationHead
                 onPress={async () => {
-                  // console.log({item});
                   if (
                     item.text.endsWith(
                       'an item from your favorites just posted. Click to view.',
@@ -109,10 +106,14 @@ const Notification = ({navigation}) => {
                   ) {
                     await firestore()
                       .collection('Post')
-                      .doc(item.newlyAddedItemId)
+                      .doc(item?.postId)
                       .get()
                       .then(async documentSnapshot => {
                         if (documentSnapshot?.exists) {
+                          // return reactotron.log(
+                          //   'documentSnapshot.data()',
+                          //   documentSnapshot.data(),
+                          // );
                           let newlyAddedItemData = documentSnapshot.data();
                           navigation.navigate('PostScreen', {
                             data: newlyAddedItemData,

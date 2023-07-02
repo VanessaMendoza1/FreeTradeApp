@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
-  Alert,
 } from 'react-native';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
 
 import Appheader from '../../Components/Appheader';
@@ -17,9 +16,7 @@ import Ads from '../../Components/Ads';
 import ServiceItem from '../../Components/ServiceItem';
 import Colors from '../../utils/Colors';
 import {useSelector, useDispatch} from 'react-redux';
-import {MyTradingAdd, MySellingAdd, MyServiceAdd} from '../../redux/myPost.js';
 import firestore from '@react-native-firebase/firestore';
-import GetLocation from 'react-native-get-location';
 import Distance from './Distence';
 import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import {SubDataAdd} from '../../redux/subSlicer';
@@ -28,11 +25,8 @@ import {useIsFocused} from '@react-navigation/native';
 import LoadingScreen from '../../Components/LoadingScreen';
 import Icons from '../../utils/icons';
 import Collapsible from 'react-native-collapsible';
-import {FlatListSlider} from 'react-native-flatlist-slider';
 import auth from '@react-native-firebase/auth';
 import {useFocusEffect} from '@react-navigation/native';
-
-import {getPreciseDistance} from 'geolib';
 
 import moment from 'moment';
 import axios from 'axios';
@@ -522,7 +516,7 @@ const Home = ({navigation}) => {
       return subscribedUsersData?.includes(element?.UserID);
     });
     setAdsData(adsData);
-  }, [subscribedUsersData]);
+  }, [subscribedUsersData, focus]);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
     if (focus == true) {
