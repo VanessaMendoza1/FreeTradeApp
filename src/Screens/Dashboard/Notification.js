@@ -145,10 +145,9 @@ const Notification = ({navigation}) => {
                       'just rated her experience, click to rate yours.',
                     )
                   ) {
-                    Alert.alert('3');
-
+                    // return console.log(item?.sellerData);
                     navigation.navigate('Review', {
-                      data: item?.sellerData,
+                      data: item?.sellerData.UserID,
                     });
                   }
                 }}

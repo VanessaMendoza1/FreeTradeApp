@@ -15,6 +15,9 @@ import Appbutton from '../../Components/Appbutton';
 import reactotron from 'reactotron-react-native';
 import firestore from '@react-native-firebase/firestore';
 import {useIsFocused} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import {DataInsert} from '../../redux/counterSlice';
 const Review = ({navigation, route}) => {
   const [currentValue, setCurrentValue] = React.useState(0);
   const stars = Array(5).fill(0);
@@ -25,6 +28,8 @@ const Review = ({navigation, route}) => {
   const [Good, setGood] = React.useState(false);
   const [user, setUser] = useState([]);
   const focused = useIsFocused();
+  const dispatch = useDispatch();
+  const [loading, setloading] = useState(false);
   //   const [activeField, setActiveField] = React.useState(false);
   //   const [activeField, setActiveField] = React.useState(false);
   useEffect(() => {
@@ -50,157 +55,201 @@ const Review = ({navigation, route}) => {
   const handleClick = value => {
     setCurrentValue(value);
   };
+  const updateUserRating = currentValue => {
+    firestore()
+      .collection('Users')
+      .doc(route?.params?.data)
+      .update({
+        reviews: currentValue,
+      })
+      .then(async res => {
+        console.log(res);
+        let userData = [];
+        await firestore()
+          .collection('Users')
+          .doc(route?.params?.data)
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot.exists) {
+              userData.push(documentSnapshot.data());
+              navigation.navigate('Home');
+              console.log(documentSnapshot.data());
+            }
+          })
+          .catch(err => {
+            console.log(err);
+            setloading(false);
+          });
 
+        await dispatch(DataInsert(userData[0]));
+
+        try {
+          await AsyncStorage.setItem('@user', JSON.stringify(userData[0]));
+
+          setloading(false);
+          navigation.navigate('TabNavigation');
+        } catch (e) {
+          // saving error
+          setloading(false);
+          navigation.navigate('TabNavigation');
+        }
+      })
+      .catch(err => {
+        setloading(false);
+        console.log(err);
+      });
+  };
   return (
-    <View style={styles.mainContainer}>
-      {/* header */}
-      <View style={styles.Header}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-          style={styles.LeftContainer}>
-          <Icon name="arrow-back-outline" size={30} color="#ffff" />
-        </TouchableOpacity>
-        <View style={styles.MiddleContainer}>
-          <Text style={styles.FontWork}>Reviews</Text>
-        </View>
-      </View>
-      {/* header */}
-
-      <View style={styles.ProfileContainer}>
-        <View style={styles.ProfileCC}>
-          <Image
-            style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-            source={{
-              uri: user?.image
-                ? user?.image
-                : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+    <View>
+      <View style={styles.mainContainer}>
+        {/* header */}
+        <View style={styles.Header}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
             }}
+            style={styles.LeftContainer}>
+            <Icon name="arrow-back-outline" size={30} color="#ffff" />
+          </TouchableOpacity>
+          <View style={styles.MiddleContainer}>
+            <Text style={styles.FontWork}>Reviews</Text>
+          </View>
+        </View>
+        {/* header */}
+
+        <View style={styles.ProfileContainer}>
+          <View style={styles.ProfileCC}>
+            <Image
+              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+              source={{
+                uri: user?.image
+                  ? user?.image
+                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+              }}
+            />
+          </View>
+        </View>
+        {/* abc */}
+        <Text style={styles.nameText}>{route?.params?.data?.name}</Text>
+        <Text style={styles.nameText2}>How was your expirence?</Text>
+
+        <View style={styles.starContainer}>
+          {stars?.map((_, index) => {
+            return (
+              <TouchableOpacity
+                onPress={() => handleClick(index + 1)}
+                key={index}>
+                <Icon
+                  name="star"
+                  size={30}
+                  color={currentValue > index ? Colors.Primary : '#0008'}
+                />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* button Containers */}
+        <View style={styles.BtnContainer}>
+          {Reliable ? (
+            <TouchableOpacity
+              onPress={() => {
+                setReliable(false);
+              }}
+              style={styles.Btn}>
+              <Text style={styles.Txt1}>Reliable</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setReliable(true);
+              }}
+              style={styles.Btn2}>
+              <Text style={styles.Txt2}>Reliable</Text>
+            </TouchableOpacity>
+          )}
+          {Friendly ? (
+            <TouchableOpacity
+              onPress={() => {
+                setFriendly(false);
+              }}
+              style={styles.Btn}>
+              <Text style={styles.Txt1}>Friendly</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setFriendly(true);
+              }}
+              style={styles.Btn2}>
+              <Text style={styles.Txt2}>Friendly</Text>
+            </TouchableOpacity>
+          )}
+          {Ontime ? (
+            <TouchableOpacity
+              onPress={() => {
+                setOntime(false);
+              }}
+              style={styles.Btn}>
+              <Text style={styles.Txt1}>On time</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setOntime(true);
+              }}
+              style={styles.Btn2}>
+              <Text style={styles.Txt2}>On time</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        {/* button Containers */}
+        <View style={styles.BtnContainer2}>
+          {Communicative ? (
+            <TouchableOpacity
+              onPress={() => {
+                setCommunicative(false);
+              }}
+              style={styles.Btn}>
+              <Text style={styles.Txt1}>Communicative</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setCommunicative(true);
+              }}
+              style={styles.Btn2}>
+              <Text style={styles.Txt2}>Communicative</Text>
+            </TouchableOpacity>
+          )}
+          {Good ? (
+            <TouchableOpacity
+              onPress={() => {
+                setGood(false);
+              }}
+              style={styles.Btn}>
+              <Text style={styles.Txt1}>Good</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setGood(true);
+              }}
+              style={styles.Btn2}>
+              <Text style={styles.Txt2}>Good</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        {/* button Containers */}
+
+        <View style={styles.Btncc}>
+          <Appbutton
+            onPress={() => {
+              updateUserRating(currentValue);
+            }}
+            text={'Submit'}
           />
         </View>
-      </View>
-      {/* abc */}
-      <Text style={styles.nameText}>{route?.params?.data?.name}</Text>
-      <Text style={styles.nameText2}>How was your expirence?</Text>
-
-      <View style={styles.starContainer}>
-        {stars?.map((_, index) => {
-          return (
-            <TouchableOpacity
-              onPress={() => handleClick(index + 1)}
-              key={index}>
-              <Icon
-                name="star"
-                size={30}
-                color={currentValue > index ? Colors.Primary : '#0008'}
-              />
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* button Containers */}
-      <View style={styles.BtnContainer}>
-        {Reliable ? (
-          <TouchableOpacity
-            onPress={() => {
-              setReliable(false);
-            }}
-            style={styles.Btn}>
-            <Text style={styles.Txt1}>Reliable</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              setReliable(true);
-            }}
-            style={styles.Btn2}>
-            <Text style={styles.Txt2}>Reliable</Text>
-          </TouchableOpacity>
-        )}
-        {Friendly ? (
-          <TouchableOpacity
-            onPress={() => {
-              setFriendly(false);
-            }}
-            style={styles.Btn}>
-            <Text style={styles.Txt1}>Friendly</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              setFriendly(true);
-            }}
-            style={styles.Btn2}>
-            <Text style={styles.Txt2}>Friendly</Text>
-          </TouchableOpacity>
-        )}
-        {Ontime ? (
-          <TouchableOpacity
-            onPress={() => {
-              setOntime(false);
-            }}
-            style={styles.Btn}>
-            <Text style={styles.Txt1}>On time</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              setOntime(true);
-            }}
-            style={styles.Btn2}>
-            <Text style={styles.Txt2}>On time</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      {/* button Containers */}
-      <View style={styles.BtnContainer2}>
-        {Communicative ? (
-          <TouchableOpacity
-            onPress={() => {
-              setCommunicative(false);
-            }}
-            style={styles.Btn}>
-            <Text style={styles.Txt1}>Communicative</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              setCommunicative(true);
-            }}
-            style={styles.Btn2}>
-            <Text style={styles.Txt2}>Communicative</Text>
-          </TouchableOpacity>
-        )}
-        {Good ? (
-          <TouchableOpacity
-            onPress={() => {
-              setGood(false);
-            }}
-            style={styles.Btn}>
-            <Text style={styles.Txt1}>Good</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              setGood(true);
-            }}
-            style={styles.Btn2}>
-            <Text style={styles.Txt2}>Good</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      {/* button Containers */}
-
-      <View style={styles.Btncc}>
-        <Appbutton
-          onPress={() => {
-            alert('Review Submited');
-            navigation.navigate('Home');
-          }}
-          text={'Submit'}
-        />
       </View>
     </View>
   );

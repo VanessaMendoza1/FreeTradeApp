@@ -38,7 +38,9 @@ const Profile = ({navigation}) => {
   const TradingAllData = useSelector(state => state.mypost.MyTradingData);
 
   const subdata = useSelector(state => state.sub.subdata);
-
+  useEffect(() => {
+    console.log('MyData1', MyData);
+  }, []);
   const allmypost = async () => {
     const currentUserId = auth().currentUser.uid;
     let SellingData = [];
