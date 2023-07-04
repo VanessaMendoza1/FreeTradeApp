@@ -14,7 +14,7 @@ import Icons from '../utils/icons';
 import firestore from '@react-native-firebase/firestore';
 
 const NotificationHead = ({data, onPress, notifications, setNotifications}) => {
-  console.log(data);
+  console.log(data?.image, 'data?.image');
   const deleteNotification = notificationId => {
     firestore()
       .collection('Notification')
@@ -46,16 +46,22 @@ const NotificationHead = ({data, onPress, notifications, setNotifications}) => {
         },
       ],
     );
+
   return (
     <TouchableOpacity onPress={onPress} style={styles.MessageContainer}>
       <View style={styles.leftContainer}>
         <View style={styles.ProfileContainer}>
-          <Icon
-            name="notifications"
-            size={30}
-            color={Colors.Primary}
-            style={{marginLeft: 10}}
-          />
+          {data?.image ? (
+            <Image source={{uri: data?.image}} style={styles.img} />
+          ) : (
+            <Icon
+              name="notifications"
+              size={30}
+              color={Colors.Primary}
+              style={{marginLeft: 10}}
+            />
+          )}
+
           <Text style={styles.nameText}>{data?.text}</Text>
         </View>
         <TouchableOpacity
@@ -84,6 +90,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     // backgroundColor: 'red',
   },
+  img: {width: 40, height: 40, borderRadius: 20},
   delete: {
     alignSelf: 'center',
     marginRight: 10,

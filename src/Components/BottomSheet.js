@@ -251,6 +251,7 @@ const PaymentBottomSheet = ({
           }
         });
       });
+    alert('Posted successfully');
 
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));

@@ -18,6 +18,7 @@ import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {DataInsert} from '../../redux/counterSlice';
+import LoadingScreen from '../../Components/LoadingScreen';
 const Review = ({navigation, route}) => {
   const [currentValue, setCurrentValue] = React.useState(0);
   const stars = Array(5).fill(0);
@@ -33,10 +34,10 @@ const Review = ({navigation, route}) => {
   //   const [activeField, setActiveField] = React.useState(false);
   //   const [activeField, setActiveField] = React.useState(false);
   useEffect(() => {
-    console.log('data', route?.params?.data);
     fetchBuyerDetails();
   }, [focused]);
   const fetchBuyerDetails = async () => {
+    setloading(true);
     const userData = [];
     await firestore()
       .collection('Users')
@@ -46,9 +47,11 @@ const Review = ({navigation, route}) => {
         if (documentSnapshot.exists) {
           setUser(documentSnapshot.data());
           userData.push(documentSnapshot.data());
+          setloading(false);
         }
       })
       .catch(err => {
+        setloading(false);
         console.log('err', err);
       });
   };
@@ -74,6 +77,7 @@ const Review = ({navigation, route}) => {
               userData.push(documentSnapshot.data());
               navigation.navigate('Home');
               console.log(documentSnapshot.data());
+              Alert.alert('You have rated successfully!');
             }
           })
           .catch(err => {
@@ -101,156 +105,160 @@ const Review = ({navigation, route}) => {
   };
   return (
     <View>
-      <View style={styles.mainContainer}>
-        {/* header */}
-        <View style={styles.Header}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}
-            style={styles.LeftContainer}>
-            <Icon name="arrow-back-outline" size={30} color="#ffff" />
-          </TouchableOpacity>
-          <View style={styles.MiddleContainer}>
-            <Text style={styles.FontWork}>Reviews</Text>
-          </View>
-        </View>
-        {/* header */}
-
-        <View style={styles.ProfileContainer}>
-          <View style={styles.ProfileCC}>
-            <Image
-              style={{width: '100%', height: '100%', resizeMode: 'cover'}}
-              source={{
-                uri: user?.image
-                  ? user?.image
-                  : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <View style={styles.mainContainer}>
+          {/* header */}
+          <View style={styles.Header}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
               }}
+              style={styles.LeftContainer}>
+              <Icon name="arrow-back-outline" size={30} color="#ffff" />
+            </TouchableOpacity>
+            <View style={styles.MiddleContainer}>
+              <Text style={styles.FontWork}>Reviews</Text>
+            </View>
+          </View>
+          {/* header */}
+
+          <View style={styles.ProfileContainer}>
+            <View style={styles.ProfileCC}>
+              <Image
+                style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                source={{
+                  uri: user?.image
+                    ? user?.image
+                    : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+                }}
+              />
+            </View>
+          </View>
+          {/* abc */}
+          <Text style={styles.nameText}>{route?.params?.data?.name}</Text>
+          <Text style={styles.nameText2}>How was your expirence?</Text>
+
+          <View style={styles.starContainer}>
+            {stars?.map((_, index) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => handleClick(index + 1)}
+                  key={index}>
+                  <Icon
+                    name="star"
+                    size={30}
+                    color={currentValue > index ? Colors.Primary : '#0008'}
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* button Containers */}
+          <View style={styles.BtnContainer}>
+            {Reliable ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setReliable(false);
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Reliable</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setReliable(true);
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Reliable</Text>
+              </TouchableOpacity>
+            )}
+            {Friendly ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setFriendly(false);
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Friendly</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setFriendly(true);
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Friendly</Text>
+              </TouchableOpacity>
+            )}
+            {Ontime ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setOntime(false);
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>On time</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setOntime(true);
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>On time</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* button Containers */}
+          <View style={styles.BtnContainer2}>
+            {Communicative ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setCommunicative(false);
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Communicative</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setCommunicative(true);
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Communicative</Text>
+              </TouchableOpacity>
+            )}
+            {Good ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setGood(false);
+                }}
+                style={styles.Btn}>
+                <Text style={styles.Txt1}>Good</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  setGood(true);
+                }}
+                style={styles.Btn2}>
+                <Text style={styles.Txt2}>Good</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* button Containers */}
+
+          <View style={styles.Btncc}>
+            <Appbutton
+              onPress={() => {
+                updateUserRating(currentValue);
+              }}
+              text={'Submit'}
             />
           </View>
         </View>
-        {/* abc */}
-        <Text style={styles.nameText}>{route?.params?.data?.name}</Text>
-        <Text style={styles.nameText2}>How was your expirence?</Text>
-
-        <View style={styles.starContainer}>
-          {stars?.map((_, index) => {
-            return (
-              <TouchableOpacity
-                onPress={() => handleClick(index + 1)}
-                key={index}>
-                <Icon
-                  name="star"
-                  size={30}
-                  color={currentValue > index ? Colors.Primary : '#0008'}
-                />
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* button Containers */}
-        <View style={styles.BtnContainer}>
-          {Reliable ? (
-            <TouchableOpacity
-              onPress={() => {
-                setReliable(false);
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Reliable</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setReliable(true);
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Reliable</Text>
-            </TouchableOpacity>
-          )}
-          {Friendly ? (
-            <TouchableOpacity
-              onPress={() => {
-                setFriendly(false);
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Friendly</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setFriendly(true);
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Friendly</Text>
-            </TouchableOpacity>
-          )}
-          {Ontime ? (
-            <TouchableOpacity
-              onPress={() => {
-                setOntime(false);
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>On time</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setOntime(true);
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>On time</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        {/* button Containers */}
-        <View style={styles.BtnContainer2}>
-          {Communicative ? (
-            <TouchableOpacity
-              onPress={() => {
-                setCommunicative(false);
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Communicative</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setCommunicative(true);
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Communicative</Text>
-            </TouchableOpacity>
-          )}
-          {Good ? (
-            <TouchableOpacity
-              onPress={() => {
-                setGood(false);
-              }}
-              style={styles.Btn}>
-              <Text style={styles.Txt1}>Good</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => {
-                setGood(true);
-              }}
-              style={styles.Btn2}>
-              <Text style={styles.Txt2}>Good</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        {/* button Containers */}
-
-        <View style={styles.Btncc}>
-          <Appbutton
-            onPress={() => {
-              updateUserRating(currentValue);
-            }}
-            text={'Submit'}
-          />
-        </View>
-      </View>
+      )}
     </View>
   );
 };

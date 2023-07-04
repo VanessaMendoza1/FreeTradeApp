@@ -235,6 +235,8 @@ const PostScreen = ({navigation, route}) => {
           userData.name +
           '  would like to trade with you, click to see profile!',
         dateTime: new Date().toUTCString(),
+        postId: route?.params?.data?.DocId,
+        image: route?.params?.data?.images[0],
       })
       .then(async () => {
         var data = JSON.stringify({

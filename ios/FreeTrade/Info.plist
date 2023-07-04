@@ -27,7 +27,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.836632075133-hsrqq38u09836sivp8fjllsp262jtf9d</string>
+				<string>com.googleusercontent.apps.836632075133-70rvq979h92ba7phuq7191h8gm6ljr4d</string>
 			</array>
 		</dict>
 		<dict>
@@ -87,6 +87,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
+    <string>AntDesign.ttf</string>
 		<string>MaterialIcons.ttf</string>
 		<string>FontAwesome.ttf</string>
 		<string>FontAwesome5_Brands.ttf</string>

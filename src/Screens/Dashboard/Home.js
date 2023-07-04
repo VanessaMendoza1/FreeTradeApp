@@ -183,6 +183,7 @@ const Home = ({navigation}) => {
   const [subscribedUsersData, setSubscribedUsersData] = useState([]);
 
   useEffect(() => {
+    console.log('UserData', UserData);
     // customSearch(searchTextt);
   }, [searchTextt]);
   useFocusEffect(

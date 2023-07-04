@@ -63,7 +63,7 @@ const MydealItem = ({
         )}
       </View>
       <View style={styles.RatingLastContianer}>
-        <Icon name={iconName} size={30} color={iconColor} />
+        {/* <Icon name={iconName} size={30} color={iconColor} /> */}
         <TouchableOpacity onPress={onPressDelete}>
           <Delete name={deleteIcon} size={25} color={deleteColor} />
         </TouchableOpacity>

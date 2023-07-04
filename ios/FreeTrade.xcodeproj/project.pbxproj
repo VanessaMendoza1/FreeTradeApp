@@ -12,7 +12,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		18F64BCE2A139BB0009FBEDB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18F64BCD2A139BAD009FBEDB /* GoogleService-Info.plist */; };
+		1802E08E2A5344D000BFBEF3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1802E08D2A5344D000BFBEF3 /* GoogleService-Info.plist */; };
 		1DDE3CEE7A85AA43E6D9C29E /* Pods_FreeTrade.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9504CDD5D5AB93101AFEBCA2 /* Pods_FreeTrade.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9A59796359B2A77C1B71FD98 /* Pods_FreeTrade_FreeTradeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC9D17708873249AA4911E1B /* Pods_FreeTrade_FreeTradeTests.framework */; };
@@ -40,8 +40,9 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FreeTrade/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = FreeTrade/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FreeTrade/main.m; sourceTree = "<group>"; };
+		1802E08D2A5344D000BFBEF3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		1802E08F2A53487D00BFBEF3 /* FreeTradeDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = FreeTradeDebug.entitlements; path = FreeTrade/FreeTradeDebug.entitlements; sourceTree = "<group>"; };
 		1854CFC32A211701005FBF51 /* hermes.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = hermes.xcframework; path = "Pods/hermes-engine/destroot/Library/Frameworks/universal/hermes.xcframework"; sourceTree = "<group>"; };
-		18F64BCD2A139BAD009FBEDB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = FreeTrade/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9504CDD5D5AB93101AFEBCA2 /* Pods_FreeTrade.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FreeTrade.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8506F919C1FDBDE498C6FB5 /* Pods-FreeTrade-FreeTradeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FreeTrade-FreeTradeTests.release.xcconfig"; path = "Target Support Files/Pods-FreeTrade-FreeTradeTests/Pods-FreeTrade-FreeTradeTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -92,7 +93,8 @@
 		13B07FAE1A68108700A75B9A /* FreeTrade */ = {
 			isa = PBXGroup;
 			children = (
-				18F64BCD2A139BAD009FBEDB /* GoogleService-Info.plist */,
+				1802E08F2A53487D00BFBEF3 /* FreeTradeDebug.entitlements */,
+				1802E08D2A5344D000BFBEF3 /* GoogleService-Info.plist */,
 				0D4C703129B768ED00D4029C /* FreeTradeRelease.entitlements */,
 				0D0B379729B098F5009A134C /* Fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -254,7 +256,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D0B379829B098F6009A134C /* Fonts in Resources */,
-				18F64BCE2A139BB0009FBEDB /* GoogleService-Info.plist in Resources */,
+				1802E08E2A5344D000BFBEF3 /* GoogleService-Info.plist in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
@@ -511,6 +513,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = FreeTrade/FreeTradeDebug.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K96R5P425B;
 				ENABLE_BITCODE = NO;
@@ -519,7 +522,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5;
+				MARKETING_VERSION = 2.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -550,7 +553,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5;
+				MARKETING_VERSION = 2.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

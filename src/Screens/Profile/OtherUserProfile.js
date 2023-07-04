@@ -212,7 +212,7 @@ const OtherUserProfile = ({navigation, route}) => {
                 {/* call button */}
                 <TouchableOpacity
                   onPress={() => {
-                    let phoneNumber = +923042323386;
+                    let phoneNumber = User[0]?.Phone;
                     Linking.openURL(`tel:${phoneNumber}`);
                   }}
                   style={styles.adminButton}>

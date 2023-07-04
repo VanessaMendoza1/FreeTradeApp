@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
-    position: 'absolute',
     zIndex: 100000,
   },
 });

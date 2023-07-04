@@ -73,7 +73,6 @@ const LocationScreen = ({navigation}) => {
                 ServiceData.push(documentSnapshot.data());
               }
             }
-            navigation.replace('SplashScreen');
           }
         });
       })
