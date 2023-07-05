@@ -281,6 +281,7 @@ const OtherUserPostDetails = ({navigation, route}) => {
         seen: false,
         userID: route.params.data.user.UserID,
         text: userData.name + '  would like to trade!',
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({

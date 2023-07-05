@@ -7,7 +7,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -19,7 +19,7 @@ import auth from '@react-native-firebase/auth';
 import {useFocusEffect} from '@react-navigation/native';
 import reactotron from 'reactotron-react-native';
 import LoadingScreen from '../../Components/LoadingScreen';
-
+import moment from 'moment';
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
   const userData = useSelector(state => state.counter.data);
@@ -28,7 +28,6 @@ const Notification = ({navigation}) => {
     NotificationData();
     NotificationData2();
   };
-
   useFocusEffect(
     React.useCallback(() => {
       getNotification();
@@ -68,6 +67,10 @@ const Notification = ({navigation}) => {
           }
         });
         setLoading(false);
+        let arr = NotificationData.sort((a, b) => {
+          moment.utc(b.dateTime).local().format('YYYY-MM-DD HH:mm:ss') -
+            moment.utc(a.dateTime).local().format('YYYY-MM-DD HH:mm:ss');
+        });
         setNotii(NotificationData);
       })
       .catch(err => {

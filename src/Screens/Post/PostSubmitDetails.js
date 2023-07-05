@@ -450,6 +450,7 @@ const PostSubmitDetails = ({navigation, route}) => {
         text:
           MyData?.name +
           ' an item from your favorites just posted. Click to view.',
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({

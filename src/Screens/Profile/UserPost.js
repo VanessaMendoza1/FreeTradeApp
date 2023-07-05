@@ -236,6 +236,7 @@ const UserPost = ({navigation, route}) => {
         // text: Userdata.name + ' has marked an ' + {dealType} + ' you ! Review it now ',
         sellerData: Userdata,
         seen: false,
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({

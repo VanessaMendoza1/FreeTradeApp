@@ -39,6 +39,7 @@ const SendOffer = ({navigation, route}) => {
         seen: false,
         userID: route.params.data.user.UserID,
         text: UserData.name + ' sent you ' + priceFormatter(offer) + ' offer',
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({

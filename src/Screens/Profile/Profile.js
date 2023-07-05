@@ -252,7 +252,6 @@ const Profile = ({navigation}) => {
           </View>
           {/* profileHeader */}
           <View style={styles.linebar} />
-
           {MyData?.AccountType === 'Bussiness' && (
             <View style={styles.adminMode}>
               {/* call button */}

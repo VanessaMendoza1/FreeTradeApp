@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     // backgroundColor: 'red',
   },
-  img: {width: 40, height: 40, borderRadius: 20},
+  img: {width: 30, height: 30, borderRadius: 15},
   delete: {
     alignSelf: 'center',
     marginRight: 10,
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 5,
     // backgroundColor: 'green',
   },
   ProfileCC: {
