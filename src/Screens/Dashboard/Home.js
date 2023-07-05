@@ -370,10 +370,10 @@ const Home = ({navigation}) => {
             const now = moment.utc();
             var end = JSON.parse(documentSnapshot.data().endDate);
             var days = now.diff(end, 'days');
-
-            if (days >= 1) {
+            console.log('days', days);
+            if (days < 1) {
               setloading(false);
-              // DeletePost();
+              DeletePost();
             } else {
               setloading(false);
               data.push(documentSnapshot.data());
@@ -398,10 +398,11 @@ const Home = ({navigation}) => {
           const now = moment.utc();
           var end = JSON.parse(documentSnapshot.data().endDate);
           var days = now.diff(end, 'days');
+          console.log('sub', days);
 
-          if (days <= 1) {
+          if (days < 1) {
             setloading(false);
-            // DeletePost();
+            DeletePost();
           } else {
             setloading(false);
             subscribedUsers?.push(documentSnapshot.data().userid);
@@ -618,7 +619,7 @@ const Home = ({navigation}) => {
             height={'45%'}
             autoPlay={true}
             windowSize={100}
-            data={AdsData}
+            data={ImageAds}
             scrollAnimationDuration={1500}
             // panGestureHandlerProps={{
             //   activeOffsetX: [-10, 10],

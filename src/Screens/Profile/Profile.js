@@ -251,9 +251,59 @@ const Profile = ({navigation}) => {
             </View>
           </View>
           {/* profileHeader */}
-
           <View style={styles.linebar} />
 
+          {MyData?.AccountType === 'Bussiness' && (
+            <View style={styles.adminMode}>
+              {/* call button */}
+              <TouchableOpacity
+                onPress={() => {
+                  let phoneNumber = MyData?.Phone;
+                  Linking.openURL(`tel:${phoneNumber}`);
+                }}
+                style={styles.adminButton}>
+                <Icon name="call" size={25} color="#ffff" />
+                <Text style={styles.numberadmin}>
+                  +{formatPhoneNumber(MyData.Phone)}
+                </Text>
+              </TouchableOpacity>
+              {/* call button */}
+
+              {/* iconLocation CC */}
+              <View style={styles.MainCCor}>
+                <View style={styles.IconCCR}>
+                  <Icon name="location" size={25} color={Colors.Primary} />
+                </View>
+                <View style={styles.IconCCR2}>
+                  <Text style={styles.IIICTxt}>{MyData.Address}</Text>
+                </View>
+              </View>
+              {/* iconLocation CC */}
+              {/* iconLocation CC */}
+              <View style={styles.MainCCor}>
+                <View style={styles.IconCCR}>
+                  <Icon name="globe" size={25} color={Colors.Primary} />
+                </View>
+                <View style={styles.IconCCR2}>
+                  <Text style={styles.IIICTxt}>{MyData.Website}</Text>
+                </View>
+              </View>
+              {/* iconLocation CC */}
+              {/* iconLocation CC */}
+              <View style={styles.MainCCor}>
+                <View style={styles.IconCCR}>
+                  <Icon name="calendar" size={25} color={Colors.Primary} />
+                </View>
+                <View style={styles.IconCCR2}>
+                  <Text style={styles.IIICTxt}>
+                    {MyData.bussinessHoursFrom} - {MyData.bussinessHoursto} &{' '}
+                    {MyData.bussinessdaysFrom} - {MyData.bussinessdaysto}{' '}
+                  </Text>
+                </View>
+              </View>
+              {/* iconLocation CC */}
+            </View>
+          )}
           {subdata.length < 0 && subdata[0].plan === 'Bussiness' && (
             // {true && (
             <>
