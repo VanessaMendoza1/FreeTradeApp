@@ -692,6 +692,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingLeft: h('1%'),
+    alignContent: 'center',
   },
   HeartContainer2: {
     width: '90%',
@@ -817,5 +818,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  HeadingText5: {marginHorizontal: 5, width: '100%'},
+  HeadingText5: {
+    marginHorizontal: 5,
+    width: '100%',
+    textAlignVertical: 'middle',
+  },
 });

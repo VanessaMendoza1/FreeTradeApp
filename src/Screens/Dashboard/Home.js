@@ -367,11 +367,16 @@ const Home = ({navigation}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           if (documentSnapshot.data().userid === currentUserId) {
-            const now = moment.utc();
-            var end = JSON.parse(documentSnapshot.data().endDate);
-            var days = now.diff(end, 'days');
-            console.log('days', days);
-            if (days < 1) {
+            // const now = moment.utc();
+            // var end = JSON.parse(documentSnapshot.data().endDate);
+            // var days = now.diff(end, 'days');
+            // console.log('days', days);
+            let endDate =
+              new Date(JSON.parse(documentSnapshot.data().endDate)).getTime() /
+              1000;
+            let now = new Date().getTime() / 1000;
+            const difference = Math.round(endDate - now);
+            if (difference < 1) {
               setloading(false);
               DeletePost();
             } else {
@@ -395,12 +400,16 @@ const Home = ({navigation}) => {
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
           // if (documentSnapshot.data().userid === currentUserId) {
-          const now = moment.utc();
-          var end = JSON.parse(documentSnapshot.data().endDate);
-          var days = now.diff(end, 'days');
-          console.log('sub', days);
-
-          if (days < 1) {
+          // const now = moment.utc();
+          // var end = JSON.parse(documentSnapshot.data().endDate);
+          // var days = now.diff(end, 'days');
+          // console.log('sub', days);
+          let endDate =
+            new Date(JSON.parse(documentSnapshot.data().endDate)).getTime() /
+            1000;
+          let now = new Date().getTime() / 1000;
+          const difference = Math.round(endDate - now);
+          if (difference < 1) {
             setloading(false);
             DeletePost();
           } else {
@@ -511,14 +520,24 @@ const Home = ({navigation}) => {
   }, []);
   useEffect(() => {
     ImageAds.filter(item => {
-      if (UserData?.LocationFilter?.location === item.user?.location) {
-        filterLocationBased.push(item);
+      let endDate = new Date(JSON.parse(item?.endDate)).getTime() / 1000;
+      let now = new Date().getTime() / 1000;
+      const difference = Math.round(endDate - now);
+      // const now = moment.utc();
+      // var end = JSON.parse(item?.endDate);
+      // var days = now.diff(end, 'days');
+      if (
+        difference > 0 &&
+        UserData?.LocationFilter?.location === item.user?.location
+      ) {
+        reactotron.log(item);
+        AdsData.push(item);
       }
     });
-    let adsData = filterLocationBased?.filter(element => {
-      return subscribedUsersData?.includes(element?.UserID);
-    });
-    setAdsData(adsData);
+    // let adsData = filterLocationBased?.filter(element => {
+    //   return subscribedUsersData?.includes(element?.UserID);
+    // });
+    //setAdsData(adsData);
   }, [subscribedUsersData, focus]);
   useEffect(() => {
     // whenever you are in the current screen, it will be true vice versa
@@ -619,7 +638,7 @@ const Home = ({navigation}) => {
             height={'45%'}
             autoPlay={true}
             windowSize={100}
-            data={ImageAds}
+            data={AdsData}
             scrollAnimationDuration={1500}
             // panGestureHandlerProps={{
             //   activeOffsetX: [-10, 10],

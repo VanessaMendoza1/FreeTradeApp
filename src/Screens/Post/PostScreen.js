@@ -680,30 +680,31 @@ const PostScreen = ({navigation, route}) => {
                 data={Sitem}
                 horizontal={true}
                 renderItem={({item}) => {
-                  // console.log({item})
-                  if (item.images) {
-                    return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          navigation.push('PostScreen', {data: item});
-                          // handleScrollToTop();
-                        }}
-                        style={styles.ServiceItemContainer}>
-                        <ImageBackground
-                          style={styles.img}
-                          source={{
-                            uri: item?.images[0]
-                              ? item?.images[0]
-                              : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                          }}>
-                          <View style={styles.imgCC2}>
-                            <View style={styles.BottomContainer}>
-                              <Text style={styles.BPTag}>{item?.Title}</Text>
+                  if (route?.params?.data?.DocId !== item?.DocId) {
+                    if (item.images) {
+                      return (
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.push('PostScreen', {data: item});
+                            // handleScrollToTop();
+                          }}
+                          style={styles.ServiceItemContainer}>
+                          <ImageBackground
+                            style={styles.img}
+                            source={{
+                              uri: item?.images[0]
+                                ? item?.images[0]
+                                : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
+                            }}>
+                            <View style={styles.imgCC2}>
+                              <View style={styles.BottomContainer}>
+                                <Text style={styles.BPTag}>{item?.Title}</Text>
+                              </View>
                             </View>
-                          </View>
-                        </ImageBackground>
-                      </TouchableOpacity>
-                    );
+                          </ImageBackground>
+                        </TouchableOpacity>
+                      );
+                    }
                   }
                 }}
               />

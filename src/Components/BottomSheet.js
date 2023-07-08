@@ -14,6 +14,7 @@ import {AddImageAds, AddVideoAds} from '../redux/adsSlicer';
 import {PostAdd} from '../redux/postSlice';
 import auth from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import reactotron from 'reactotron-react-native';
 const PaymentBottomSheet = ({
   modall,
   setModal,
@@ -157,7 +158,7 @@ const PaymentBottomSheet = ({
   const PostAd = async () => {
     let currentUserId = auth().currentUser.uid;
     const now = moment.utc();
-    var end = moment().add(value === 100 ? 15 : 30, 'days');
+    var end = moment().add(value === 1.99 ? 1 : value === 4.99 ? 3 : 5, 'days');
     var days = now.diff(end, 'days');
     setloading(true);
     if (value === '') {
@@ -258,7 +259,7 @@ const PaymentBottomSheet = ({
   };
   const PostAdAdv = async () => {
     const now = moment.utc();
-    var end = moment().add(value === 100 ? 15 : 30, 'days');
+    var end = moment().add(value === 1.99 ? 1 : value === 4.99 ? 3 : 5, 'days');
     var days = now.diff(end, 'days');
 
     setloading(true);
