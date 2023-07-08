@@ -254,7 +254,7 @@ const PostPromotion = ({navigation, route}) => {
               style={styles.inputContainercc}
               placeholder={
                 type === 'post'
-                  ? 'Subscribe to post your ad'
+                  ? 'Enter Tagline/Title'
                   : 'Set Business name For Promotion'
               }
               placeholderTextColor={Colors.Primary}

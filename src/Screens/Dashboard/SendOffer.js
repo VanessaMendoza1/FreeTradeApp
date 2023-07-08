@@ -25,6 +25,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const SendOffer = ({navigation, route}) => {
   const [offer, setoffer] = React.useState('');
+  const [value, setValue] = React.useState('');
   const [Notii, setNotii] = React.useState(
     route.params.data.user.NotificationToken,
   );
@@ -101,19 +102,24 @@ const SendOffer = ({navigation, route}) => {
             <View style={styles.TxtInputs}>
               <TextInput
                 style={styles.inputCon}
-                value={offer}
+                value={value}
                 placeholder={'Enter Amount'}
                 keyboardType={'number-pad'}
                 placeholderTextColor={'#ffff'}
                 onChangeText={e => {
-                  setoffer(e);
+                  setoffer('You have received an offer $' + e);
+                  setValue(route?.params?.data?.Price);
                 }}
               />
 
               {route.params.data.Price && (
                 <TouchableOpacity
                   onPress={() => {
-                    setoffer(route?.params?.data?.Price);
+                    setoffer(
+                      'You have received an offer $' +
+                        route?.params?.data?.Price,
+                    );
+                    setValue(route?.params?.data?.Price);
                   }}
                   style={styles.BtnCC}>
                   <Text style={styles.manColor}>Full Amount</Text>

@@ -202,15 +202,14 @@ const Profile = ({navigation}) => {
                 </View>
 
                 <View style={styles.HeadingTextContainer45}>
-                  <View style={styles.HeartContainer}>
-                    <Icon
-                      name="star"
-                      size={20}
-                      color={MyData?.reviews > 0 ? 'gold' : 'grey'}
-                    />
-                  </View>
+                  <Icon
+                    name="star"
+                    size={20}
+                    color={MyData?.reviews > 0 ? 'gold' : 'grey'}
+                    style={{alignSelf: 'center'}}
+                  />
                   {MyData?.reviews > 0 ? (
-                    <Text style={styles.HeadingText5}>{MyData?.reviews}</Text>
+                    <Text style={[styles.HeadingText5]}>{MyData?.reviews}</Text>
                   ) : (
                     <Text style={styles.HeadingText5}>Not rated yet</Text>
                   )}
@@ -279,14 +278,18 @@ const Profile = ({navigation}) => {
               </View>
               {/* iconLocation CC */}
               {/* iconLocation CC */}
-              <View style={styles.MainCCor}>
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL('https://' + MyData.Website);
+                }}
+                style={styles.MainCCor}>
                 <View style={styles.IconCCR}>
                   <Icon name="globe" size={25} color={Colors.Primary} />
                 </View>
                 <View style={styles.IconCCR2}>
                   <Text style={styles.IIICTxt}>{MyData.Website}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               {/* iconLocation CC */}
               {/* iconLocation CC */}
               <View style={styles.MainCCor}>
@@ -687,7 +690,7 @@ const styles = StyleSheet.create({
   HeadingTextContainer45: {
     width: '50%',
     // backgroundColor: 'orange',
-    height: h('2.5%'),
+    height: h('3%'),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -821,6 +824,5 @@ const styles = StyleSheet.create({
   HeadingText5: {
     marginHorizontal: 5,
     width: '100%',
-    textAlignVertical: 'middle',
   },
 });

@@ -47,20 +47,20 @@ const MydealItem = ({
             <Text style={styles.HeadingText4}>Sold</Text>
           </View>
         )}
-        {Property === 'Bought' && (
+        {/* {Property === 'Bought' && (
           <View style={styles.HeadingTextContainer45}>
             <Text style={styles.HeadingText5}>Bought</Text>
             <View style={styles.borderCC} />
             <Text style={styles.HeadingText5}>Review</Text>
           </View>
-        )}
-        {Property === 'Traded' && (
+        )} */}
+        {/* {Property === 'Traded' && (
           <View style={styles.HeadingTextContainer45}>
             <Text style={styles.HeadingText5}>Traded</Text>
             <View style={styles.borderCC} />
             <Text style={styles.HeadingText5}>Review</Text>
           </View>
-        )}
+        )} */}
       </View>
       <View style={styles.RatingLastContianer}>
         {/* <Icon name={iconName} size={30} color={iconColor} /> */}

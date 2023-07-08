@@ -234,14 +234,18 @@ const OtherUserProfile = ({navigation, route}) => {
                 </View>
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
-                <View style={styles.MainCCor}>
+                <TouchableOpacity
+                  onPress={() => {
+                    Linking.openURL('https://' + User[0].Website);
+                  }}
+                  style={styles.MainCCor}>
                   <View style={styles.IconCCR}>
                     <Icon name="globe" size={25} color={Colors.Primary} />
                   </View>
                   <View style={styles.IconCCR2}>
                     <Text style={styles.IIICTxt}>{User[0].Website}</Text>
                   </View>
-                </View>
+                </TouchableOpacity>
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
                 <View style={styles.MainCCor}>
