@@ -44,9 +44,9 @@ const PostScreen = ({navigation, route}) => {
   const [Sitem, setSitem] = React.useState([]);
   const [VideoAd, setVideoAd] = React.useState([]);
   const [RText, setRText] = React.useState('');
-  const userData = useSelector(state => state.counter.data);
+  const userData = useSelector(state => state.counter?.data);
 
-  const AllPostData = useSelector(state => state.post.PostData);
+  const AllPostData = useSelector(state => state.post?.PostData);
   const VideoData = useSelector(state => state.ads.VideoData);
   const subdata = useSelector(state => state.sub.subdata);
   const [heart, setheart] = React.useState(false);
@@ -58,11 +58,10 @@ const PostScreen = ({navigation, route}) => {
   );
   const [imgeUrl2, setimgeUrl2] = React.useState([]);
   const [Notii, setNotii] = React.useState(
-    route.params.data.Notification !== ''
-      ? route.params.data.Notification
+    route?.params?.data?.Notification !== ''
+      ? route?.params?.data?.Notification
       : 123123123,
   );
-  const data = route.params?.data;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -77,10 +76,9 @@ const PostScreen = ({navigation, route}) => {
     let data = [];
     route?.params?.data?.images?.map(item => {
       if (item !== '') {
-        data.push(item);
+        data?.push(item);
       }
     });
-    console.log({SETTING: data});
     setimgeUrl2(data);
   };
 
@@ -277,7 +275,7 @@ const PostScreen = ({navigation, route}) => {
   };
 
   React.useEffect(() => {
-    reactotron.log(route?.params?.data.Price);
+    reactotron.log(route?.params?.data?.Price);
     randomItem();
     randomItem2();
     allImage();
@@ -371,7 +369,7 @@ const PostScreen = ({navigation, route}) => {
 
           <View>
             <FlatList
-              data={route.params.data.images}
+              data={route?.params?.data?.images}
               renderItem={item => {
                 if (item.item != '') {
                   return (
@@ -397,20 +395,20 @@ const PostScreen = ({navigation, route}) => {
           </View>
 
           <View style={styles.HeadingTextContainer}>
-            <Text style={styles.HeadingText}>{route.params.data.Title}</Text>
-            {route.params.data.Discount !== 0 ? (
+            <Text style={styles.HeadingText}>{route?.params?.data?.Title}</Text>
+            {route?.params?.data?.Discount !== 0 ? (
               <View style={styles.Discountbox}>
                 <Text style={styles.HeadingText33}>
                   {priceFormatter(route?.params?.data?.Discount)}
                 </Text>
                 <Text style={styles.HeadingText22}>
-                  {route.params.data.Price !== '' &&
-                    priceFormatter(route.params.data.Price)}
+                  {route?.params?.data?.Price !== '' &&
+                    priceFormatter(route?.params?.data?.Price)}
                 </Text>
               </View>
             ) : (
               <Text style={styles.HeadingText}>
-                {route.params.data.Price !== '' &&
+                {route?.params?.data?.Price !== '' &&
                   priceFormatter(route?.params?.data?.Price)}
               </Text>
             )}
@@ -476,7 +474,7 @@ const PostScreen = ({navigation, route}) => {
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate('ImageScreen', {
-                      data: route.params.data.videUrl,
+                      data: route?.params?.data?.videUrl,
                       video: true,
                     });
                   }}
@@ -532,7 +530,7 @@ const PostScreen = ({navigation, route}) => {
                     <Icon name="star" size={20} color="gold" />
                   </View>
                   <Text style={styles.HeadingText5}>
-                    {route.params.data.user.reviews.length}
+                    {route?.params?.data?.user?.reviews?.length}
                   </Text>
                 </View>
               )}
@@ -596,7 +594,7 @@ const PostScreen = ({navigation, route}) => {
             <TouchableOpacity
               onPress={() => {
                 const currentUserId = auth().currentUser.uid;
-                console.log({THIS: route.params.data.UserID, currentUserId});
+                console.log({THIS: route?.params?.data?.UserID, currentUserId});
                 if (route?.params?.data?.UserID == currentUserId) {
                   alert("You are the owner of this item, can't send message !");
                   return;
@@ -675,7 +673,7 @@ const PostScreen = ({navigation, route}) => {
             <Text style={styles.SimiliarText}>Similar Items</Text>
           </View>
           <View style={styles.HeadingTextContainer8}>
-            {Sitem.length >= 1 && (
+            {Sitem?.length >= 1 && (
               <FlatList
                 data={Sitem}
                 horizontal={true}
