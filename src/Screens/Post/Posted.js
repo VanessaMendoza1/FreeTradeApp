@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Image,
   Share,
+  Alert,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import Colors from '../../utils/Colors';
@@ -12,7 +13,7 @@ import {h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Appbutton from '../../Components/Appbutton';
-
+import auth from '@react-native-firebase/auth';
 const Posted = ({navigation, route}) => {
   const [oldData, setoldData] = React.useState(route.params);
   const onShare = async () => {
@@ -33,9 +34,9 @@ const Posted = ({navigation, route}) => {
       alert(error.message);
     }
   };
-  useEffect(() => {
-    console.log('route.param', route.params);
-  }, []);
+  // useEffect(() => {
+  //   Alert.alert(JSON.stringify(auth().currentUser.uid));
+  // }, []);
   return (
     <View style={styles.MainContainer}>
       {/* header */}
@@ -92,7 +93,11 @@ const Posted = ({navigation, route}) => {
           text={'Start Promotion'}
           onPress={() => {
             console.log(oldData);
-            navigation.navigate('PostPromotion', {data: oldData});
+            navigation.navigate('PostPromotion', {
+              data: oldData,
+              postData: route?.params?.postData,
+              type: route?.params?.type,
+            });
           }}
         />
         <TouchableOpacity onPress={onShare} style={styles.ShareButton}>

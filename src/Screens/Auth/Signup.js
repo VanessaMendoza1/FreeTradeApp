@@ -33,7 +33,7 @@ const Signup = ({navigation}) => {
   const [SecondName, setSecondName] = useState('');
   const [NotificationToken, setNotificationToken] = useState('');
 
-  requestPermission = () => {
+  const requestPermission = () => {
     messaging()
       .requestPermission()
       .then(() => {
@@ -47,7 +47,7 @@ const Signup = ({navigation}) => {
       });
   };
 
-  checkPermission = async () => {
+  const checkPermission = async () => {
     const deviceRemote = await messaging().registerDeviceForRemoteMessages();
     try {
       const token = await messaging().getToken();

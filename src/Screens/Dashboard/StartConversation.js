@@ -283,10 +283,10 @@ const StartConversation = ({navigation, route}) => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            settxt('Hi, could you send a video?');
+            settxt('Hi, can we meet today?');
           }}
           style={styles.inputBtn}>
-          <Text style={styles.Txt123}>Hi, could you send a video?</Text>
+          <Text style={styles.Txt123}>Hi, can we meet today?</Text>
         </TouchableOpacity>
       </View>
       {txt !== '' && (

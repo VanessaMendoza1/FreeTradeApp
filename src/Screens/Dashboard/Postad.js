@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   Image,
   Modal,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -46,6 +47,7 @@ import moment from 'moment';
 import CreatePaymentIntent from '../../utils/stripe';
 import {CardField, createToken, useStripe} from '@stripe/stripe-react-native';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
+import PaymentBottomSheet from '../../Components/BottomSheet';
 
 const getAdsPrices = callback => {
   let adsPrices = [];
@@ -129,7 +131,7 @@ const Postad = ({navigation}) => {
   const [TagLine, setTagLine] = React.useState('');
   const [Title, setTitle] = React.useState('');
   const [getvideogaleery, setgetvideo] = React.useState();
-
+  const [modall, setModal] = useState(false);
   const [loading, setloading] = React.useState(false);
 
   const MyData = useSelector(state => state.counter.data);
@@ -283,7 +285,7 @@ const Postad = ({navigation}) => {
           .collection('Ads')
           .doc()
           .set({
-            UserID: MyData.UserID,
+            UserID: MyData?.UserID,
             ads: value,
             Adtype:
               subdata.length > 0
@@ -534,7 +536,9 @@ const Postad = ({navigation}) => {
                 style={styles.inputText}
                 placeholder={'Tag line: 12 characters'}
                 placeholderTextColor={Colors.Primary}
-                onChangeText={e => setTagLine(e)}
+                onChangeText={e => {
+                  setTagLine(e);
+                }}
               />
               {/* ) : null}
                 </>
@@ -593,7 +597,8 @@ const Postad = ({navigation}) => {
                     } else {
                       if (ImageUrl !== '' || VideoUrl !== '') {
                         if (toggleCheckBox3) {
-                          setModalVisible(!modalVisible);
+                          setModal(true);
+                          // setModalVisible(!modalVisible);
                         } else {
                           alert('Please Check the Terms & Conditions');
                         }
@@ -623,8 +628,27 @@ const Postad = ({navigation}) => {
               </TouchableOpacity>
             </View>
           )}
-
-          <Modal
+          <PaymentBottomSheet
+            modall={modall}
+            setModal={setModal}
+            setloading={setloading}
+            MyData={MyData}
+            toggleCheckBox3={toggleCheckBox3}
+            value={value}
+            setToggleCheckBox3={setToggleCheckBox3}
+            amount={value}
+            from="adv"
+            subdata={subdata}
+            ImageUrl={ImageUrl}
+            VideoUrl={VideoUrl}
+            TagLine={TagLine}
+            setImgeUrl={setImgeUrl}
+            setVideoUrl={setVideoUrl}
+            setTagLine={setTagLine}
+            setValue={setValue}
+            Title={Title}
+          />
+          {/* <Modal
             animationType="slide"
             transparent={true}
             visible={modalVisible}
@@ -655,7 +679,7 @@ const Postad = ({navigation}) => {
                 </TouchableOpacity>
               </View>
             </View>
-          </Modal>
+          </Modal> */}
         </KeyboardAvoidingScrollView>
       )}
     </>

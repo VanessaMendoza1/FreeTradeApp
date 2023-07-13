@@ -11,14 +11,18 @@ import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Appbutton from '../Components/Appbutton';
 import Colors from '../utils/Colors';
-import { getSubscriptionTarriff } from '../Screens/Settings/SubscriptionPage'
+import {getSubscriptionTarriff} from '../Screens/Settings/SubscriptionPage';
 const SubModal = ({visible, onPress, Plan}) => {
-
-  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] = React.useState(9.99)
-  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] = React.useState(1.99)
+  const [businessSubscriptionPricing, setBusinessSubscriptionPricing] =
+    React.useState(9.99);
+  const [individualSubscriptionPricing, setIndividualSubscriptionPricing] =
+    React.useState(1.99);
   React.useEffect(() => {
-    getSubscriptionTarriff(setIndividualSubscriptionPricing, setBusinessSubscriptionPricing)
-  }, [])
+    getSubscriptionTarriff(
+      setIndividualSubscriptionPricing,
+      setBusinessSubscriptionPricing,
+    );
+  }, []);
 
   return (
     <>

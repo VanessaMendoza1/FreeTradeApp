@@ -8,7 +8,7 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -35,6 +35,7 @@ import axios from 'axios';
 import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import {PostAdd} from '../../redux/postSlice';
+import PaymentBottomSheet from '../../Components/BottomSheet';
 
 const PostPromotion = ({navigation, route}) => {
   const dispatch = useDispatch();
@@ -47,9 +48,11 @@ const PostPromotion = ({navigation, route}) => {
 
   const MyData = useSelector(state => state.counter.data);
   const [loading, setloading] = React.useState(false);
+  const [modall, setModal] = React.useState(false);
   const [businessName, setBusinessName] = React.useState(MyData?.BusinessName);
   const [type, setType] = useState(route?.params?.type);
-  const [postData, setpostData] = useState(route?.params?.postdata);
+
+  const [postData, setpostData] = useState(route?.params?.postData);
   useFocusEffect(
     React.useCallback(() => {
       console.log('Focussed PostPromotion.js, running getAdsPrices');
@@ -57,7 +60,9 @@ const PostPromotion = ({navigation, route}) => {
       return () => null;
     }, []),
   );
-
+  useEffect(() => {
+    console.log(type, 'ppppppp');
+  }, []);
   const adposted = () => {
     setloading(true);
     if (toggleCheckBox3) {
@@ -203,7 +208,6 @@ const PostPromotion = ({navigation, route}) => {
             setmodalVisble(false);
           }}
         />
-
         <View>
           {/* header */}
           <View style={styles.Header}>
@@ -250,7 +254,7 @@ const PostPromotion = ({navigation, route}) => {
               style={styles.inputContainercc}
               placeholder={
                 type === 'post'
-                  ? 'Subscribe to post your ad'
+                  ? 'Enter Tagline/Title'
                   : 'Set Business name For Promotion'
               }
               placeholderTextColor={Colors.Primary}
@@ -345,7 +349,7 @@ const PostPromotion = ({navigation, route}) => {
               onPress={() => {
                 // adposted();
                 if (toggleCheckBox3) {
-                  setModalVisible(true);
+                  setModal(true);
                 } else {
                   alert('Please accept the Terms & Condition ');
                 }
@@ -355,7 +359,29 @@ const PostPromotion = ({navigation, route}) => {
             />
           </View>
         </View>
-        <Modal
+        <PaymentBottomSheet
+          modall={modall}
+          setModal={setModal}
+          setloading={setloading}
+          MyData={MyData}
+          toggleCheckBox3={toggleCheckBox3}
+          value={value}
+          images={route?.params?.data?.images}
+          Title={
+            route?.params?.data?.Title === undefined
+              ? route?.params?.data?.Title
+              : ''
+          }
+          setValue={setValue}
+          setToggleCheckBox3={setToggleCheckBox3}
+          from="Promotion"
+          amount={value}
+          businessName={businessName}
+          postData={postData}
+          type={type}
+        />
+
+        {/* <Modal
           animationType="slide"
           transparent={true}
           visible={modalVisible}
@@ -387,7 +413,7 @@ const PostPromotion = ({navigation, route}) => {
               </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </>
     </ScrollView>
   );
@@ -415,6 +441,7 @@ function PaymentScreen({navigation, amount, onDone, onLoading, email, data}) {
         }
       })
       .catch(err => {
+        setmodalVisble(false);
         alert('something went wrong');
       });
   };

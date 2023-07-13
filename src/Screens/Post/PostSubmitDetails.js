@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import Colors from '../../utils/Colors';
@@ -13,6 +14,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Appbutton from '../../Components/Appbutton';
 import LoadingScreen from '../../Components/LoadingScreen';
+import moment from 'moment';
+import auth from '@react-native-firebase/auth';
 
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import Distance from '../Dashboard/Distence';
@@ -26,6 +29,10 @@ import {PostAdd} from '../../redux/postSlice';
 import uuid from 'react-native-uuid';
 import {DataInsert} from '../../redux/counterSlice';
 import {getCategoriesAndSubCategories} from '../Dashboard/Home';
+import axios from 'axios';
+import Reactotron from 'reactotron-react-native';
+import reactotron from 'reactotron-react-native';
+
 const PostSubmitDetails = ({navigation, route}) => {
   const [items, setItems] = React.useState([
     {label: 'Baby Care', value: 'Baby Care'},
@@ -35,7 +42,8 @@ const PostSubmitDetails = ({navigation, route}) => {
   ]);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
-
+  const [usersHavingFav, setUserHavingFav] = React.useState([]);
+  const [postId, setPostId] = useState('');
   const [items2, setItems2] = React.useState([
     {label: 'Athletic Shoes', value: 'Athletic Shoes'},
     {label: 'Boat shoes', value: 'Boat shoes'},
@@ -61,22 +69,17 @@ const PostSubmitDetails = ({navigation, route}) => {
   const [Description, setDescription] = React.useState('');
   const MyData = useSelector(state => state.counter.data);
   const [isUserHavingLocation, setIsUserHavingLocation] = React.useState(
-    MyData.latitude && MyData.longitude ? true : false,
+    MyData?.latitude && MyData?.longitude ? true : false,
   );
   const [
     entireCategoryAndSubCategoryData,
     setEntireCategoryAndSubCategoryData,
   ] = React.useState({});
-
-  // React.useEffect(() => {
-  //   if (value == "Services"){
-  //     setItems3([
-  //       {label: 'Good', value: 'Good'},
-  //       {label: 'excellent', value: 'excellent'},
-  //     ])
-  //   }
-  // }, [value])
-
+  const [favouriteSellingItems, setFavouriteSellingItems] = React.useState([]);
+  const [favouriteServicesItems, setFavouriteServicesItems] = React.useState(
+    [],
+  );
+  const [favouriteTradingItems, setFavouriteTradingItems] = React.useState([]);
   React.useEffect(() => {
     setValue2({});
     setValue3({});
@@ -144,14 +147,14 @@ const PostSubmitDetails = ({navigation, route}) => {
                 DocId: POstId,
                 Discount: 0,
                 status: false,
-                latitude: MyData.latitude
-                  ? MyData.latitude
+                latitude: MyData?.latitude
+                  ? MyData?.latitude
                   : 'No Location Set By User',
-                longitude: MyData.longitude
-                  ? MyData.longitude
+                longitude: MyData?.longitude
+                  ? MyData?.longitude
                   : 'No Location Set By User',
-                Notification: MyData.NotificationToken,
-                videUrl: route.params.VideoUrl,
+                Notification: MyData?.NotificationToken,
+                videUrl: route?.params?.VideoUrl,
               },
             });
           }
@@ -184,8 +187,36 @@ const PostSubmitDetails = ({navigation, route}) => {
       });
     setloading(false);
   };
+  const MySubscriptionPackage = async (POstId, userID) => {
+    const currentUserId = auth().currentUser.uid;
+    let data = [];
+    await firestore()
+      .collection('sub')
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          if (documentSnapshot.data().userid === currentUserId) {
+            const now = moment.utc();
+            var end = JSON.parse(documentSnapshot.data().endDate);
+            var days = now.diff(end, 'days');
+
+            if (days >= 1) {
+              setloading(false);
+              postAdd(postAdd(POstId, userID, trialSize));
+              // DeletePost();
+            } else {
+              setloading(false);
+              checkFreeCount(POstId, MyData?.UserID);
+              // data.push(documentSnapshot.data());
+            }
+          }
+        });
+      });
+    setloading(false);
+  };
   const onSubmit = () => {
-    let POstId = uuid.v4();
+    const POstId = uuid.v4();
+    setPostId(postId);
     setloading(true);
     if (!isUserHavingLocation) {
       alert('Please set your location in settings first');
@@ -193,18 +224,66 @@ const PostSubmitDetails = ({navigation, route}) => {
       navigation.navigate('Setting');
       return;
     }
-    checkFreeCount(POstId, MyData.UserID);
+    postAdd(POstId, MyData?.UserID);
+    // MySubscriptionPackage(POstId, MyData.UserID);
   };
-  const postAdd = async (POstId, userID, count) => {
+  const remove_duplicates = (arr, POstId) => {
+    var obj = {};
+    var ret_arr = [];
+    for (var i = 0; i < arr.length; i++) {
+      obj[arr[i]] = true;
+    }
+    for (var key in obj) {
+      ret_arr?.push(key);
+      fetchUsersTokenHavingFavoritesItems(key, POstId);
+    }
+    return ret_arr;
+  };
+  const fetchFavorites = async POstId => {
+    let currentUserId = auth().currentUser.uid;
+    let _favouriteSellingItems = [];
+    let _favouriteServicesItems = [];
+    let _favouriteTradingItems = [];
+    let promises = [];
+    let users = [];
+    await firestore()
+      .collection('Favourite')
+      .where('users', 'array-contains-any', [currentUserId])
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(async documentSnapshot => {
+          if (value === documentSnapshot?.data()?.category) {
+            users?.push(documentSnapshot?.data()?.users[0]);
+          }
+        });
+        setUserHavingFav(users);
+        if (users?.length > 0) {
+          remove_duplicates(users, POstId);
+        }
+        return promises;
+      })
+      .catch(overallError => {
+        console.log('OVERALL ERROR CAUGHT');
+        setloading(false);
+      })
+      .then(async _promises => {
+        await Promise.all(_promises);
+        setFavouriteServicesItems(_favouriteServicesItems);
+        setFavouriteSellingItems(_favouriteSellingItems);
+        setFavouriteTradingItems(_favouriteTradingItems);
+        setloading(false);
+      });
+  };
+  const postAdd = async (POstId, userID) => {
     await firestore()
       .collection('Post')
       .doc(POstId)
       .set({
         UserID: userID,
-        images: route.params.images,
-        Title: route.params.Title,
-        PostType: route.params.Type,
-        Price: route.params.Price,
+        images: route.params?.images,
+        Title: route.params?.Title,
+        PostType: route.params?.Type,
+        Price: route.params?.Price,
         Category: value,
         SubCategory: value2,
         Condition: value3,
@@ -214,27 +293,52 @@ const PostSubmitDetails = ({navigation, route}) => {
         DocId: POstId,
         Discount: 0,
         status: false,
-        latitude: MyData.latitude ? MyData.latitude : 'No Location Set By User',
-        longitude: MyData.longitude
-          ? MyData.longitude
+        latitude: MyData?.latitude
+          ? MyData?.latitude
           : 'No Location Set By User',
-        Notification: MyData.NotificationToken,
-        videUrl: route.params.VideoUrl,
+        longitude: MyData?.longitude
+          ? MyData?.longitude
+          : 'No Location Set By User',
+        Notification: MyData?.NotificationToken,
+        videUrl: route.params?.VideoUrl,
       })
       .then(async doc => {
-        addFreePostsCount(MyData.UserID, count);
-
+        let data = {
+          UserID: userID,
+          images: route.params?.images,
+          Title: route.params?.Title,
+          PostType: route.params?.Type,
+          Price: route.params?.Price,
+          Category: value,
+          SubCategory: value2,
+          Condition: value3,
+          Brand: brand,
+          Description: Description,
+          user: MyData,
+          DocId: POstId,
+          Discount: 0,
+          status: false,
+          latitude: MyData?.latitude
+            ? MyData?.latitude
+            : 'No Location Set By User',
+          longitude: MyData?.longitude
+            ? MyData?.longitude
+            : 'No Location Set By User',
+          Notification: MyData?.NotificationToken,
+          videUrl: route.params?.VideoUrl,
+        };
+        reactotron.log(data);
+        // addFreePostsCount(MyData.UserID, count);
+        reactotron.log(doc);
         let PostData = [];
         await firestore()
           .collection('Post')
           .get()
           .then(async querySnapshot => {
-            console.log('Total users: ', querySnapshot.size);
-
             querySnapshot.forEach(documentSnapshot => {
               PostData.push(documentSnapshot.data());
             });
-            allmypost();
+            allmypost(POstId);
             await dispatch(PostAdd(PostData));
           })
           .catch(err => {
@@ -247,18 +351,19 @@ const PostSubmitDetails = ({navigation, route}) => {
         setloading(false);
       });
   };
-  const allmypost = async () => {
+  const allmypost = async POstId => {
     let SellingData = [];
     let TradingData = [];
     let ServiceData = [];
 
-    const lat1 = MyData.latitude; // Latitude of first coordinate
-    const lon1 = MyData.longitude; // Longitude of first coordinate
+    const lat1 = MyData?.latitude; // Latitude of first coordinate
+    const lon1 = MyData?.longitude; // Longitude of first coordinate
 
     await firestore()
       .collection('Post')
       .get()
       .then(async querySnapshot => {
+        fetchFavorites(POstId);
         querySnapshot.forEach(documentSnapshot => {
           try {
             let lat2;
@@ -292,7 +397,103 @@ const PostSubmitDetails = ({navigation, route}) => {
 
     UserDataPost();
   };
+  const areNotificationsHidden = (callback, currentUserId = null) => {
+    if (currentUserId == null) currentUserId = auth().currentUser.uid;
+    firestore()
+      .collection('Users')
+      .doc(currentUserId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          if (
+            documentSnapshot.data().hideNotifications &&
+            documentSnapshot.data().hideNotifications === true
+          ) {
+            callback(true);
+          }
+        }
+      })
+      .catch(err => {});
+  };
 
+  const fetchUsersTokenHavingFavoritesItems = async (userId, POstId) => {
+    await firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          // tokens.push(documentSnapshot?.data()?.Notification);
+          if (userId !== auth()?.currentUser?.uid) {
+            // if (documentSnapshot?.data()?.NotificationToken !== '') {
+            NotificationSystem(
+              documentSnapshot?.data()?.NotificationToken,
+              POstId,
+              userId,
+            );
+            // }
+          }
+        }
+      })
+      .catch(err => {
+        setloading(false);
+      });
+  };
+  const NotificationSystem = async (token, POstId, userId) => {
+    firestore()
+      .collection('Notification')
+      .doc()
+      .set({
+        seen: false,
+        userID: userId,
+        postId: POstId,
+        text:
+          MyData?.name +
+          ' an item from your favorites just posted. Click to view.',
+        dateTime: new Date().toUTCString(),
+      })
+      .then(async () => {
+        var data = JSON.stringify({
+          data: {
+            body: MyData?.name + ' has posted Item',
+            title:
+              MyData?.name +
+              ' an item from your favorites just posted. Click to view.',
+          },
+          notification: {
+            body: MyData?.name + ' has posted Item',
+            title:
+              MyData?.name +
+              ' an item from your favorites just posted. Click to view.',
+          },
+          to: token,
+        });
+        var config = {
+          method: 'post',
+          url: 'https://fcm.googleapis.com/fcm/send',
+          // 'https://fcm.googleapis.com/fcm/send',
+          headers: {
+            Authorization:
+              'key=AAAAwssoW30:APA91bGw2zSndcTuY4Q_o_L9x6up-8tCzIe0QjNLOs-bTtZQQJk--iAVrGU_60Vl1Q41LmUU8MekVjH_bHowDK4RC-mzDaJyjr9ma21gxSqNYrQFNTzG7vfy537eA_ogt1IORC12B5Ls',
+            'Content-Type': 'application/json',
+          },
+          data: data,
+        };
+        let callBackIfNotificationsNotHidden = axios(config)
+          .then(function (response) {
+            console.log('success', JSON.stringify(response.data));
+            areNotificationsHidden(
+              callBackIfNotificationsNotHidden,
+              MyData?.UserID,
+            );
+            // navigation.goBack();
+          })
+          .catch(function (error) {
+            console.log('errr', error);
+          });
+      })
+      .catch(err => {});
+  };
   const UserDataPost = async () => {
     let SellingData = [];
     let TradingData = [];
@@ -302,7 +503,7 @@ const PostSubmitDetails = ({navigation, route}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().UserID === MyData.UserID) {
+          if (documentSnapshot.data().UserID === MyData?.UserID) {
             if (documentSnapshot.data().PostType === 'Trading') {
               TradingData.push(documentSnapshot.data());
             }
@@ -326,15 +527,15 @@ const PostSubmitDetails = ({navigation, route}) => {
     setloading(true);
     firestore()
       .collection('Users')
-      .doc(MyData.UserID)
+      .doc(MyData?.UserID)
       .update({
-        Post: MyData.Post + 1,
+        Post: MyData?.Post + 1,
       })
       .then(async () => {
         let userData = [];
         await firestore()
           .collection('Users')
-          .doc(MyData.UserID)
+          .doc(MyData?.UserID)
           .get()
           .then(documentSnapshot => {
             if (documentSnapshot.exists) {
@@ -352,6 +553,37 @@ const PostSubmitDetails = ({navigation, route}) => {
           images: route.params.images,
           condition: value3,
           brand: brand,
+          data: {
+            title: route.params.Title,
+            images: route.params.images,
+            condition: value3,
+            brand: brand,
+          },
+          type: 'post',
+          postData: {
+            UserID: MyData?.UserID,
+            images: route.params.images,
+            Title: route.params.Title,
+            PostType: route.params.Type,
+            Price: route.params.Price,
+            Category: value,
+            SubCategory: value2,
+            Condition: value3,
+            Brand: brand,
+            Description: Description,
+            user: MyData,
+            DocId: postId,
+            Discount: 0,
+            status: false,
+            latitude: MyData?.latitude
+              ? MyData?.latitude
+              : 'No Location Set By User',
+            longitude: MyData?.longitude
+              ? MyData?.longitude
+              : 'No Location Set By User',
+            Notification: MyData?.NotificationToken,
+            videUrl: route?.params?.VideoUrl,
+          },
         });
 
         setloading(false);
@@ -474,6 +706,7 @@ const PostSubmitDetails = ({navigation, route}) => {
                   {Description ? (
                     <Appbutton
                       onPress={() => {
+                        // fetchFavorites();
                         onSubmit();
                       }}
                       text={'Submit'}

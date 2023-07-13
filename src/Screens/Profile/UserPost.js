@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -235,6 +236,7 @@ const UserPost = ({navigation, route}) => {
         // text: Userdata.name + ' has marked an ' + {dealType} + ' you ! Review it now ',
         sellerData: Userdata,
         seen: false,
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({
@@ -263,7 +265,7 @@ const UserPost = ({navigation, route}) => {
           .then(function (response) {
             console.log(JSON.stringify(response.data));
             areNotificationsHidden(callBackIfNotificationsNotHidden, id);
-            navigation.navigate('Review');
+            navigation.navigate('Review', {data: id});
           })
           .catch(function (error) {});
       })
@@ -417,7 +419,7 @@ const UserPost = ({navigation, route}) => {
                 <Appbutton
                   onPress={() => {
                     navigation.navigate('PostPromotion', {
-                      data: route.params.data,
+                      data: route?.params?.data,
                     });
                   }}
                   text={'Promote'}

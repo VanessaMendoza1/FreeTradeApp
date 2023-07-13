@@ -4,6 +4,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -19,16 +20,19 @@ import axios from 'axios';
 import uuid from 'react-native-uuid';
 import {sendMsg} from './Inbox';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
+import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const SendOffer = ({navigation, route}) => {
   const [offer, setoffer] = React.useState('');
+  const [value, setValue] = React.useState('');
   const [Notii, setNotii] = React.useState(
     route.params.data.user.NotificationToken,
   );
   const [loading, setloading] = React.useState(false);
-  const UserData = useSelector(state => state.counter.data);
+  const UserData = useSelector(state => state.counter?.data);
   const NotificationSystem = async (id, name, token) => {
-    console.log({PARAMS: route.params});
+    console.log({PARAMS: route?.params});
     firestore()
       .collection('Notification')
       .doc()
@@ -36,6 +40,7 @@ const SendOffer = ({navigation, route}) => {
         seen: false,
         userID: route.params.data.user.UserID,
         text: UserData.name + ' sent you ' + priceFormatter(offer) + ' offer',
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({
@@ -76,163 +81,166 @@ const SendOffer = ({navigation, route}) => {
   const data = route.params.data;
 
   return (
-    <View style={styles.MainContainer}>
-      {/* header */}
-      <View style={styles.Header}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-          style={styles.LeftContainer}>
-          <Icon name="arrow-back-outline" size={30} color="#ffff" />
-        </TouchableOpacity>
-        <View style={styles.MiddleContainer}>
-          <Text style={styles.FontWork}>Enter your offer</Text>
-        </View>
-      </View>
-      {/* header */}
-      <View style={styles.Headerw}>
-        <View style={styles.TxtInputs}>
-          <TextInput
-            style={styles.inputCon}
-            value={offer}
-            placeholder={'Enter Amount'}
-            keyboardType={'number-pad'}
-            placeholderTextColor={'#ffff'}
-            onChangeText={e => {
-              setoffer(e);
-            }}
-          />
-
-          {route.params.data.Price && (
+    <KeyboardAvoidingScrollView contentContainerStyle={{flex: 1}}>
+      <View style={styles.MainContainer}>
+        {/* header */}
+        <View>
+          <View style={styles.Header}>
             <TouchableOpacity
               onPress={() => {
-                setoffer(route.params.data.Price);
+                navigation.goBack();
               }}
-              style={styles.BtnCC}>
-              <Text style={styles.manColor}>Full Amount</Text>
+              style={styles.LeftContainer}>
+              <Icon name="arrow-back-outline" size={30} color="#ffff" />
             </TouchableOpacity>
-          )}
+            <View style={styles.MiddleContainer}>
+              <Text style={styles.FontWork}>Enter your offer</Text>
+            </View>
+          </View>
+          {/* header */}
+          <View style={styles.Headerw}>
+            <View style={styles.TxtInputs}>
+              <TextInput
+                style={styles.inputCon}
+                value={value}
+                placeholder={'Enter Amount'}
+                keyboardType={'number-pad'}
+                placeholderTextColor={'#ffff'}
+                onChangeText={e => {
+                  setoffer('You have received an offer $' + e);
+                  setValue(route?.params?.data?.Price);
+                }}
+              />
+
+              {route.params.data.Price && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setoffer(
+                      'You have received an offer $' +
+                        route?.params?.data?.Price,
+                    );
+                    setValue(route?.params?.data?.Price);
+                  }}
+                  style={styles.BtnCC}>
+                  <Text style={styles.manColor}>Full Amount</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
         </View>
-      </View>
-      {/* header */}
-
-      <View style={styles.AppBtn}>
-        <Appbutton
-          onPress={() => {
-            // NotificationSystem();
-
-            // navigation.navigate('StartConversation', {
-            //   data: route.params.data,
-            //   receiverData: {
-            //     // roomId,
-            //     // lastMsg: txt,
-            //     // route.params.data.user.image
-            //     id: route.params.data.UserID,
-            //     name: route.params.data.name,
-            //     img: route.params.data.image,
-            //     emailId: route.params.data.email,
-            //     about: route.params.data.Bio,
-            //     Token: route.params.data.NotificationToken,
-
-            //     itemPrice: route.params.data.Price,
-            //     itemImage: route.params.data.images[0],
-            //     sellersName: route.params.data.user.name,
-            //     sellersImage: route.params.data.user.image,
-            //   }
-            // });
-
-            database()
-              .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
-              .once('value')
-              .then(async snapshot => {
-                let roomId;
-                if (snapshot.val() == null) {
-                  roomId = uuid.v4();
+        <View>
+          <View style={styles.AppBtn}>
+            <Appbutton
+              onPress={() => {
+                if (offer === '' || offer === 'undefined' || offer === null) {
+                  return alert('Please enter some amount');
                 } else {
-                  roomId = snapshot.val().roomId;
-                }
-                console.log({roomId});
-                let SendData = {
-                  roomId,
-                  id: data.UserID,
-                  name: data.name,
-                  img: data.image,
-                  emailId: data.email,
-                  about: data.Bio,
-                  lastMsg: offer,
-                  Token: data.NotificationToken,
-
-                  itemPrice: data.Price,
-                  itemImage: data.images[0],
-                  sellersName: data.user.name,
-                  sellersImage: data.user.image,
-                };
-                sendMsg(offer, setoffer, setloading, UserData, SendData);
-                database()
-                  .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
-                  .once('value')
-                  .then(async snapshot => {
-                    if (
-                      snapshot.val() == null ||
-                      (snapshot.val().itemPrice == null &&
-                        snapshot.val().itemImage == null)
-                    ) {
-                      let myData = {
+                  database()
+                    .ref('/chatlist/' + UserData?.UserID + '/' + data?.UserID)
+                    .once('value')
+                    .then(async snapshot => {
+                      let roomId;
+                      if (snapshot.val() == null) {
+                        roomId = uuid.v4();
+                      } else {
+                        roomId = snapshot.val()?.roomId;
+                      }
+                      console.log({roomId});
+                      let SendData = {
                         roomId,
-                        id: UserData.UserID,
-                        name: UserData.name,
-                        img: UserData.image,
-                        emailId: UserData.emails,
-                        about: UserData.Bio,
+                        id: data.UserID,
+                        name: data.name,
+                        img: data.image,
+                        emailId: data.email,
+                        about: data.Bio,
                         lastMsg: offer,
-                        Token: UserData.NotificationToken,
+                        Token: data.NotificationToken,
 
                         itemPrice: data.Price,
                         itemImage: data.images[0],
                         sellersName: data.user.name,
                         sellersImage: data.user.image,
                       };
+                      sendMsg(offer, setoffer, setloading, UserData, SendData);
                       database()
-                        .ref('/chatlist/' + data.UserID + '/' + UserData.UserID)
-                        .update(myData)
-                        .then(() => console.log('Data updated.'));
+                        .ref(
+                          '/chatlist/' + UserData?.UserID + '/' + data?.UserID,
+                        )
+                        .once('value')
+                        .then(async snapshot => {
+                          if (
+                            snapshot.val() == null ||
+                            (snapshot.val().itemPrice == null &&
+                              snapshot.val().itemImage == null)
+                          ) {
+                            let myData = {
+                              roomId,
+                              id: UserData?.UserID,
+                              name: UserData?.name,
+                              img: UserData?.image,
+                              emailId: UserData?.emails,
+                              about: UserData?.Bio,
+                              lastMsg: offer,
+                              Token: UserData?.NotificationToken,
 
-                      data.lastMsg = offer;
-                      data.roomId = roomId;
+                              itemPrice: data?.Price,
+                              itemImage: data?.images[0],
+                              sellersName: data?.user?.name,
+                              sellersImage: data?.user?.image,
+                            };
+                            database()
+                              .ref(
+                                '/chatlist/' +
+                                  data?.UserID +
+                                  '/' +
+                                  UserData?.UserID,
+                              )
+                              .update(myData)
+                              .then(() => console.log('Data updated.'));
 
-                      database()
-                        .ref('/chatlist/' + UserData.UserID + '/' + data.UserID)
-                        .update(SendData)
-                        .then(() => {
-                          console.log('Data updated.');
-                          alert('Offer Sent');
-                          navigation.goBack();
+                            data.lastMsg = offer;
+                            data.roomId = roomId;
+
+                            database()
+                              .ref(
+                                '/chatlist/' +
+                                  UserData?.UserID +
+                                  '/' +
+                                  data?.UserID,
+                              )
+                              .update(SendData)
+                              .then(() => {
+                                console.log('Data updated.');
+                                alert('Offer Sent');
+                                navigation.goBack();
+                              });
+                            // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
+                            setloading(false);
+                          } else {
+                            alert('Offer Sent');
+                            navigation.goBack();
+                            // navigation.navigate('Inbox', {
+                            //   txt: txt,
+                            //   receiverData: {
+                            //     ...snapshot.val(),
+                            //     itemPrice: data.Price,
+                            //     itemImage: data.images[0],
+                            //     sellersName: data.user.name,
+                            //     sellersImage: data.user.image,
+                            //   }
+                            // });
+                            setloading(false);
+                          }
                         });
-                      // navigation.navigate('Inbox', {receiverData: SendData}); // STOPPED TAKING TO INBOX AFTER SENDING A MESSAGE
-                      setloading(false);
-                    } else {
-                      alert('Offer Sent');
-                      navigation.goBack();
-                      // navigation.navigate('Inbox', {
-                      //   txt: txt,
-                      //   receiverData: {
-                      //     ...snapshot.val(),
-                      //     itemPrice: data.Price,
-                      //     itemImage: data.images[0],
-                      //     sellersName: data.user.name,
-                      //     sellersImage: data.user.image,
-                      //   }
-                      // });
-                      setloading(false);
-                    }
-                  });
-              });
-          }}
-          text={'Make offer'}
-        />
+                    });
+                }
+              }}
+              text={'Make offer'}
+            />
+          </View>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingScrollView>
   );
 };
 
@@ -242,6 +250,7 @@ const styles = StyleSheet.create({
   MainContainer: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'space-between',
   },
   Headerw: {
     width: '100%',
@@ -305,9 +314,6 @@ const styles = StyleSheet.create({
   },
   AppBtn: {
     width: '100%',
-    height: '70%',
-    // backgroundColor: 'red',
-    justifyContent: 'flex-end',
     alignItems: 'center',
   },
 });

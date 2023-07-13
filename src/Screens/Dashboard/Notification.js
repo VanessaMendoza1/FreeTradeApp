@@ -5,8 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,26 +17,34 @@ import {useSelector, useDispatch} from 'react-redux';
 import {areNotificationsHidden} from '../../utils/appConfigurations';
 import auth from '@react-native-firebase/auth';
 import {useFocusEffect} from '@react-navigation/native';
-
+import reactotron from 'reactotron-react-native';
+import LoadingScreen from '../../Components/LoadingScreen';
+import moment from 'moment';
 const Notification = ({navigation}) => {
   const [Notii, setNotii] = React.useState([]);
   const userData = useSelector(state => state.counter.data);
-
+  const [loading, setLoading] = useState(false);
   const getNotification = () => {
-    console.log('Getting Notifications');
     NotificationData();
     NotificationData2();
-    console.log('Notii', Notii);
   };
-
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Focussed Notification.js, running getNotification');
       getNotification();
       return () => null;
     }, []),
   );
-
+  const getTradedPost = async postId => {
+    await firestore()
+      .collection('Post')
+      .doc(postId)
+      .get()
+      .then(async documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          return documentSnapshot.data()?.images[0];
+        }
+      });
+  };
   const NotificationData = async () => {
     let NotificationData = [];
     const currentUserId = auth().currentUser.uid;
@@ -44,10 +53,10 @@ const Notification = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-          console.log('image', documentSnapshot?.data().sellerData);
           if (
-            documentSnapshot.data() &&
-            documentSnapshot.data().userID == currentUserId
+            documentSnapshot.data() && documentSnapshot.data().receiverId
+              ? documentSnapshot.data()?.receiverId === currentUserId
+              : documentSnapshot.data()?.userID === currentUserId
           ) {
             // if (documentSnapshot.data().seen == false) {
             NotificationData.push({
@@ -57,9 +66,16 @@ const Notification = ({navigation}) => {
             // }
           }
         });
+        setLoading(false);
+        let arr = NotificationData.sort((a, b) => {
+          moment.utc(b.dateTime).local().format('YYYY-MM-DD HH:mm:ss') -
+            moment.utc(a.dateTime).local().format('YYYY-MM-DD HH:mm:ss');
+        });
         setNotii(NotificationData);
       })
-      .catch(err => {});
+      .catch(err => {
+        setLoading(false);
+      });
   };
   const NotificationData2 = async () => {
     const currentUserId = auth().currentUser.uid;
@@ -79,82 +95,92 @@ const Notification = ({navigation}) => {
 
   return (
     <View style={styles.MainContainer}>
-      {/* header */}
-      <View style={styles.Header}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}
-          style={styles.LeftContainer}>
-          <Icon name="arrow-back-outline" size={30} color="#ffff" />
-        </TouchableOpacity>
-        <View style={styles.MiddleContainer}>
-          <Text style={styles.FontWork}>Notification</Text>
-        </View>
-      </View>
-      {/* header */}
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <View>
+          {/* header */}
+          <View style={styles.Header}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+              }}
+              style={styles.LeftContainer}>
+              <Icon name="arrow-back-outline" size={30} color="#ffff" />
+            </TouchableOpacity>
+            <View style={styles.MiddleContainer}>
+              <Text style={styles.FontWork}>Notification</Text>
+            </View>
+          </View>
+          {/* header */}
 
-      {Notii !== [] && (
-        <ScrollView style={styles.content}>
-          {Notii.map((item, idx) => {
-            return (
-              <NotificationHead
-                onPress={async () => {
-                  // console.log({item});
-                  if (
-                    item.text.endsWith(
-                      'an item from your favorites just posted. Click to view.',
-                    )
-                  ) {
-                    await firestore()
-                      .collection('Post')
-                      .doc(item.newlyAddedItemId)
-                      .get()
-                      .then(async documentSnapshot => {
-                        if (documentSnapshot.exists) {
-                          let newlyAddedItemData = documentSnapshot.data();
-                          navigation.navigate('PostScreen', {
-                            data: newlyAddedItemData,
+          {Notii !== [] && (
+            <ScrollView style={styles.content}>
+              {Notii.map((item, idx) => {
+                return (
+                  <NotificationHead
+                    onPress={async () => {
+                      if (
+                        item.text.endsWith(
+                          'an item from your favorites just posted. Click to view.',
+                        )
+                      ) {
+                        await firestore()
+                          .collection('Post')
+                          .doc(item?.postId)
+                          .get()
+                          .then(async documentSnapshot => {
+                            if (documentSnapshot?.exists) {
+                              // return reactotron.log(
+                              //   'documentSnapshot.data()',
+                              //   documentSnapshot.data(),
+                              // );
+                              let newlyAddedItemData = documentSnapshot.data();
+                              navigation.navigate('PostScreen', {
+                                data: newlyAddedItemData,
+                              });
+                            }
                           });
-                        }
-                      });
-                  } else if (
-                    item.text.endsWith(
-                      'would like to trade with you, click to see profile!',
-                    )
-                  ) {
-                    await firestore()
-                      .collection('Users')
-                      .doc(item.userID)
-                      .get()
-                      .then(async documentSnapshot => {
-                        if (documentSnapshot.exists) {
-                          let userData = documentSnapshot.data();
-                          navigation.navigate('OtherUserProfile', {
-                            data: {
-                              UserID: item.userID,
-                              image: userData.image,
-                            },
+                      } else if (
+                        item.text.endsWith(
+                          'would like to trade with you, click to see profile!',
+                        )
+                      ) {
+                        await firestore()
+                          .collection('Users')
+                          .doc(item?.userID)
+                          .get()
+                          .then(async documentSnapshot => {
+                            if (documentSnapshot.exists) {
+                              let userData = documentSnapshot?.data();
+                              navigation?.navigate('OtherUserProfile', {
+                                data: {
+                                  UserID: item?.userID,
+                                  image: userData?.image,
+                                },
+                              });
+                            }
                           });
-                        }
-                      });
-                  } else if (
-                    item.text.endsWith(
-                      'just rated her experience, click to rate yours.',
-                    )
-                  ) {
-                    navigation.navigate('Review', {
-                      data: item.sellerData,
-                    });
-                  }
-                }}
-                data={item}
-                notifications={Notii}
-                setNotifications={setNotii}
-              />
-            );
-          })}
-        </ScrollView>
+                      } else if (
+                        item.text.endsWith(
+                          'just rated her experience, click to rate yours.',
+                        )
+                      ) {
+                        // return console.log(item?.sellerData);
+                        navigation.navigate('Review', {
+                          data: item?.sellerData.UserID,
+                        });
+                      }
+                    }}
+                    data={item}
+                    notifications={Notii}
+                    setNotifications={setNotii}
+                  />
+                );
+              })}
+            </ScrollView>
+          )}
+        </View>
       )}
     </View>
   );

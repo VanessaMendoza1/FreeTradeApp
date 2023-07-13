@@ -12,10 +12,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {TradingAdd, SellingAdd, ServiceAdd} from '../../redux/postSlice';
 import {AddImageAds, AddVideoAds} from '../../redux/adsSlicer';
 import {DataInsert} from '../../redux/counterSlice';
+import Distance from '../Dashboard/Distence';
 
 const SplashScreen = ({navigation}) => {
   const [progress, setProgress] = useState(0);
   const dispatch = useDispatch();
+  const UserData = useSelector(state => state.counter.data);
 
   const Allads = async () => {
     let ImageData = [];
@@ -26,15 +28,24 @@ const SplashScreen = ({navigation}) => {
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
+          // let distance = Distance(
+          //   documentSnapshot?.data()?.user?.LocationFilter?.latitude,
+          //   documentSnapshot?.data()?.user?.LocationFilter?.longitude,
+          //   UserData?.LocationFilter?.location?.latitude,
+          //   UserData?.LocationFilter?.location?.longitude,
+          // );
+          // console.log('distance', distance);
+
           if (documentSnapshot.data().MediaType === 'Image') {
             ImageData.push(documentSnapshot.data());
           }
           if (documentSnapshot.data().MediaType === 'Videos') {
+            console.log('Videos', 'true');
+
             VideoData.push(documentSnapshot.data());
           }
         });
       });
-
     await dispatch(AddImageAds(ImageData));
     await dispatch(AddVideoAds(VideoData));
   };
@@ -43,8 +54,9 @@ const SplashScreen = ({navigation}) => {
     CheckRemeberME();
 
     Allads();
-  }, []);
 
+    //__updateOnlineStatus('No');
+  }, []);
   const CheckRemeberME = async () => {
     try {
       const value = await AsyncStorage.getItem('@userData2');

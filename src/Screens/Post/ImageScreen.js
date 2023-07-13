@@ -28,7 +28,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 const ImageScreen = ({navigation, route}) => {
   const images = [
     {
-      url: route.params.data,
+      url: route?.params?.data,
     },
   ];
 

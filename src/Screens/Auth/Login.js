@@ -19,9 +19,12 @@ import LoadingScreen from '../../Components/LoadingScreen';
 
 import {DataInsert} from '../../redux/counterSlice';
 import {useSelector, useDispatch} from 'react-redux';
-
+import {localNotificationService} from '../../Fcm/LocalNotificationService';
+import {fcmService} from '../../Fcm/FCMService';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   PostAdd,
@@ -42,6 +45,7 @@ const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setloading] = useState(false);
+  const [NotificationToken, setNotificationToken] = useState('');
 
   const dispatch = useDispatch();
 
@@ -121,7 +125,7 @@ const Login = ({navigation}) => {
       });
   };
 
-  const onSubmit = () => {
+  const onSubmit = (email, password) => {
     setloading(true);
     if (email === '' || password === '') {
       alert('All fields  are required');
@@ -197,6 +201,162 @@ const Login = ({navigation}) => {
         });
     }
   };
+  //  notifications gathering
+  // const tt = async () => {
+  //   try {
+  //     if (Platform.OS === 'ios') {
+  //       await messaging().registerDeviceForRemoteMessages();
+  //       await messaging().setAutoInitEnabled(true);
+  //     }
+
+  //     const token = await messaging().getToken();
+
+  //     const jsonValue = JSON.stringify(token);
+  //     await AsyncStorage.setItem('TokensStore', jsonValue);
+  //     setNotificationToken(jsonValue);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // const checkPermission = async () => {
+  //   const deviceRemote = await messaging().registerDeviceForRemoteMessages();
+  //   try {
+  //     const token = await messaging().getToken();
+  //     setNotificationToken(token);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   const authStatus = await messaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  //   if (enabled) {
+  //     messaging()
+  //       .hasPermission()
+  //       .then(enabled => {
+  //         if (enabled) {
+  //           // User has permission
+  //           getData();
+  //         } else {
+  //           // User doesn't have permission
+  //           this.requestPermission();
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.log(error);
+  //         //  console.log('@@@ FCM SERVICE PERMISSION REJECT ERROR ===========', error);
+  //       });
+  //   } else {
+  //     alert('Permission denied');
+  //   }
+  // };
+  const onRegister = token => {
+    console.log('[App] onRegister :', token);
+    AsyncStorage.setItem('fcm_token', token);
+    setNotificationToken(token);
+
+    // __updateOnlineStatus('Yes');
+  };
+  const onNotification = (notify, remoteMessage) => {
+    console.log('[App] remote :', notify);
+    const options = {
+      soundName: 'default',
+      playSound: true,
+    };
+    localNotificationService.showNotification(
+      0,
+      notify?.doctor_name,
+      notify?.body,
+      notify,
+      options,
+    );
+  };
+
+  const onOpenNotification = notify => {
+    //     var numberPattern = /\d+/g;
+    let id = notify?.doctor_id;
+    // let id=notify.sender.match( numberPattern )
+    // alert(JSON.stringify(notify));
+
+    navigation.navigate('chat', {
+      userData: {id: notify?.doctor_id, pro_name: notify?.doctor_name},
+
+      uid: notify?.user_id,
+      uname: notify?.title,
+      doctor_id: notify?.doctor_id,
+      user_id: notify?.user_id,
+      type: 'assis',
+      // userData: notify,
+      //days: item?.days,
+    });
+    console.log('[App] onNotification :', notify);
+    // alert('open notification: ', notify.body);
+  };
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('TokensStore');
+
+      if (value) {
+        setNotificationToken(value);
+      } else {
+        tt();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const checkUserData = async (userId, email, fname, lname) => {
+    let userData = [];
+    await firestore()
+      .collection('Users')
+      .doc(userId)
+      .get()
+      .then(documentSnapshot => {
+        console.log('checking user data');
+        if (documentSnapshot.exists) {
+          userData.push(documentSnapshot.data());
+        } else {
+          console.log('not existing');
+          storeUserOnCloud(userId, email, fname, lname);
+        }
+      })
+      .catch(err => {
+        console.log(err, 'check data err');
+        storeUserOnCloud(userId, email, fname, lname);
+        setloading(false);
+      });
+    await dispatch(DataInsert(userData[0]));
+  };
+  const storeUserOnCloud = (userId, email, fname, lname) => {
+    firestore()
+      .collection('Users')
+      .doc(userId)
+      .set({
+        UserID: userId,
+        email: email?.toLowerCase(),
+        password: password,
+        name: fname + ' ' + lname,
+        image:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYNdMgrRFXgRDPrxcKcc7VA_MAoE3zkphM_g&usqp=CAU',
+
+        phone: '',
+        reviews: 0,
+        NotificationToken: NotificationToken ? NotificationToken : '',
+        location: '',
+        AccountType: 'Free',
+        Post: 0,
+        ban: false,
+      })
+      .then(() => {
+        console.log('storing user data');
+
+        checkUserData(userId, email, fname, lname);
+        setloading(false);
+      })
+      .catch(err => {
+        console.log(err, 'user data errr store');
+      });
+  };
   //  =================== Facebook Authenication ================
   async function onFacebookButtonPress() {
     // Attempt login with permissions
@@ -225,8 +385,12 @@ const Login = ({navigation}) => {
     return auth()
       .signInWithCredential(facebookCredential)
       .then(async res => {
-        console.log(res?.user?.uid, 'fbid');
-        await dispatch(DataInsert(res));
+        checkUserData(
+          res?.user?.uid,
+          res?.user?.email,
+          res?.user?.displayName,
+          '',
+        );
         if (toggleCheckBox) {
           await AsyncStorage.setItem(
             '@userData2',
@@ -266,7 +430,12 @@ const Login = ({navigation}) => {
       return auth()
         .signInWithCredential(googleCredential)
         .then(async res => {
-          await dispatch(DataInsert(res));
+          checkUserData(
+            res?.user?.uid,
+            res?.user?.email,
+            res?.user?.displayName,
+            '',
+          );
           if (toggleCheckBox) {
             await AsyncStorage.setItem(
               '@userData2',
@@ -345,7 +514,12 @@ const Login = ({navigation}) => {
     return auth()
       .signInWithCredential(appleCredential)
       .then(async res => {
-        await dispatch(DataInsert(res));
+        checkUserData(
+          res?.user?.uid,
+          res?.user?.email,
+          res?.user?.displayName,
+          '',
+        );
         if (toggleCheckBox) {
           await AsyncStorage.setItem(
             '@userData2',
@@ -372,41 +546,23 @@ const Login = ({navigation}) => {
       .catch(e => {
         alert('Something went wrong');
       });
-
-    // console.log('signed in', appleAuthRequestResponse);
-    // console.log(appleAuthRequestResponse.email);
-    // var user_email = appleAuthRequestResponse.email;
-    // var user_name = appleAuthRequestResponse.fullName.givenName;
-    // // Singup(user_name, user_email, '', '', 'apple');
-    // const credentialState = await appleAuth.getCredentialStateForUser(
-    //   appleAuthRequestResponse.user,
-    // );
-    // // use credentialState response to ensure the user is authenticated
-    // if (credentialState === appleAuth.State.AUTHORIZED) {
-    //   // user is authenticated
-    //   //alert(JSON.stringify(appleAuthRequestResponse));
-    // }
   };
-  // /////init user
-  // const initUser = token => {
-  //   fetch(
-  //     'https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=' +
-  //       token,
-  //   )
-  //     .then(response => response.json())
-  //     .then(json => {
-  //       // Singup(json?.name, json?.email, '', '', 'fb');
-  //     })
-  //     .catch(() => {
-  //       console.log('ERROR GETTING DATA FROM FACEBOOK');
-  //     });
-  // };
   React.useEffect(() => {
+    // checkPermission();
     GoogleSignin.configure({
       webClientId:
         '836632075133-icfofnqj20u7f3n2c9986eamlfobveg3.apps.googleusercontent.com',
     });
+
     Allads();
+    fcmService.register(onRegister, onNotification, onOpenNotification);
+    localNotificationService.configure(onOpenNotification);
+    return () => {
+      console.log('[App] unRegister');
+      fcmService.unRegister();
+      localNotificationService.unregister();
+      console.log('[App ] idun :', 'data');
+    };
   }, []);
 
   return (
@@ -451,7 +607,7 @@ const Login = ({navigation}) => {
             <View style={styles.space2} />
             <Appbutton
               onPress={async () => {
-                onSubmit();
+                onSubmit(email, password);
               }}
               text={'Sign in'}
             />

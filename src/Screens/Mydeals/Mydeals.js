@@ -262,7 +262,7 @@ const Mydeals = ({navigation}) => {
                   {sold.map(item => (
                     <MydealItem
                       onPress={() => {
-                        navigation.navigate('Review', {data: item});
+                        // navigation.navigate('Review', {data: item});
                       }}
                       onPressDelete={() => {
                         confirmationAlert('Sold', item?.ItemID);
@@ -324,7 +324,8 @@ const Mydeals = ({navigation}) => {
                   {Trade.map(item => (
                     <MydealItem
                       onPress={() => {
-                        navigation.navigate('Review');
+                        // Alert.alert(JSON.stringify(item));
+                        // navigation.navigate('Review', {data: item?.BuyerImage});
                       }}
                       onPressDelete={() => {
                         confirmationAlert('Traded', item?.ItemID);

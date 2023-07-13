@@ -8,8 +8,9 @@ import {
   ImageBackground,
   Modal,
   TouchableHighlight,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -28,11 +29,9 @@ import moment from 'moment';
 import LoadingScreen from '../../Components/LoadingScreen';
 import axios from 'axios';
 
-import {
-  CreditCardInput,
-  LiteCreditCardInput,
-} from 'react-native-credit-card-input';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import PaymentBottomSheet from '../../Components/BottomSheet';
 
 const getSubscriptionTarriff = (
   setIndividualSubscriptionPricing,
@@ -56,8 +55,6 @@ const getSubscriptionTarriff = (
       });
     })
     .catch(err => {
-      setloading(false);
-      setModalVisible(!modalVisible);
       console.log(err);
     });
 };
@@ -70,7 +67,7 @@ const getSubscriptionDetails = async setIsSubscriptionValid => {
     .get()
     .then(async querySnapshot => {
       querySnapshot.forEach(documentSnapshot => {
-        if (documentSnapshot.data().userid === currentUserId) {
+        if (documentSnapshot.data()?.userid === currentUserId) {
           const now = moment.utc();
           var end = JSON.parse(documentSnapshot.data().endDate);
           var days = now.diff(end, 'days');
@@ -85,13 +82,15 @@ const getSubscriptionDetails = async setIsSubscriptionValid => {
 };
 
 const SubscriptionPage = ({navigation}) => {
-  const dispatch = useDispatch();
   const [sub, setsub] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [modall, setModal] = React.useState(false);
   const [plan, setplan] = React.useState('Personal');
   const MyData = useSelector(state => state.counter.data);
+  const dispatch = useDispatch();
   const [loading, setloading] = React.useState(false);
-
+  const {confirmPayment} = useStripe();
+  const [cardData, setCardData] = React.useState('');
   const [businessSubscriptionPricing, setBusinessSubscriptionPricing] =
     React.useState(9.99);
   const [individualSubscriptionPricing, setIndividualSubscriptionPricing] =
@@ -104,25 +103,37 @@ const SubscriptionPage = ({navigation}) => {
       setBusinessSubscriptionPricing,
     );
   }, []);
-
-  const subdata = useSelector(state => state.sub.subdata);
   let uploadSubscription = () => {
     firestore()
       .collection('sub')
       .doc(MyData.UserID)
       .delete()
       .then(async () => {
-        console.log('Document successfully deleted!');
         await dispatch(SubDataAdd([]));
-        navigation.goBack();
-        setloading(false);
       })
       .catch(error => {
-        setloading(false);
-        setModalVisible(!modalVisible);
         console.error('Error removing document: ', error);
       });
   };
+  const subdata = useSelector(state => state.sub.subdata);
+  // let uploadSubscription = () => {
+  //   firestore()
+  //     .collection('sub')
+  //     .doc(MyData?.UserID)
+  //     .delete()
+  //     .then(async () => {
+  //       console.log('Document successfully deleted!');
+  //       await dispatch(SubDataAdd([]));
+  //       navigation.goBack();
+  //       setloading(false);
+  //     })
+  //     .catch(error => {
+  //       setloading(false);
+  //       // setModalVisible(!modalVisible);
+  //       console.error('Error removing document: ', error);
+  //     });
+  // };
+  // const paymentScreen = (amount, plan, email) => {
 
   return (
     <>
@@ -131,7 +142,7 @@ const SubscriptionPage = ({navigation}) => {
         visible={sub}
         onPress={() => {
           setsub(!sub);
-          setModalVisible(true);
+          setModal(true);
         }}
         Plan={plan}
       />
@@ -165,15 +176,19 @@ const SubscriptionPage = ({navigation}) => {
                 setloading(true);
                 axios
                   .get(
-                    `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData.email}`,
+                    `https://umeraftabdev.com/FreeTradeApi/public/api/subscriptions/cancel?email=${MyData?.email}`,
                   )
                   .then(res => {
+                    console.log(res?.data);
+                    setloading(false);
+                    Alert.alert('Subscription cancelled successfully!');
                     uploadSubscription();
                   })
                   .catch(err => {
+                    console.log(err);
                     setloading(false);
-                    setModalVisible(!modalVisible);
-                    uploadSubscription();
+                    // setModalVisible(!modalVisible);
+                    // uploadSubscription();
                   });
               }}
               style={styles.mainViewCC2}>
@@ -181,196 +196,68 @@ const SubscriptionPage = ({navigation}) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <>
+          <View>
+            <Text style={{...styles.mainText123, textAlign: 'center'}}>
+              You currently don't have any subscription
+            </Text>
             <View style={styles.MainContainer}>
-              <View style={{...styles.LastPageCC, marginBottom: 100}}>
-                <Text style={{...styles.mainText123, textAlign: 'center'}}>
-                  You currently don't have any subscription
-                </Text>
+              <View style={styles.planContainer}>
+                <TouchableOpacity
+                  style={styles.mainViewCC}
+                  onPress={() => {
+                    // setModalVisible(true)
+                    setplan('price_1N64c3KAtBxeYOh2sxd0LP36');
+                    setsub(!sub);
+                  }}>
+                  <Text style={styles.mainText123}>
+                    Personal Plan{' '}
+                    {priceFormatter(individualSubscriptionPricing)}
+                    /Month
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    // navigation.navigation('PaymentScree', {
+                    //   navigation,
+                    //   amount: MyData?.amount,
+                    //   onDone: () => {},
+                    //   onLoading: () => {},
+                    //   email: MyData?.email,
+
+                    //   data: MyData,
+                    // });
+                    // setModalVisible(true)
+                    setplan('price_1N64dIKAtBxeYOh2knKZAbOk');
+                    setsub(!sub);
+                  }}
+                  style={styles.mainViewCC}>
+                  <Text style={styles.mainText123}>
+                    Business Plan {priceFormatter(businessSubscriptionPricing)}
+                    /Month
+                  </Text>
+                  <Text style={styles.mainText1233}>
+                    Let’s grow your business!
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.mainViewCC}
-                onPress={() => {
-                  // setModalVisible(true)
-                  setplan('price_1N64c3KAtBxeYOh2sxd0LP36');
-                  setsub(!sub);
-                }}>
-                <Text style={styles.mainText123}>
-                  Personal Plan {priceFormatter(individualSubscriptionPricing)}
-                  /Month
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  // setModalVisible(true)
-                  setplan('price_1N64dIKAtBxeYOh2knKZAbOk');
-                  setsub(!sub);
-                }}
-                style={styles.mainViewCC}>
-                <Text style={styles.mainText123}>
-                  Business Plan {priceFormatter(businessSubscriptionPricing)}
-                  /Month
-                </Text>
-                <Text style={styles.mainText1233}>
-                  Let’s grow your business!
-                </Text>
-              </TouchableOpacity>
             </View>
-          </>
-        )}
-      </ImageBackground>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Stripe</Text>
-            <PaymentScreen
-              amount={
-                plan === '1.99$'
-                  ? individualSubscriptionPricing
-                  : businessSubscriptionPricing
-              }
-              plan={plan}
-              email={MyData.email}
-              onLoading={() => {
-                setloading(true);
-                setModalVisible(!modalVisible);
-              }}
-              onDone={() => {
-                setModalVisible(!modalVisible);
-                setloading(false);
-                // navigation.goBack();
-                if (plan === 'price_1N64c3KAtBxeYOh2sxd0LP36') {
-                  navigation.goBack();
-                } else {
-                  navigation.navigate('BussinessAccountEdits');
-                }
-              }}
-              onDone2={() => {
-                setModalVisible(!modalVisible);
-                setloading(false);
-              }}
-            />
-
-            <TouchableOpacity
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}>
-              <Text style={styles.textStyle}>Cancel</Text>
-            </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+        )}
+        <PaymentBottomSheet
+          modall={modall}
+          setModal={setModal}
+          setloading={setloading}
+          businessSubscriptionPricing={businessSubscriptionPricing}
+          individualSubscriptionPricing={individualSubscriptionPricing}
+          plan={plan}
+          MyData={MyData}
+        />
+      </ImageBackground>
     </>
   );
 };
 
 export default SubscriptionPage;
-
-function PaymentScreen({
-  navigation,
-  amount,
-  plan,
-  onDone,
-  onLoading,
-  email,
-  onDone2,
-}) {
-  const dispatch = useDispatch();
-  const {confirmPayment} = useStripe();
-  const MyData = useSelector(state => state.counter.data);
-  const [loading, setloading] = React.useState(false);
-  const [cardData, setCardData] = React.useState('');
-
-  const _createToken = async () => {
-    setloading(false);
-    axios
-      .get(
-        `https://umeraftabdev.com/FreeTradeApi/public/api/subscribe?card_number=${cardData.number}&email=${email}&sub_plan=${plan}&expiry=${cardData.expiry}&cvc=${cardData.cvc}`,
-      )
-      .then(res => {
-        if (res.data.message === 'Subscription created successfully') {
-          uploadSubscription();
-        }
-      })
-      .catch(err => {
-        setloading(false);
-        onDone2();
-        alert('Please re-check your Card & try again');
-      });
-  };
-
-  const MySubscriptionPackage = async () => {
-    let data = [];
-    await firestore()
-      .collection('sub')
-      .get()
-      .then(async querySnapshot => {
-        querySnapshot.forEach(documentSnapshot => {
-          if (documentSnapshot.data().userid === MyData.UserID) {
-            data.push(documentSnapshot.data());
-          }
-        });
-      });
-    await dispatch(SubDataAdd(data));
-    onDone();
-  };
-
-  let uploadSubscription = () => {
-    const now = moment.utc();
-    var end = moment().add(30, 'days');
-    var days = now.diff(end, 'days');
-
-    firestore()
-      .collection('sub')
-      .doc(MyData.UserID)
-      .set({
-        userid: MyData.UserID,
-        startDate: JSON.stringify(now),
-        endDate: JSON.stringify(end),
-        plan:
-          plan === 'price_1N64c3KAtBxeYOh2sxd0LP36' ? 'Personal' : 'Bussiness',
-        price: amount === 999 ? '9.99$' : '1.99',
-      })
-      .then(() => {
-        MySubscriptionPackage();
-      })
-      .catch(err => {
-        onDone2();
-      });
-  };
-
-  return (
-    <>
-      <View style={{width: '100%', height: '35%', justifyContent: 'center'}}>
-        <LiteCreditCardInput
-          onChange={({values}) => {
-            setCardData(values);
-          }}
-        />
-      </View>
-
-      <TouchableOpacity
-        style={[styles.button, styles.buttonClose]}
-        onPress={async () => {
-          onLoading();
-
-          _createToken();
-          // await uploadSubscription();
-        }}>
-        <Text style={styles.textStyle}>Submit</Text>
-      </TouchableOpacity>
-    </>
-  );
-}
 
 export {getSubscriptionTarriff};
 
@@ -380,6 +267,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'white',
   },
+  planContainer: {width: '90%', marginTop: h(1), height: h(40)},
   centeredView: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -414,7 +302,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   MainContainer: {
-    width: '90%',
+    width: '100%',
     height: '70%',
     // backgroundColor: 'red',
     alignSelf: 'center',
@@ -456,7 +344,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     width: w('100%'),
-    height: h('60%'),
+    height: h('100%'),
     backgroundColor: 'white',
     borderRadius: h('0.7%'),
     alignItems: 'center',
@@ -464,7 +352,7 @@ const styles = StyleSheet.create({
   },
   button: {
     elevation: 2,
-    marginBottom: h('2%'),
+    marginTop: h('2%'),
   },
   buttonOpen: {
     backgroundColor: '#F194FF',
@@ -494,5 +382,18 @@ const styles = StyleSheet.create({
     // backgroundColor: 'red',
     position: 'absolute',
     bottom: 0,
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    width: '100%',
+    height: '100%',
+    marginTop: h(2),
+    zIndex: 1,
+    position: 'absolute',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
 });

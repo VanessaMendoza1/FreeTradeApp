@@ -25,12 +25,17 @@ const ServiceItem = ({onPress, item}) => {
         <View style={styles.imgCC}>
           <View style={styles.BottomContainer}>
             <Text style={styles.BPTag}>{item.Title}</Text>
+            {item?.promoted && (
+              <Text style={styles.BPPromoted}>{item?.promoted}</Text>
+            )}
             {item.Discount !== 0 ? (
               <View style={styles.boxview}>
                 <Text style={styles.BPTag22}>
                   {item.Price !== '' ? priceFormatter(item.Price) : null}
                 </Text>
-                <Text style={styles.BPTag3}>{priceFormatter(item.Discount)}</Text>
+                <Text style={styles.BPTag3}>
+                  {priceFormatter(item.Discount)}
+                </Text>
               </View>
             ) : (
               <Text style={styles.BPTag2}>
@@ -96,7 +101,12 @@ const styles = StyleSheet.create({
   },
   BPTag: {
     color: '#fff',
-    fontSize: h('2%'),
+    fontSize: h('1.5%'),
+    fontWeight: 'bold',
+  },
+  BPPromoted: {
+    color: 'red',
+    fontSize: h('1.5%'),
     fontWeight: 'bold',
   },
   BPTag2: {

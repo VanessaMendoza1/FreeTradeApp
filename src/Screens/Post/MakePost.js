@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Colors from '../../utils/Colors';
 import {w, h} from 'react-native-responsiveness';
 import CheckBox from '@react-native-community/checkbox';
@@ -17,10 +17,13 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import firestore from '@react-native-firebase/firestore';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
 import VideoPlayer from 'react-native-video-player';
-
+import auth from '@react-native-firebase/auth';
+import moment from 'moment';
 import * as ImagePickers from 'react-native-image-picker';
 
 import {useSelector, useDispatch} from 'react-redux';
+import {SubDataAdd} from '../../redux/subSlicer';
+import axios from 'axios';
 
 const MakePost = ({navigation}) => {
   const [toggleCheckBox, setToggleCheckBox] = React.useState(true);
@@ -36,7 +39,7 @@ const MakePost = ({navigation}) => {
   const [VideoUrl, setVideoUrl] = React.useState('');
   const MyData = useSelector(state => state?.counter?.data);
   const subdata = useSelector(state => state?.sub?.subdata);
-
+  const [isSubscribed, setIsSubscribed] = useState(false);
   // images
 
   const [ImageOne, setImageOne] = React.useState('');
@@ -72,7 +75,9 @@ const MakePost = ({navigation}) => {
       setShowUploadBox(true);
     }
   };
-
+  useEffect(() => {
+    MySubscriptionPackage();
+  }, []);
   const openCamera = () => {
     setloading(true);
     ImagePicker.openCamera({
@@ -102,7 +107,7 @@ const MakePost = ({navigation}) => {
             alert('Something went wrong');
           },
           () => {
-            uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            uploadTask?.snapshot?.ref?.getDownloadURL()?.then(downloadURL => {
               setloading(false);
 
               if (ImageBoxNumber === 1) {
@@ -262,7 +267,34 @@ const MakePost = ({navigation}) => {
       },
     );
   };
-
+  const MySubscriptionPackage = async () => {
+    const currentUserId = auth().currentUser.uid;
+    let data = [];
+    await firestore()
+      .collection('sub')
+      .get()
+      .then(async querySnapshot => {
+        querySnapshot.forEach(documentSnapshot => {
+          console.log('days', currentUserId);
+          if (documentSnapshot.data()?.userid === MyData.UserID) {
+            console.log('days', 'days');
+            const now = moment.utc();
+            var end = documentSnapshot.data().endDate;
+            var days = now.diff(end, 'days');
+            console.log('days', end);
+            if (days >= 1) {
+              setloading(false);
+              setIsSubscribed(true);
+            } else {
+              setIsSubscribed(false);
+              setloading(false);
+              // data.push(documentSnapshot.data());
+            }
+          }
+        });
+      });
+    setloading(false);
+  };
   return (
     <>
       {loading ? (
@@ -709,6 +741,7 @@ const MakePost = ({navigation}) => {
                 ) : (
                   <Appbutton
                     onPress={() => {
+                      // return console.log(subdata);
                       alert('Please Subscribe to Make more Post');
                       navigation.navigate('SubscriptionPage');
                     }}

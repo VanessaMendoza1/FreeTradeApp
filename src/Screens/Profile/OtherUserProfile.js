@@ -87,11 +87,11 @@ const OtherUserProfile = ({navigation, route}) => {
     let userData = [];
     await firestore()
       .collection('Users')
-      .doc(route.params.data.UserID)
+      .doc(route?.params?.data?.UserID)
       .get()
       .then(async documentSnapshot => {
         if (documentSnapshot.exists) {
-          userData.push(documentSnapshot.data());
+          userData.push(documentSnapshot?.data());
         }
         await setUser(userData);
         setloading(false);
@@ -150,9 +150,10 @@ const OtherUserProfile = ({navigation, route}) => {
                         resizeMode: 'cover',
                       }}
                       source={{
-                        uri: route.params.data.image
-                          ? route.params.data.image
-                          : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
+                        uri:
+                          User?.length > 0
+                            ? User[0]?.image
+                            : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                       }}
                     />
                   </View>
@@ -211,7 +212,7 @@ const OtherUserProfile = ({navigation, route}) => {
                 {/* call button */}
                 <TouchableOpacity
                   onPress={() => {
-                    let phoneNumber = +923042323386;
+                    let phoneNumber = User[0]?.Phone;
                     Linking.openURL(`tel:${phoneNumber}`);
                   }}
                   style={styles.adminButton}>
@@ -233,14 +234,18 @@ const OtherUserProfile = ({navigation, route}) => {
                 </View>
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
-                <View style={styles.MainCCor}>
+                <TouchableOpacity
+                  onPress={() => {
+                    Linking.openURL('https://' + User[0].Website);
+                  }}
+                  style={styles.MainCCor}>
                   <View style={styles.IconCCR}>
                     <Icon name="globe" size={25} color={Colors.Primary} />
                   </View>
                   <View style={styles.IconCCR2}>
                     <Text style={styles.IIICTxt}>{User[0].Website}</Text>
                   </View>
-                </View>
+                </TouchableOpacity>
                 {/* iconLocation CC */}
                 {/* iconLocation CC */}
                 <View style={styles.MainCCor}>

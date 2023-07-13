@@ -85,10 +85,10 @@ const CreateMessage = ({navigation}) => {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          setMessage('Hi, could you send a video?');
+          setMessage('Hi, can we meet today?');
         }}
         style={styles.msgBtn}>
-        <Text style={styles.MsgTxt}>Hi, could you send a video?</Text>
+        <Text style={styles.MsgTxt}>Hi, can we meet today?</Text>
       </TouchableOpacity>
       {/* msg btn */}
       <TextInput

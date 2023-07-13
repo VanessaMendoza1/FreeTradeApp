@@ -29,19 +29,20 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import axios from 'axios';
 import {areNotificationsHidden} from '../../utils/appConfigurations';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
+import Reactotron from 'reactotron-react-native';
 
 const isItemLiked = (itemId, setLikedCallback) => {
   let currentUserId = auth().currentUser.uid;
   firestore()
     .collection('Favourite')
-    .where('productId', '==', itemId)
+    // .where('productId', '==', itemId)
     .get()
     .then(querySnapshot => {
       if (querySnapshot.size > 0) {
         querySnapshot.forEach(documentSnapshot => {
           let favouriteItem = documentSnapshot.data();
-          let usersWhoMadeItemFavourite = favouriteItem.users;
-          if (usersWhoMadeItemFavourite.includes(currentUserId)) {
+          let usersWhoMadeItemFavourite = favouriteItem?.users;
+          if (usersWhoMadeItemFavourite?.includes(currentUserId)) {
             setLikedCallback();
           }
         });
@@ -147,7 +148,8 @@ const OtherUserPostDetails = ({navigation, route}) => {
   );
 
   React.useEffect(() => {
-    isItemLiked(route.params.data.id, () => setheart(true));
+    Reactotron.log(route?.params?.data);
+    // isItemLiked(route?.params?.data?.id, () => setheart(true));
   }, []);
 
   const allImage = () => {
@@ -279,6 +281,7 @@ const OtherUserPostDetails = ({navigation, route}) => {
         seen: false,
         userID: route.params.data.user.UserID,
         text: userData.name + '  would like to trade!',
+        dateTime: new Date().toUTCString(),
       })
       .then(async () => {
         var data = JSON.stringify({
@@ -385,9 +388,9 @@ const OtherUserPostDetails = ({navigation, route}) => {
                 onPress={async () => {
                   if (!heart) {
                     await toggleMarkFavourite(
-                      route.params.data.id,
-                      route.params.data.Category,
-                      route.params.data.SubCategory,
+                      route?.params?.data?.id,
+                      route?.params?.data?.Category,
+                      route?.params?.data?.SubCategory,
                     );
                     setheart(true);
                   } else {

@@ -42,13 +42,13 @@ import VerificationDone from '../Screens/Settings/VerificationDone';
 import BussinessAccountEdits from '../Screens/Settings/BussinessAccountEdits';
 import SubscriptionPage from '../Screens/Settings/SubscriptionPage';
 import ImageScreen from '../Screens/Post/ImageScreen';
-import FavouriteItemsScreen from '../Screens/Settings/FavouriteItemsScreen'
-import AboutUsScreen from '../Screens/Settings/AboutUsScreen'
-import PrivacyPolicyScreen from '../Screens/Settings/PrivacyPolicyScreen'
-import TermsAndConditionsScreen from '../Screens/Settings/TermsAndConditionsScreen'
-import ContactUsScreen from '../Screens/Settings/ContactUsScreen'
+import FavouriteItemsScreen from '../Screens/Settings/FavouriteItemsScreen';
+import AboutUsScreen from '../Screens/Settings/AboutUsScreen';
+import PrivacyPolicyScreen from '../Screens/Settings/PrivacyPolicyScreen';
+import TermsAndConditionsScreen from '../Screens/Settings/TermsAndConditionsScreen';
+import ContactUsScreen from '../Screens/Settings/ContactUsScreen';
 import ToggleNotificationsScreen from '../Screens/Settings/ToggleNotificationsScreen';
-
+import PaymentScreen from '../Screens/PaymentCompnent/PaymentScreen';
 import TabNavigation from './TabNavigation';
 
 const Stack = createNativeStackNavigator();
@@ -92,9 +92,15 @@ const StackNavigation = () => {
         <Stack.Screen name="FavouriteItems" component={FavouriteItemsScreen} />
         <Stack.Screen name="AboutUs" component={AboutUsScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
-        <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} />
+        <Stack.Screen
+          name="TermsAndConditions"
+          component={TermsAndConditionsScreen}
+        />
         <Stack.Screen name="ContactUs" component={ContactUsScreen} />
-        <Stack.Screen name="ToggleNotifications" component={ToggleNotificationsScreen} />
+        <Stack.Screen
+          name="ToggleNotifications"
+          component={ToggleNotificationsScreen}
+        />
         <Stack.Screen
           name="BussinessAccountEdits"
           component={BussinessAccountEdits}
@@ -103,6 +109,7 @@ const StackNavigation = () => {
         <Stack.Screen name="ForgetPassword" component={ForgetPassword} />
         <Stack.Screen name="LocationPage" component={LocationPage} />
         <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

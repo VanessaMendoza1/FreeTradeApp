@@ -22,6 +22,7 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import MsgComponent from '../../Components/MsgComponent';
 import {useFocusEffect} from '@react-navigation/native';
+import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
 
 const msgvalid = txt => txt && txt.replace(/\s/g, '').length;
 
@@ -188,11 +189,12 @@ const Inbox = ({navigation, route}) => {
   }, [receiverData.roomId]);
 
   return (
-    <ScrollView
-      // automaticallyAdjustKeyboardInsets={true}
-      keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingScrollView
+    // automaticallyAdjustKeyboardInsets={true}
+    >
       <View style={styles.MainContainer}>
         {/* header */}
+
         <View style={styles.Header}>
           <TouchableOpacity
             onPress={() => {
@@ -257,7 +259,7 @@ const Inbox = ({navigation, route}) => {
           </View>
         </View>
         {/* header */}
-
+        {/* <KeyboardAvoidingScrollView contentContainerStyle={{flex: 1}}> */}
         <View style={{flex: 1}}>
           <FlatList
             style={{flex: 1}}
@@ -322,12 +324,13 @@ const Inbox = ({navigation, route}) => {
               Keyboard.dismiss();
               sendMsg(msg, setMsg, setdisabled, userData, receiverData);
             }}>
-            <Icon name="chatbubbles" size={25} color={'#fff'} />
-            <Text style={{color: '#fff', fontSize: 18}}>Send</Text>
+            <Icon name="send" size={25} color={'#fff'} />
+            {/* <Text style={{color: '#fff', fontSize: 18}}>Send</Text> */}
           </TouchableOpacity>
         </View>
+        {/* </KeyboardAvoidingScrollView> */}
       </View>
-    </ScrollView>
+    </KeyboardAvoidingScrollView>
   );
 };
 
@@ -338,7 +341,7 @@ export {sendMsg};
 const styles = StyleSheet.create({
   MainContainer: {
     width: '100%',
-    height: h('95%'),
+    height: h('90%'),
     backgroundColor: '#fff',
   },
   Header: {

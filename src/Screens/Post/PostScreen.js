@@ -9,6 +9,7 @@ import {
   Share,
   FlatList,
   Platform,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import {w, h} from 'react-native-responsiveness';
@@ -35,39 +36,37 @@ import {useFocusEffect} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 import {priceFormatter} from '../../utils/helpers/helperFunctions';
+import Reactotron from 'reactotron-react-native';
+import reactotron from 'reactotron-react-native';
 
 const PostScreen = ({navigation, route}) => {
   const [loading, setloading] = React.useState(false);
   const [Sitem, setSitem] = React.useState([]);
   const [VideoAd, setVideoAd] = React.useState([]);
   const [RText, setRText] = React.useState('');
-  const userData = useSelector(state => state.counter.data);
+  const userData = useSelector(state => state.counter?.data);
 
-  const AllPostData = useSelector(state => state.post.PostData);
+  const AllPostData = useSelector(state => state.post?.PostData);
   const VideoData = useSelector(state => state.ads.VideoData);
   const subdata = useSelector(state => state.sub.subdata);
   const [heart, setheart] = React.useState(false);
   const [mode, setmode] = React.useState(false);
   const [imgeUrl, setimgeUrl] = React.useState(
-    route.params.data.images[0]
-      ? route.params.data.images[0]
+    route.params?.data?.images?.length > 0 && route.params?.data?.images[0]
+      ? route.params?.data?.images[0]
       : 'https://images.unsplash.com/photo-1595341888016-a392ef81b7de?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=879&q=80',
   );
   const [imgeUrl2, setimgeUrl2] = React.useState([]);
   const [Notii, setNotii] = React.useState(
-    route.params.data.Notification !== ''
-      ? route.params.data.Notification
+    route?.params?.data?.Notification !== ''
+      ? route?.params?.data?.Notification
       : 123123123,
   );
-  const data = route.params.data;
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log(
-        'Focussed PostScreen.js, running allImage isItemLiked getSimilarItems',
-      );
       allImage();
-      isItemLiked(route.params.data.id, () => setheart(true));
+      isItemLiked(route?.params?.data?.id, () => setheart(true));
       getSimilarItems();
       return () => null;
     }, []),
@@ -75,12 +74,11 @@ const PostScreen = ({navigation, route}) => {
 
   const allImage = () => {
     let data = [];
-    route.params.data.images.map(item => {
+    route?.params?.data?.images?.map(item => {
       if (item !== '') {
-        data.push(item);
+        data?.push(item);
       }
     });
-    console.log({SETTING: data});
     setimgeUrl2(data);
   };
 
@@ -165,8 +163,8 @@ const PostScreen = ({navigation, route}) => {
     let similarItems = [];
     await firestore()
       .collection('Post')
-      .where('Category', '==', data.Category)
-      .where('SubCategory', '==', data.SubCategory)
+      .where('Category', '==', route?.params?.data?.Category)
+      .where('SubCategory', '==', route?.params?.data?.SubCategory)
       .get()
       .then(async querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
@@ -180,18 +178,18 @@ const PostScreen = ({navigation, route}) => {
   };
 
   const randomItem = () => {
-    const arr = AllPostData.map(a => ({sort: 3, value: a}))
+    const arr = AllPostData?.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
 
-    setSitem(arr.slice(0, 3));
+    setSitem(arr?.slice(0, 3));
   };
 
   const randomItem2 = () => {
-    const arr = VideoData.map(a => ({sort: 3, value: a}))
+    const arr = VideoData?.map(a => ({sort: 3, value: a}))
       .sort((a, b) => a.sort - b.sort)
       .map(a => a.value);
-    setVideoAd(arr.slice(0, 1));
+    setVideoAd(arr?.slice(0, 1));
   };
 
   const sendreport = () => {
@@ -200,15 +198,18 @@ const PostScreen = ({navigation, route}) => {
       .collection('Reports')
       .doc()
       .set({
-        UserName: userData.name,
-        UserID: userData.UserID,
+        UserName: userData?.name,
+        UserID: userData?.UserID,
         ReportText: RText !== '' ? RText : 'No Text added',
         Date: new Date().toLocaleDateString(),
-        PostName: route.params.data.Title,
-        PostId: route.params.data.DocId,
-        PostImage: route.params.data.images,
-        PostOwner: route.params.data.user.name,
-        PostOwnerEmail: route.params.data.user.email,
+        PostName: route?.params?.data?.Title,
+        PostId: route?.params?.data?.DocId,
+        PostImage:
+          route?.params?.data?.images.length > 0
+            ? route?.params?.data?.images
+            : [],
+        PostOwner: route?.params?.data?.user?.name,
+        PostOwnerEmail: route?.params?.data?.user?.email,
       })
       .then(async () => {
         setmode(false);
@@ -226,10 +227,14 @@ const PostScreen = ({navigation, route}) => {
       .doc()
       .set({
         seen: false,
-        userID: route.params.data.user.UserID,
+        userID: userData.UserID,
+        receiverId: route?.params?.data?.user?.UserID,
         text:
           userData.name +
           '  would like to trade with you, click to see profile!',
+        dateTime: new Date().toUTCString(),
+        postId: route?.params?.data?.DocId,
+        image: route?.params?.data?.images[0],
       })
       .then(async () => {
         var data = JSON.stringify({
@@ -257,7 +262,7 @@ const PostScreen = ({navigation, route}) => {
             console.log(JSON.stringify(response.data));
             areNotificationsHidden(
               callBackIfNotificationsNotHidden,
-              route.params.data.user.UserID,
+              route?.params?.data?.user?.UserID,
             );
             navigation.goBack();
             alert('Trade Offer Sent');
@@ -270,6 +275,7 @@ const PostScreen = ({navigation, route}) => {
   };
 
   React.useEffect(() => {
+    reactotron.log(route?.params?.data?.Price);
     randomItem();
     randomItem2();
     allImage();
@@ -334,17 +340,17 @@ const PostScreen = ({navigation, route}) => {
                 onPress={async () => {
                   if (!heart) {
                     await toggleMarkFavourite(
-                      route.params.data.id,
-                      route.params.data.Category,
-                      route.params.data.SubCategory,
+                      route.params?.data?.id,
+                      route.params?.data?.Category,
+                      route.params?.data?.SubCategory,
                     );
                     setheart(true);
                   } else {
                     let isForRemovingFromFavourites = true;
                     await toggleMarkFavourite(
-                      route.params.data.id,
-                      route.params.data.Category,
-                      route.params.data.SubCategory,
+                      route.params?.data?.id,
+                      route.params?.data?.Category,
+                      route.params?.data?.SubCategory,
                       isForRemovingFromFavourites,
                     );
                     setheart(false);
@@ -363,7 +369,7 @@ const PostScreen = ({navigation, route}) => {
 
           <View>
             <FlatList
-              data={route.params.data.images}
+              data={route?.params?.data?.images}
               renderItem={item => {
                 if (item.item != '') {
                   return (
@@ -389,27 +395,27 @@ const PostScreen = ({navigation, route}) => {
           </View>
 
           <View style={styles.HeadingTextContainer}>
-            <Text style={styles.HeadingText}>{route.params.data.Title}</Text>
-            {route.params.data.Discount !== 0 ? (
+            <Text style={styles.HeadingText}>{route?.params?.data?.Title}</Text>
+            {route?.params?.data?.Discount !== 0 ? (
               <View style={styles.Discountbox}>
                 <Text style={styles.HeadingText33}>
-                  {priceFormatter(route.params.data.Discount)}
+                  {priceFormatter(route?.params?.data?.Discount)}
                 </Text>
                 <Text style={styles.HeadingText22}>
-                  {route.params.data.Price !== '' &&
-                    priceFormatter(route.params.data.Price)}
+                  {route?.params?.data?.Price !== '' &&
+                    priceFormatter(route?.params?.data?.Price)}
                 </Text>
               </View>
             ) : (
               <Text style={styles.HeadingText}>
-                {route.params.data.Price !== '' &&
-                  priceFormatter(route.params.data.Price)}
+                {route?.params?.data?.Price !== '' &&
+                  priceFormatter(route?.params?.data?.Price)}
               </Text>
             )}
           </View>
           <View style={styles.HeadingTextContainer2}>
             <Text style={styles.HeadingText2}>
-              {route.params.data.user.location}
+              {route?.params?.data?.user?.location}
             </Text>
           </View>
           <View style={styles.HeadingTextContainer2}>
@@ -419,13 +425,13 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer2222}>
             <Text style={styles.HeadingText3}>Condition: </Text>
             <Text style={styles.HeadingText2}>
-              {route.params.data.Condition}
+              {route?.params?.data?.Condition}
             </Text>
           </View>
 
           {/* imges */}
           <View style={styles.ImgesContainer}>
-            {route.params.data.images.map((item, index) => (
+            {route?.params?.data?.images?.map((item, index) => (
               <>
                 {item !== '' ? (
                   <TouchableOpacity
@@ -450,7 +456,7 @@ const PostScreen = ({navigation, route}) => {
                 ) : null}
               </>
             ))}
-            {route.params.data.images.length > !0 && (
+            {route?.params?.data?.images?.length < 1 && (
               <>
                 <Text>No image available</Text>
               </>
@@ -458,7 +464,7 @@ const PostScreen = ({navigation, route}) => {
           </View>
           {/* imges */}
 
-          {route.params.data.videUrl && (
+          {route?.params?.data?.videUrl && (
             <>
               <View style={styles.HeadingTextContainer22232}>
                 <Text>Video</Text>
@@ -468,7 +474,7 @@ const PostScreen = ({navigation, route}) => {
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate('ImageScreen', {
-                      data: route.params.data.videUrl,
+                      data: route?.params?.data?.videUrl,
                       video: true,
                     });
                   }}
@@ -488,7 +494,7 @@ const PostScreen = ({navigation, route}) => {
 
           <View style={styles.HeadingTextContainer3}>
             <Text style={styles.HeadingText4}>
-              {route.params.data.Description}
+              {route?.params?.data?.Description}
             </Text>
           </View>
 
@@ -501,8 +507,8 @@ const PostScreen = ({navigation, route}) => {
                 <Image
                   style={{width: '100%', height: '100%', resizeMode: 'cover'}}
                   source={{
-                    uri: route.params.data.user.image
-                      ? route.params.data.user.image
+                    uri: route?.params?.data?.user?.image
+                      ? route?.params?.data?.user?.image
                       : 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
                   }}
                 />
@@ -511,18 +517,20 @@ const PostScreen = ({navigation, route}) => {
             {/* img */}
             {/* rating */}
             <View style={styles.RatingContianer}>
-              <Text style={styles.NameC}>{route.params.data.user.name}</Text>
               <Text style={styles.NameC}>
-                {route.params.data.user.location}
+                {route?.params?.data?.user?.name}
+              </Text>
+              <Text style={styles.NameC}>
+                {route?.params?.data?.user?.location}
               </Text>
 
-              {route.params.data.user.reviews.length > 0 && (
+              {route?.params?.data?.user?.reviews?.length > 0 && (
                 <View style={styles.HeadingTextContainer45}>
                   <View style={styles.HeartContainer}>
                     <Icon name="star" size={20} color="gold" />
                   </View>
                   <Text style={styles.HeadingText5}>
-                    {route.params.data.user.reviews.length}
+                    {route?.params?.data?.user?.reviews?.length}
                   </Text>
                 </View>
               )}
@@ -530,7 +538,7 @@ const PostScreen = ({navigation, route}) => {
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate('OtherUserProfile', {
-                  data: route.params.data.user,
+                  data: route?.params?.data?.user,
                 });
               }}
               style={styles.RatingContianer2}>
@@ -547,53 +555,30 @@ const PostScreen = ({navigation, route}) => {
           <View style={styles.HeadingTextContainer5}>
             <TouchableOpacity
               onPress={() => {
-                const currentUserId = auth().currentUser.uid;
-                if (route.params.data.UserID == currentUserId) {
+                const currentUserId = auth()?.currentUser?.uid;
+                if (route?.params?.data?.UserID === currentUserId) {
                   alert("You are the owner of this item, can't send message !");
                   return;
                 }
-                // TEMPORARILY ADDED
-                // navigation.navigate('StartConversation', {
-                //   data: route.params.data,
-                //   receiverData: {
-                //     // roomId,
-                //     // lastMsg: txt,
-                //     // route.params.data.user.image
-                //     id: route.params.data.UserID,
-                //     name: route.params.data.name,
-                //     img: route.params.data.image,
-                //     emailId: route.params.data.email,
-                //     about: route.params.data.Bio,
-                //     Token: route.params.data.NotificationToken,
-
-                //     itemPrice: route.params.data.Price,
-                //     itemImage: route.params.data.images[0],
-                //     sellersName: route.params.data.user.name,
-                //     sellersImage: route.params.data.user.image,
-                //   },
-                // });
                 console.log({subdata});
                 if (subdata.length > 0) {
-                  // createChatList(route.params.data.user);
-                  // console.log({ID1: route.params.data.UserID, ID2: currentUserId,})
-
                   navigation.navigate('StartConversation', {
-                    data: route.params.data,
+                    data: route.params?.data,
                     receiverData: {
-                      // roomId,
-                      // lastMsg: txt,
-                      // route.params.data.user.image
-                      id: route.params.data.UserID,
-                      name: route.params.data.name,
-                      img: route.params.data.image,
-                      emailId: route.params.data.email,
-                      about: route.params.data.Bio,
-                      Token: route.params.data.NotificationToken,
+                      id: route?.params?.data?.UserID,
+                      name: route?.params?.data?.name,
+                      img: route?.params?.data?.image,
+                      emailId: route?.params?.data?.email,
+                      about: route?.params?.data?.Bio,
+                      Token: route?.params?.data?.NotificationToken,
 
-                      itemPrice: route.params.data.Price,
-                      itemImage: route.params.data.images[0],
-                      sellersName: route.params.data.user.name,
-                      sellersImage: route.params.data.user.image,
+                      itemPrice: route?.params?.data?.Price,
+                      itemImage:
+                        route?.params?.data?.images?.length > 0
+                          ? route?.params?.data?.images[0]
+                          : '',
+                      sellersName: route?.params?.data?.name,
+                      sellersImage: route?.params?.data?.image,
                     },
                   });
                 } else {
@@ -609,18 +594,20 @@ const PostScreen = ({navigation, route}) => {
             <TouchableOpacity
               onPress={() => {
                 const currentUserId = auth().currentUser.uid;
-                console.log({THIS: route.params.data.UserID, currentUserId});
-                if (route.params.data.UserID == currentUserId) {
+                console.log({THIS: route?.params?.data?.UserID, currentUserId});
+                if (route?.params?.data?.UserID == currentUserId) {
                   alert("You are the owner of this item, can't send message !");
                   return;
                 }
                 // TEMPORARILY ADDED
                 // NotificationSystem();
                 if (subdata.length > 0) {
-                  if (route.params.data.PostType === 'Trading') {
+                  if (route?.params?.data?.PostType === 'Trading') {
                     NotificationSystem();
                   } else {
-                    navigation.navigate('SendOffer', {data: route.params.data});
+                    navigation.navigate('SendOffer', {
+                      data: route?.params?.data,
+                    });
                   }
                 } else {
                   // alert('You need to buy Subscription');
@@ -629,9 +616,9 @@ const PostScreen = ({navigation, route}) => {
               }}
               style={styles.AskButton2}>
               <Text style={styles.FontCOlor2}>
-                {route.params.data.PostType === 'Trading'
+                {route?.params?.data?.PostType === 'Trading'
                   ? 'Let’s Trade'
-                  : 'Send offer'}{' '}
+                  : 'Send offer'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -644,14 +631,14 @@ const PostScreen = ({navigation, route}) => {
                 uri:
                   VideoAd.length > 0
                     ? VideoAd[0]?.AdGraphicLink
-                    : VideoAd.length > 0
+                    : VideoAd?.length > 0
                     ? VideoAd[0]?.AdGraphicLink
                     : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
               }}
               autoplay
               paused={false}
               controls={true}
-              resizeMode={'contain'}
+              resizeMode={'cover'}
               thumbnail={{
                 uri: 'https://i.picsum.photos/id/866/1600/900.jpg',
               }}
@@ -660,23 +647,23 @@ const PostScreen = ({navigation, route}) => {
           <TouchableOpacity
             onPress={() => {
               navigation.navigate('OtherUserProfile', {
-                data: VideoAd[0].user,
+                data: VideoAd[0]?.user,
               });
             }}>
             <View style={styles.overlay}>
               <Text style={styles.videoShoesTag}>
-                {VideoAd.length > 0 ? VideoAd[0]?.title : ''}
+                {VideoAd?.length > 0 ? VideoAd[0]?.title : ''}
               </Text>
               <Text style={styles.videoShoesTag2}>
-                {VideoAd.length > 0 ? VideoAd[0]?.TagLine : ''}
+                {VideoAd?.length > 0 ? VideoAd[0]?.TagLine : ''}
               </Text>
 
               <Text style={styles.MainText2}>
-                {VideoAd.length > 0 ? VideoAd[0]?.user?.Address : ''}
+                {VideoAd?.length > 0 ? VideoAd[0]?.user?.Address : ''}
               </Text>
-              {VideoAd.length > 0 && VideoAd[0].user?.Phone !== undefined && (
+              {VideoAd?.length > 0 && VideoAd[0]?.user?.Phone !== undefined && (
                 <Text style={styles.MainText2}>
-                  Call: {VideoAd.length > 0 ? VideoAd[0]?.user?.Phone : ''}
+                  Call: {VideoAd?.length > 0 ? VideoAd[0]?.user?.Phone : ''}
                 </Text>
               )}
             </View>
@@ -686,35 +673,36 @@ const PostScreen = ({navigation, route}) => {
             <Text style={styles.SimiliarText}>Similar Items</Text>
           </View>
           <View style={styles.HeadingTextContainer8}>
-            {Sitem.length >= 1 && (
+            {Sitem?.length >= 1 && (
               <FlatList
                 data={Sitem}
                 horizontal={true}
                 renderItem={({item}) => {
-                  // console.log({item})
-                  if (item.images) {
-                    return (
-                      <TouchableOpacity
-                        onPress={() => {
-                          navigation.push('PostScreen', {data: item});
-                          // handleScrollToTop();
-                        }}
-                        style={styles.ServiceItemContainer}>
-                        <ImageBackground
-                          style={styles.img}
-                          source={{
-                            uri: item.images[0]
-                              ? item.images[0]
-                              : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                          }}>
-                          <View style={styles.imgCC2}>
-                            <View style={styles.BottomContainer}>
-                              <Text style={styles.BPTag}>{item.Title}</Text>
+                  if (route?.params?.data?.DocId !== item?.DocId) {
+                    if (item.images) {
+                      return (
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.push('PostScreen', {data: item});
+                            // handleScrollToTop();
+                          }}
+                          style={styles.ServiceItemContainer}>
+                          <ImageBackground
+                            style={styles.img}
+                            source={{
+                              uri: item?.images[0]
+                                ? item?.images[0]
+                                : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
+                            }}>
+                            <View style={styles.imgCC2}>
+                              <View style={styles.BottomContainer}>
+                                <Text style={styles.BPTag}>{item?.Title}</Text>
+                              </View>
                             </View>
-                          </View>
-                        </ImageBackground>
-                      </TouchableOpacity>
-                    );
+                          </ImageBackground>
+                        </TouchableOpacity>
+                      );
+                    }
                   }
                 }}
               />

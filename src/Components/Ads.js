@@ -1,13 +1,16 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {w, h} from 'react-native-responsiveness';
 import {formatPhoneNumber} from '../utils/phoneNumberFormatter';
 import Colors from '../utils/Colors';
+import {useIsFocused} from '@react-navigation/native';
 
 let img =
   'https://images.unsplash.com/photo-1659095141570-be8b9aff59ce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80';
 
 const Ads = ({data, onPress}) => {
+  const isFoucsed = useIsFocused();
+  useEffect(() => {}, [isFoucsed]);
   return (
     <TouchableOpacity onPress={onPress} style={styles.MainContainer}>
       <View style={styles.ImageContainer}>
@@ -32,9 +35,9 @@ const Ads = ({data, onPress}) => {
           </>
         )}
         {data.title && <Text style={styles.MainText}>{data.title}</Text>}
-        {data.TagLine && (
+        {data?.TagLine && (
           <Text style={{...styles.MainText3, color: 'red'}}>
-            {data.TagLine}
+            {data?.TagLine}
           </Text>
         )}
 

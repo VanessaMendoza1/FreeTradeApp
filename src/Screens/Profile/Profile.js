@@ -38,7 +38,9 @@ const Profile = ({navigation}) => {
   const TradingAllData = useSelector(state => state.mypost.MyTradingData);
 
   const subdata = useSelector(state => state.sub.subdata);
-
+  useEffect(() => {
+    console.log('MyData1', MyData);
+  }, []);
   const allmypost = async () => {
     const currentUserId = auth().currentUser.uid;
     let SellingData = [];
@@ -200,17 +202,16 @@ const Profile = ({navigation}) => {
                 </View>
 
                 <View style={styles.HeadingTextContainer45}>
-                  <View style={styles.HeartContainer}>
-                    <Icon
-                      name="star"
-                      size={20}
-                      color={MyData?.reviews > 0 ? 'gold' : 'grey'}
-                    />
-                  </View>
+                  <Icon
+                    name="star"
+                    size={20}
+                    color={MyData?.reviews > 0 ? 'gold' : 'grey'}
+                    style={{alignSelf: 'center'}}
+                  />
                   {MyData?.reviews > 0 ? (
-                    <Text style={styles.HeadingText5}>{MyData?.reviews}</Text>
+                    <Text style={[styles.HeadingText5]}>{MyData?.reviews}</Text>
                   ) : (
-                    <Text style={styles.HeadingText5}>Not ratted yet</Text>
+                    <Text style={styles.HeadingText5}>Not rated yet</Text>
                   )}
                 </View>
 
@@ -249,9 +250,62 @@ const Profile = ({navigation}) => {
             </View>
           </View>
           {/* profileHeader */}
-
           <View style={styles.linebar} />
+          {MyData?.AccountType === 'Bussiness' && (
+            <View style={styles.adminMode}>
+              {/* call button */}
+              <TouchableOpacity
+                onPress={() => {
+                  let phoneNumber = MyData?.Phone;
+                  Linking.openURL(`tel:${phoneNumber}`);
+                }}
+                style={styles.adminButton}>
+                <Icon name="call" size={25} color="#ffff" />
+                <Text style={styles.numberadmin}>
+                  +{formatPhoneNumber(MyData.Phone)}
+                </Text>
+              </TouchableOpacity>
+              {/* call button */}
 
+              {/* iconLocation CC */}
+              <View style={styles.MainCCor}>
+                <View style={styles.IconCCR}>
+                  <Icon name="location" size={25} color={Colors.Primary} />
+                </View>
+                <View style={styles.IconCCR2}>
+                  <Text style={styles.IIICTxt}>{MyData.Address}</Text>
+                </View>
+              </View>
+              {/* iconLocation CC */}
+              {/* iconLocation CC */}
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL('https://' + MyData.Website);
+                }}
+                style={styles.MainCCor}>
+                <View style={styles.IconCCR}>
+                  <Icon name="globe" size={25} color={Colors.Primary} />
+                </View>
+                <View style={styles.IconCCR2}>
+                  <Text style={styles.IIICTxt}>{MyData.Website}</Text>
+                </View>
+              </TouchableOpacity>
+              {/* iconLocation CC */}
+              {/* iconLocation CC */}
+              <View style={styles.MainCCor}>
+                <View style={styles.IconCCR}>
+                  <Icon name="calendar" size={25} color={Colors.Primary} />
+                </View>
+                <View style={styles.IconCCR2}>
+                  <Text style={styles.IIICTxt}>
+                    {MyData.bussinessHoursFrom} - {MyData.bussinessHoursto} &{' '}
+                    {MyData.bussinessdaysFrom} - {MyData.bussinessdaysto}{' '}
+                  </Text>
+                </View>
+              </View>
+              {/* iconLocation CC */}
+            </View>
+          )}
           {subdata.length < 0 && subdata[0].plan === 'Bussiness' && (
             // {true && (
             <>
@@ -636,11 +690,12 @@ const styles = StyleSheet.create({
   HeadingTextContainer45: {
     width: '50%',
     // backgroundColor: 'orange',
-    height: h('2.5%'),
+    height: h('3%'),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingLeft: h('1%'),
+    alignContent: 'center',
   },
   HeartContainer2: {
     width: '90%',
@@ -766,5 +821,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  HeadingText5: {marginHorizontal: 5, width: '100%'},
+  HeadingText5: {
+    marginHorizontal: 5,
+    width: '100%',
+    marginTop: 1,
+  },
 });
