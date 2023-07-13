@@ -824,5 +824,6 @@ const styles = StyleSheet.create({
   HeadingText5: {
     marginHorizontal: 5,
     width: '100%',
+    marginTop: 1,
   },
 });

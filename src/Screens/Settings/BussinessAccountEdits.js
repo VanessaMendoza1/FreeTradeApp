@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Modal,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import Colors from '../../utils/Colors';
@@ -24,6 +25,7 @@ import LoadingScreen from '../../Components/LoadingScreen';
 import {openPhoto, openCamera, updateDetails} from './EditAccount';
 import auth from '@react-native-firebase/auth';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const heightDropItem = 40;
 
@@ -226,6 +228,19 @@ const BussinessAccountEdits = () => {
   };
 
   const UpdateData = () => {
+    // if (Business === '' || Address === '' || Website === '' || Phone === '') {
+    //   return Alert.alert('Please fill all the fields');
+    // }
+    // if (
+    //   value === undefined ||
+    //   value === null ||
+    //   closedOnDayModalValue === undefined ||
+    //   closedOnDayModalValue === null ||
+    //   value2 === undefined ||
+    //   value2 === null
+    // ) {
+    //   return Alert.alert('Please selecte business hours and closing day');
+    // }
     const currentUserId = auth().currentUser.uid;
     setloading(true);
     if (
@@ -242,15 +257,15 @@ const BussinessAccountEdits = () => {
         .collection('Users')
         .doc(currentUserId)
         .update({
-          BusinessName: Business,
-          Address: Address,
-          Website: Website,
-          Phone: Phone,
-          bussinessdaysFrom: value3,
-          bussinessdaysto: value4,
-          closedDays: closedOnDayModalValue,
-          bussinessHoursFrom: value,
-          bussinessHoursto: value2,
+          BusinessName: Business ? Business : '',
+          Address: Address ? Address : '',
+          Website: Website ? Website : '',
+          Phone: Phone ? Phone : '',
+          bussinessdaysFrom: value3 ? value3 : '',
+          bussinessdaysto: value4 ? value4 : '',
+          closedDays: closedOnDayModalValue ? closedOnDayModalValue : '',
+          bussinessHoursFrom: value ? value : '',
+          bussinessHoursto: value2 ? value2 : '',
           AccountType: 'Bussiness',
           BussinessDetails: true,
         })
@@ -318,7 +333,7 @@ const BussinessAccountEdits = () => {
   };
 
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView>
       {loading ? (
         <LoadingScreen />
       ) : (
@@ -468,6 +483,7 @@ const BussinessAccountEdits = () => {
               placeholder={'Phone Number'}
               placeholderTextColor={Colors.Primary}
               onChangeText={e => sePhone(e)}
+              keyboardType="phone-pad"
               value={Phone}
             />
 
@@ -743,7 +759,7 @@ const BussinessAccountEdits = () => {
           </View>
         </View>
       </Modal>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

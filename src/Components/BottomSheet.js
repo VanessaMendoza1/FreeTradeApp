@@ -1,6 +1,6 @@
 import BottomSheet from '@gorhom/bottom-sheet';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {LiteCreditCardInput} from 'react-native-credit-card-input';
 import axios from 'axios';
@@ -399,6 +399,7 @@ const styles = StyleSheet.create({
     width: w('100%'),
     height: h('100%'),
     backgroundColor: '#0008',
+    top: Platform.OS === 'ios' ? '9%' : 0,
   },
   Header: {
     width: '100%',
